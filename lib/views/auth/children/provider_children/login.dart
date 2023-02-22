@@ -3,16 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:seizhtv/extensions/string.dart';
 import 'package:seizhtv/globals/labeled_textfield.dart';
 import 'package:seizhtv/globals/palette.dart';
+import 'package:z_m3u_handler/z_m3u_handler.dart';
 
 class LoginProvider extends StatefulWidget {
-  const LoginProvider({super.key});
-
+  const LoginProvider(
+      {super.key, required this.loadingCallback, required this.userCallback});
+  final ValueChanged<bool> loadingCallback;
+  final ValueChanged<CredentialProvider> userCallback;
   @override
   State<LoginProvider> createState() => _LoginProviderState();
 }
 
 class _LoginProviderState extends State<LoginProvider> with ColorPalette {
   final GlobalKey<FormState> _kForm = GlobalKey<FormState>();
+  final M3uFirebaseAuthService _auth = M3uFirebaseAuthService.instance;
   late final TextEditingController _email, _password;
   @override
   void initState() {
@@ -86,6 +90,17 @@ class _LoginProviderState extends State<LoginProvider> with ColorPalette {
               color: orange,
               onPressed: () async {
                 FocusScope.of(context).unfocus();
+
+                if (_kForm.currentState!.validate()) {
+                  widget.loadingCallback(true);
+                  await _auth.login(_email.text, _password.text).then((value) {
+                    if (value != null) {
+                      widget.userCallback(value);
+                    }
+                  }).onError((error, stackTrace) {
+                    widget.loadingCallback(false);
+                  });
+                }
               },
               child: Text(
                 "LOGIN",

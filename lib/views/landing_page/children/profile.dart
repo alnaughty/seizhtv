@@ -61,7 +61,9 @@ class _ProfilePageState extends State<ProfilePage>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(refId ?? "Unknown"),
+                          Text(user != null
+                              ? user!.displayName ?? refId ?? "Unknown"
+                              : refId ?? "Unknown"),
                           // Container(
                           //   margin: const EdgeInsets.all(3),
                           //   height: 25,

@@ -97,10 +97,8 @@ class _CustomPlayerState extends State<CustomPlayer> with ColorPalette {
   @override
   void dispose() {
     // TODO: implement dispose
-    if (_chewieWidget != null) {
-      _videoController.dispose();
-      _chewieController.dispose();
-    }
+    _videoController.dispose();
+    _chewieController.dispose();
     super.dispose();
   }
 

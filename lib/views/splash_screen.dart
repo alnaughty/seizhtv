@@ -15,6 +15,7 @@ class _SplashScreenState extends State<SplashScreen> {
   final DataCacher _cacher = DataCacher.instance;
   Future<void> check() async {
     refId = _cacher.refId;
+    user = _cacher.m3uUser;
     await Future.delayed(const Duration(milliseconds: 1500));
     if (refId == null) {
       // ignore: use_build_context_synchronously

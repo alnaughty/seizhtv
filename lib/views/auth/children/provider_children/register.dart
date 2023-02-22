@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:seizhtv/extensions/string.dart';
 import 'package:seizhtv/globals/labeled_textfield.dart';
 import 'package:seizhtv/globals/palette.dart';
+import 'package:z_m3u_handler/z_m3u_handler.dart';
 
 class RegisterProvider extends StatefulWidget {
-  const RegisterProvider({super.key});
+  const RegisterProvider(
+      {super.key, required this.loadingCallback, required this.userCallback});
+  final ValueChanged<bool> loadingCallback;
+  final ValueChanged<CredentialProvider> userCallback;
 
   @override
   State<RegisterProvider> createState() => _RegisterProviderState();
@@ -13,6 +17,7 @@ class RegisterProvider extends StatefulWidget {
 class _RegisterProviderState extends State<RegisterProvider> with ColorPalette {
   final GlobalKey<FormState> _kForm = GlobalKey<FormState>();
   late final TextEditingController _email, _password, _url;
+  final M3uFirebaseAuthService _auth = M3uFirebaseAuthService.instance;
   @override
   void initState() {
     // TODO: implement initState
@@ -102,6 +107,18 @@ class _RegisterProviderState extends State<RegisterProvider> with ColorPalette {
             color: orange,
             onPressed: () async {
               FocusScope.of(context).unfocus();
+              if (_kForm.currentState!.validate()) {
+                widget.loadingCallback(true);
+                await _auth
+                    .register(_email.text, _password.text, _url.text)
+                    .then((value) {
+                  if (value != null) {
+                    widget.userCallback(value);
+                  }
+                }).onError((error, stackTrace) {
+                  widget.loadingCallback(false);
+                });
+              }
             },
             child: Text(
               "REGISTER",

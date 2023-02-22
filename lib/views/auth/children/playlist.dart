@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
@@ -62,8 +64,7 @@ class _LoadPlaylistState extends State<LoadPlaylist>
     }
     if (mounted) setState(() {});
     _vm.populate(data);
-    // ignore: use_build_context_synchronously
-    Navigator.pushReplacementNamed(context, "/landing_page");
+    Navigator.pushReplacementNamed(context, "/landing-page");
     print(data);
   }
 
@@ -86,7 +87,9 @@ class _LoadPlaylistState extends State<LoadPlaylist>
             label = "Extracting data ${x.ceil()}%";
             if (mounted) setState(() {});
           },
-        ).then(onSuccess);
+        ).then((value) async {
+          await onSuccess(value);
+        });
       } else {
         Fluttertoast.showToast(
           msg: "Please upload a file",
@@ -114,7 +117,9 @@ class _LoadPlaylistState extends State<LoadPlaylist>
       }, onFinished: () {
         _isLoading = false;
         if (mounted) setState(() {});
-      }).then(onSuccess);
+      }).then((value) async {
+        await onSuccess(value);
+      });
     }
   }
 

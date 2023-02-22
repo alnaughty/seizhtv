@@ -1,3 +1,4 @@
+import 'package:seizhtv/models/m3u_user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DataCacher {
@@ -12,6 +13,28 @@ class DataCacher {
   Future<void> clearData() async {
     await removePlaylistName();
     await removeRefID();
+  }
+
+  Future<bool> removeM3uUser() async =>
+      await sharedPreferences.remove("m3u-user");
+  Future<void> saveM3uUser(M3uUser user) async {
+    await sharedPreferences.setStringList("m3u-user", [
+      user.uid,
+      user.email ?? "",
+      user.displayName ?? "",
+      user.photoUrl ?? ""
+    ]);
+  }
+
+  M3uUser? get m3uUser {
+    final List<String>? _d = sharedPreferences.getStringList("m3u-user");
+    if (_d == null) return null;
+    return M3uUser(
+      displayName: _d[2].isEmpty ? null : _d[2],
+      email: _d[1].isEmpty ? null : _d[1],
+      photoUrl: _d[3].isEmpty ? null : _d[3],
+      uid: _d[0],
+    );
   }
 
   /// REFERENCE ID FUNCTIONS
