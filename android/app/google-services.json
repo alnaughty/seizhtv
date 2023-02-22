@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "238590285701",
+    "project_id": "seizhtv",
+    "storage_bucket": "seizhtv.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:238590285701:android:20118df3f07df8486fd6ec",
+        "android_client_info": {
+          "package_name": "com.studioseizh.seizhtv"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "238590285701-dkkrsiom02b57ild2d5atmvo20tsmlf3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASu2AfX5k2bDKlfFvVcRHpz2hb8yI2_9o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "238590285701-dkkrsiom02b57ild2d5atmvo20tsmlf3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "238590285701-0p6l7m09gfmt98h0lnmcbgblcqaklo0h.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.studioseizh.seizhtv"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
