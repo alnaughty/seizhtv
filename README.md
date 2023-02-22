@@ -1,6 +1,6 @@
 # seizhtv
 
-A new Flutter project.
+An IPTV app built by Studio Seizh
 
 ## Getting Started
 
