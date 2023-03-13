@@ -9,6 +9,7 @@ import 'package:seizhtv/globals/data.dart';
 import 'package:seizhtv/globals/favorite_button.dart';
 import 'package:seizhtv/globals/network_image_viewer.dart';
 import 'package:seizhtv/globals/palette.dart';
+import 'package:seizhtv/globals/video_loader.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
 
 class SeriesDetails extends StatefulWidget {
@@ -18,7 +19,8 @@ class SeriesDetails extends StatefulWidget {
   State<SeriesDetails> createState() => _SeriesDetailsState();
 }
 
-class _SeriesDetailsState extends State<SeriesDetails> with ColorPalette {
+class _SeriesDetailsState extends State<SeriesDetails>
+    with ColorPalette, VideoLoader {
   static final Favorites _vm = Favorites.instance;
   static final ZM3UHandler _handler = ZM3UHandler.instance;
   fetchFav() async {

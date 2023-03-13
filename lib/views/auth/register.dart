@@ -9,23 +9,19 @@ import 'package:seizhtv/globals/loader.dart';
 import 'package:seizhtv/globals/logo.dart';
 import 'package:seizhtv/globals/palette.dart';
 import 'package:seizhtv/globals/ui_additional.dart';
+import 'package:seizhtv/models/m3u_user.dart';
 import 'package:seizhtv/services/google_sign_in.dart';
-import 'package:seizhtv/views/auth/children/load_mac_address.dart';
-import 'package:seizhtv/views/auth/children/load_playlist.dart';
-import 'package:seizhtv/views/auth/register.dart';
 import 'package:seizhtv/views/landing_page/source_management.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
 
-import '../../models/m3u_user.dart';
-
-class MainAuthPage extends StatefulWidget {
-  const MainAuthPage({super.key});
+class MainRegisterPage extends StatefulWidget {
+  const MainRegisterPage({super.key});
 
   @override
-  State<MainAuthPage> createState() => _MainAuthPageState();
+  State<MainRegisterPage> createState() => _MainRegisterPageState();
 }
 
-class _MainAuthPageState extends State<MainAuthPage>
+class _MainRegisterPageState extends State<MainRegisterPage>
     with UIAdditional, ColorPalette {
   final GlobalKey<FormState> _kForm = GlobalKey<FormState>();
   final M3uFirebaseAuthService _auth = M3uFirebaseAuthService.instance;
@@ -70,7 +66,7 @@ class _MainAuthPageState extends State<MainAuthPage>
                   const Hero(
                     tag: "auth-logo",
                     child: LogoSVG(
-                      bottomText: "Login with credentials",
+                      bottomText: "Register with Us",
                     ),
                   ),
                   Form(
@@ -119,7 +115,7 @@ class _MainAuthPageState extends State<MainAuthPage>
                         _isLoading = true;
                         if (mounted) setState(() {});
                         await _auth
-                            .login(_email.text, _password.text)
+                            .register(_email.text, _password.text, "")
                             .then((u) async {
                           if (u != null) {
                             refId = u.user.uid;
@@ -147,7 +143,7 @@ class _MainAuthPageState extends State<MainAuthPage>
                     color: orange,
                     height: 55,
                     child: Center(
-                      child: Text("Login".toUpperCase()),
+                      child: Text("Register".toUpperCase()),
                     ),
                   ),
                   const SizedBox(
@@ -155,19 +151,13 @@ class _MainAuthPageState extends State<MainAuthPage>
                   ),
                   Text.rich(
                     TextSpan(
-                      text: "Don't have an account yet? ",
+                      text: "Already have an account? ",
                       children: [
                         TextSpan(
-                          text: "Register",
+                          text: "Login",
                           recognizer: TapGestureRecognizer()
-                            ..onTap = () async {
-                              await Navigator.push(
-                                context,
-                                PageTransition(
-                                  child: const MainRegisterPage(),
-                                  type: PageTransitionType.leftToRight,
-                                ),
-                              );
+                            ..onTap = () {
+                              Navigator.of(context).pop();
                             },
                           style: TextStyle(
                             color: orange,
@@ -244,49 +234,11 @@ class _MainAuthPageState extends State<MainAuthPage>
                           "Login with Google",
                           style: TextStyle(
                             color: Colors.black,
-                            fontSize: 15,
                           ),
                         )
                       ],
                     ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  button2(
-                    title: "Load your playlist (File/URL)",
-                    assetPath: "assets/icons/folder.svg",
-                    onPressed: () async {
-                      await Navigator.push(
-                        context,
-                        PageTransition(
-                          child: const LoadWithPlaylist(),
-                          type: PageTransitionType.leftToRight,
-                        ),
-                      );
-                    },
-                    foregroundColor: Colors.black,
-                  ),
-                  // const SizedBox(
-                  //   height: 10,
-                  // ),
-                  // button2(
-                  //   title: "Login with your MAC Address",
-                  //   assetPath: "assets/icons/mac.svg",
-                  //   onPressed: () async {
-                  //     await Navigator.push(
-                  //       context,
-                  //       PageTransition(
-                  //         child: const LoadWithMacAddress(),
-                  //         type: PageTransitionType.leftToRight,
-                  //       ),
-                  //     );
-                  //   },
-                  //   foregroundColor: Colors.black,
-                  // ),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  )
                 ],
               ),
             ),

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:seizhtv/views/auth/children/playlist.dart';
-import 'package:seizhtv/views/auth/children/provider.dart';
 import 'package:seizhtv/views/auth/main_auth.dart';
+import 'package:seizhtv/views/landing_page/children/home_children/history.dart';
 import 'package:seizhtv/views/landing_page/children/profile.dart';
+import 'package:seizhtv/views/landing_page/children/search/search_live.dart';
+import 'package:seizhtv/views/landing_page/children/search/search_movies.dart';
+import 'package:seizhtv/views/landing_page/children/search/search_series.dart';
 import 'package:seizhtv/views/landing_page/children/series_children/series_details.dart';
 import 'package:seizhtv/views/landing_page/main_landing_page.dart';
 import 'package:seizhtv/views/splash_screen.dart';
@@ -16,6 +19,34 @@ class Routes {
   static const Duration _transitionDuration = Duration(milliseconds: 500);
   Route<dynamic>? Function(RouteSettings) settings = (RouteSettings settings) {
     switch (settings.name) {
+      case "/search-live-page":
+        return PageTransition(
+          child: const SearchLive(),
+          type: PageTransitionType.rightToLeft,
+          duration: _transitionDuration,
+          reverseDuration: _transitionDuration,
+        );
+      case "/search-movies-page":
+        return PageTransition(
+          child: const SearchMovies(),
+          type: PageTransitionType.rightToLeft,
+          duration: _transitionDuration,
+          reverseDuration: _transitionDuration,
+        );
+      case "/search-series-page":
+        return PageTransition(
+          child: const SearchSeries(),
+          type: PageTransitionType.rightToLeft,
+          duration: _transitionDuration,
+          reverseDuration: _transitionDuration,
+        );
+      case "/history-page":
+        return PageTransition(
+          child: const HistoryPage(),
+          type: PageTransitionType.rightToLeft,
+          duration: _transitionDuration,
+          reverseDuration: _transitionDuration,
+        );
       case "/series-details":
         final ClassifiedData data = settings.arguments as ClassifiedData;
         return PageTransition(
@@ -47,13 +78,7 @@ class Routes {
           duration: _transitionDuration,
           reverseDuration: _transitionDuration,
         );
-      case "/provider-login":
-        return PageTransition(
-          child: const ProviderLogin(),
-          type: PageTransitionType.rightToLeft,
-          duration: _transitionDuration,
-          reverseDuration: _transitionDuration,
-        );
+
       case "/auth":
         return PageTransition(
           child: const MainAuthPage(),

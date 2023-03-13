@@ -12,6 +12,10 @@ class Favorites {
   Stream<CategorizedM3UData> get stream => _subject.stream;
   CategorizedM3UData get current => _subject.value;
 
+  void dispose() {
+    _subject = BehaviorSubject<CategorizedM3UData>();
+  }
+
   void populate(CategorizedM3UData data) {
     _subject.add(data);
   }
@@ -38,7 +42,11 @@ class Favorites {
         populate(_f);
         return;
       case "live":
-        _f.live.add(entry);
+        _f.live
+            .where((element) => element.name == entry.attributes['title-clean'])
+            .first
+            .data
+            .add(entry);
         populate(_f);
         return;
     }
@@ -65,7 +73,11 @@ class Favorites {
         populate(_f);
         return;
       case "live":
-        _f.live.removeWhere((element) => element.link == entry.link);
+        _f.live
+            .where((element) => element.name == entry.attributes['title-clean'])
+            .first
+            .data
+            .removeWhere((element) => element.link == entry.link);
         populate(_f);
         return;
     }

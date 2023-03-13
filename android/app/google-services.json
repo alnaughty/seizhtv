@@ -14,7 +14,23 @@
       },
       "oauth_client": [
         {
-          "client_id": "238590285701-dkkrsiom02b57ild2d5atmvo20tsmlf3.apps.googleusercontent.com",
+          "client_id": "238590285701-6hpa9club692jsbsme2qm9dqiu9qc7ae.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.studioseizh.seizhtv",
+            "certificate_hash": "568dd9f6352562a7b019949540834ca67e650ae0"
+          }
+        },
+        {
+          "client_id": "238590285701-e748safg142cagqj094e5ae7sh46juh0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.studioseizh.seizhtv",
+            "certificate_hash": "720760fb51efee9760bb9650e01004b44c1e8cc7"
+          }
+        },
+        {
+          "client_id": "238590285701-09c6j3cd853b57i30e0bsf3de8e5fas4.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -27,7 +43,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "238590285701-dkkrsiom02b57ild2d5atmvo20tsmlf3.apps.googleusercontent.com",
+              "client_id": "238590285701-09c6j3cd853b57i30e0bsf3de8e5fas4.apps.googleusercontent.com",
               "client_type": 3
             },
             {

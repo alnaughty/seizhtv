@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart' as cup;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:seizhtv/data_containers/favorites.dart';
+import 'package:seizhtv/data_containers/history.dart';
 import 'package:seizhtv/data_containers/loaded_m3u_data.dart';
 import 'package:seizhtv/globals/data.dart';
 import 'package:seizhtv/globals/data_cacher.dart';
@@ -26,7 +29,9 @@ class _MainLandingPageState extends State<MainLandingPage> with ColorPalette {
   final ZM3UHandler _handler = ZM3UHandler.instance;
   final LoadedM3uData _vm = LoadedM3uData.instance;
   final Favorites _favVm = Favorites.instance;
+  final History _hisVm = History.instance;
   late final PageController _controller;
+  final GlobalKey<ZNavbarState> _kNavState = GlobalKey<ZNavbarState>();
   final List<ZTab> _tabs = [
     ZTabImage(
       text: "Home",
@@ -56,16 +61,40 @@ class _MainLandingPageState extends State<MainLandingPage> with ColorPalette {
       imgType: ZImageType.svgAsset,
     ),
   ];
-  final List<Widget> _content = [
-    const HomePage(),
+  late final List<Widget> _content = [
+    HomePage(
+      onPagePressed: (int page) async {
+        _kNavState.currentState!.updateIndex(page);
+        await _controller.animateToPage(
+          page,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      },
+    ),
     const LivePage(),
     const MoviePage(),
     const SeriesPage(),
     const FavoritesPage(),
   ];
-  initPlatform() async {
-    print("REFID : $refId");
-    await _handler
+  Future<void> initPlatform() async {
+    String? file = _cacher.filePath;
+    refId = _cacher.refId;
+    if (mounted) setState(() {});
+    if (file == null) {
+      await Navigator.pushReplacementNamed(context, "/auth");
+      await _cacher.clearData();
+      return;
+    }
+    await _handler.getData(File(file)).then((value) async {
+      if (value == null) {
+        await Navigator.pushReplacementNamed(context, "/auth");
+        await _cacher.clearData();
+      } else {
+        _vm.populate(value);
+      }
+    });
+    _handler
         .getDataFrom(type: CollectionType.favorites, refId: refId!)
         .then((value) {
       if (value != null) {
@@ -73,21 +102,24 @@ class _MainLandingPageState extends State<MainLandingPage> with ColorPalette {
         _favVm.populate(value);
       }
     });
-
-    await _handler
+    _handler
         .getDataFrom(type: CollectionType.history, refId: refId!)
-        .then((value) => null);
-    await _handler.savedData.then((v) {
-      if (v == null) return;
-      print("SAVED DATA : $v");
-      _vm.populate(v);
+        .then((value) {
+      if (value != null) {
+        print("FETCH DATA FROM HISTORY: $value");
+        _hisVm.populate(value);
+      }
     });
   }
 
   @override
   void initState() {
     _controller = PageController();
-    initPlatform();
+    refId = _cacher.refId;
+    print("REF ID : $refId");
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await initPlatform();
+    });
     // TODO: implement initState
     super.initState();
   }
@@ -103,7 +135,7 @@ class _MainLandingPageState extends State<MainLandingPage> with ColorPalette {
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     return Scaffold(
-      backgroundColor: Colors.red,
+      backgroundColor: card,
       // body: ZTab,
       body: PageView.builder(
         controller: _controller,
@@ -111,6 +143,7 @@ class _MainLandingPageState extends State<MainLandingPage> with ColorPalette {
         itemBuilder: (_, i) => _content[i],
       ),
       bottomNavigationBar: ZNavbar(
+        key: _kNavState,
         indicatorColor: orange,
         backgroundColor: highlight,
         activeColor: white,

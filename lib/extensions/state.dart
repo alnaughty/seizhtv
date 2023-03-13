@@ -1,7 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:seizhtv/globals/data.dart';
 import 'package:seizhtv/globals/palette.dart';
 
 extension EXT on State {
@@ -78,32 +80,49 @@ extension EXT on State {
     );
   }
 
-  Widget appbar(int index, {bool showLeading = false, Widget? title}) {
+  Widget appbar(int index,
+      {bool showLeading = false, Widget? title, Function()? onSearchPressed}) {
     return AppBar(
       elevation: 0,
       backgroundColor: Colors.transparent,
       foregroundColor: palette.white,
       automaticallyImplyLeading: showLeading,
       actions: [
-        IconButton(
-          onPressed: () {},
-          icon: SvgPicture.asset(
-            "assets/icons/search.svg",
-            height: 25,
-            width: 25,
-            color: palette.white,
+        if (index > 0) ...{
+          IconButton(
+            // onPressed: () async {
+            //   if (index == 1) {
+            //     await Navigator.pushNamed(context, "/search-live-page");
+            //   } else if (index == 2) {
+            //     await Navigator.pushNamed(context, "/search-movies-page");
+            //   } else {
+            //     await Navigator.pushNamed(context, "/search-series-page");
+            //   }
+            // },
+            onPressed: onSearchPressed,
+            icon: SvgPicture.asset(
+              "assets/icons/search.svg",
+              height: 25,
+              width: 25,
+              color: palette.white,
+            ),
           ),
-        ),
+        },
         Center(
           child: ClipRRect(
+            borderRadius: BorderRadius.circular(50),
             child: Container(
               width: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: palette.white,
-              ),
+              height: 40,
+              color: Colors.white,
+              // decoration: BoxDecoration(
+              //   shape: BoxShape.circle,
+              //   color: palette.white,
+              //   image: DecorationImage(image: user!.photoUrl == null ? AssetImage("assetName") : )
+              // ),
               child: MaterialButton(
                 height: 40,
+                padding: EdgeInsets.zero,
                 onPressed: () {
                   Navigator.pushNamed(context, "/profile-page"
                       // MaterialPageRoute(
@@ -111,6 +130,19 @@ extension EXT on State {
                       // ),
                       );
                 },
+                child: user?.photoUrl == null
+                    ? Image.asset(
+                        "assets/icons/default-picture.jpeg",
+                        height: 40,
+                        width: 40,
+                        fit: BoxFit.cover,
+                      )
+                    : CachedNetworkImage(
+                        imageUrl: user!.photoUrl!,
+                        height: 40,
+                        width: 40,
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
           ),

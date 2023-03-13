@@ -1,49 +1,80 @@
 import 'package:flutter/material.dart';
-import 'package:seizhtv/data_containers/favorites.dart';
-import 'package:seizhtv/extensions/color.dart';
-import 'package:seizhtv/extensions/state.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:seizhtv/data_containers/history.dart';
 import 'package:seizhtv/globals/data.dart';
 import 'package:seizhtv/globals/loader.dart';
 import 'package:seizhtv/globals/network_image_viewer.dart';
 import 'package:seizhtv/globals/palette.dart';
 import 'package:seizhtv/globals/video_loader.dart';
-import 'package:seizhtv/views/custom_player.dart';
 import 'package:seizhtv/views/landing_page/children/live_children/live_details.dart';
 import 'package:seizhtv/views/landing_page/children/movie_children/movie_details.dart';
 import 'package:seizhtv/views/landing_page/children/series_children/series_details_sheet.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
-import 'package:z_m3u_handler/src/helpers/db_regx.dart';
+// import 'package:z_m3u_handler/src/helpers/db_regx.dart';
 
-class FavoritesPage extends StatefulWidget {
-  const FavoritesPage({super.key});
+class HistoryPage extends StatefulWidget {
+  const HistoryPage({super.key});
 
   @override
-  State<FavoritesPage> createState() => _FavoritesPageState();
+  State<HistoryPage> createState() => _HistoryPageState();
 }
 
-class _FavoritesPageState extends State<FavoritesPage>
-    with ColorPalette, DBRegX, VideoLoader {
-  final Favorites _vm = Favorites.instance;
-  static final ZM3UHandler _handler = ZM3UHandler.instance;
-  fetchFav() async {
+class _HistoryPageState extends State<HistoryPage>
+    with ColorPalette, VideoLoader {
+  final ZM3UHandler _handler = ZM3UHandler.instance;
+  final History _vm = History.instance;
+  Future<void> fetch() async {
     await _handler
-        .getDataFrom(type: CollectionType.favorites, refId: refId!)
+        .getDataFrom(type: CollectionType.history, refId: refId!)
         .then((value) {
       if (value != null) {
-        print("FETCH DATA FROM FAV: $value");
+        print("FETCH DATA FROM HISTORY: $value");
         _vm.populate(value);
       }
     });
   }
 
   @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await fetch();
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: card,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
-        child: appbar(4),
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        title: Row(
+          children: [
+            SvgPicture.asset(
+              "assets/images/logo-full.svg",
+              height: 25,
+              color: orange,
+            ),
+            Container(
+              margin: const EdgeInsets.symmetric(
+                horizontal: 10,
+              ),
+              height: 25,
+              width: 1.5,
+              color: Colors.white.withOpacity(.5),
+            ),
+            Text(
+              "History".toUpperCase(),
+              style: TextStyle(
+                color: white,
+                fontSize: 15,
+                height: 1,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
       body: StreamBuilder<CategorizedM3UData>(
           stream: _vm.stream,
@@ -60,8 +91,8 @@ class _FavoritesPageState extends State<FavoritesPage>
             final List<ClassifiedData> _series = _result.series;
             final List<ClassifiedData> _live = _result.live;
             if (_live.isEmpty && _series.isEmpty && _result.movies.isEmpty) {
-              return Center(
-                child: Text("No data added to favorites"),
+              return const Center(
+                child: Text("No data added to history"),
               );
             }
             return ListView(
@@ -122,53 +153,7 @@ class _FavoritesPageState extends State<FavoritesPage>
                       ),
                       itemCount: _live.length,
                     ),
-                  ),
-                  // SizedBox(
-                  //   width: double.maxFinite,
-                  //   height: 100,
-                  //   child: ListView.separated(
-                  //     padding: const EdgeInsets.symmetric(horizontal: 20),
-                  //     scrollDirection: Axis.horizontal,
-                  //     itemBuilder: (_, i) {
-                  //       final ClassifiedData _e = _live[i];
-                  //       return ClipRRect(
-                  //         borderRadius: BorderRadius.circular(10),
-                  //         child: GestureDetector(
-                  //           onTap: () async {
-                  //             // await showModalBottomSheet(
-                  //             //     context: context,
-                  //             //     isDismissible: true,
-                  //             //     backgroundColor: Colors.transparent,
-                  //             //     constraints: const BoxConstraints(
-                  //             //       maxHeight: 230,
-                  //             //     ),
-                  //             //     builder: (_) {
-                  //             //       return LiveDetails(
-                  //             //         onLoadVideo: () async {
-                  //             //           Navigator.of(context).pop(null);
-                  //             //           await loadVideo(context, _e);
-                  //             //           await _e.addToHistory(refId!);
-                  //             //         },
-                  //             //         entry: _e,
-                  //             //       );
-                  //             //     });
-                  //           },
-                  //           // child: NetworkImageViewer(
-                  //           //   url: _e.attributes['tvg-logo']!,
-                  //           //   width: 130,
-                  //           //   height: 100,
-                  //           //   color: card,
-                  //           //   fit: BoxFit.cover,
-                  //           // ),
-                  //         ),
-                  //       );
-                  //     },
-                  //     separatorBuilder: (_, i) => const SizedBox(
-                  //       width: 10,
-                  //     ),
-                  //     itemCount: _live.length,
-                  //   ),
-                  // )
+                  )
                 },
                 if (_result.movies.isNotEmpty) ...{
                   const Padding(
@@ -205,7 +190,7 @@ class _FavoritesPageState extends State<FavoritesPage>
                                     ),
                                     builder: (_) {
                                       return MovieDetails(
-                                        data: _result.movies[i],
+                                        data: _entry,
                                         onLoadVideo: (M3uEntry entry) async {
                                           Navigator.of(context).pop(null);
                                           entry.addToHistory(refId!);

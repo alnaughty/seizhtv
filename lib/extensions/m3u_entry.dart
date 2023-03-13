@@ -23,7 +23,11 @@ extension ENTRY on M3uEntry {
               .toList()
               .contains(link);
         case "live":
-          return _f.live.map((element) => element.link).toList().contains(link);
+          return _f.live
+              .expand((element) => element.data)
+              .map((element) => element.link)
+              .toList()
+              .contains(link);
         default:
           return false;
       }

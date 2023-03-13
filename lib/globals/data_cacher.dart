@@ -1,20 +1,65 @@
+import 'dart:io';
+
+import 'package:seizhtv/data_containers/favorites.dart';
+import 'package:seizhtv/data_containers/history.dart';
+import 'package:seizhtv/globals/data.dart';
 import 'package:seizhtv/models/m3u_user.dart';
+import 'package:seizhtv/services/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DataCacher {
   DataCacher._private();
   static final DataCacher _instance = DataCacher._private();
+  static final GoogleSignInService _google = GoogleSignInService.instance;
   static DataCacher get instance => _instance;
   static late final SharedPreferences sharedPreferences;
+  final Favorites _favVm = Favorites.instance;
+  final History _hisVm = History.instance;
+  Future<void> saveLoginType(int i) async => await sharedPreferences.setInt(
+        "login-type",
+        i,
+      );
+  Future<void> saveDate(String data) async =>
+      await sharedPreferences.setString("date", data);
+  Future<void> removeData() async => await sharedPreferences.remove("date");
+  DateTime? get date {
+    final String? d = sharedPreferences.getString("date");
+    if (d == null) return null;
+    return DateTime.parse(d);
+  }
+
+  Future<void> removeLoginType() async =>
+      await sharedPreferences.remove("login-type");
+  int? get savedLoginType => sharedPreferences.getInt("login-type");
   Future<void> init() async {
     sharedPreferences = await SharedPreferences.getInstance();
   }
 
+  Future<void> saveFile(File file) async =>
+      await sharedPreferences.setString("file", file.path);
+  String? get filePath => sharedPreferences.getString("file");
+  Future<void> removeFile() async => await sharedPreferences.remove('file');
   Future<void> clearData() async {
-    await removePlaylistName();
-    await removeRefID();
+    _favVm.dispose();
+    _hisVm.dispose();
+    if (savedLoginType == 1) {
+      await _google.signOut();
+    }
+    user = null;
+    await Future.wait([
+      removePlaylistName(),
+      removeRefID(),
+      removeUrl(),
+      removeFile(),
+      removeLoginType(),
+      removeM3uUser()
+    ]);
   }
 
+  Future<void> saveUrl(String url) async =>
+      await sharedPreferences.setString("url", url);
+  String? get savedUrl => sharedPreferences.getString("url");
+  Future<void> removeUrl() async => await sharedPreferences.remove("url");
   Future<bool> removeM3uUser() async =>
       await sharedPreferences.remove("m3u-user");
   Future<void> saveM3uUser(M3uUser user) async {

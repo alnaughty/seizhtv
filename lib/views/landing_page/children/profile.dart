@@ -1,11 +1,14 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:seizhtv/globals/data.dart';
 import 'package:seizhtv/globals/data_cacher.dart';
 import 'package:seizhtv/globals/loader.dart';
 import 'package:seizhtv/globals/palette.dart';
 import 'package:seizhtv/globals/ui_additional.dart';
 import 'package:seizhtv/models/option.dart';
+import 'package:seizhtv/views/landing_page/source_management.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -42,17 +45,24 @@ class _ProfilePageState extends State<ProfilePage>
                 width: double.infinity,
                 child: Row(
                   children: [
-                    SizedBox(
-                      width: 120,
-                      child: Container(
-                        width: 80,
-                        height: 80,
-                        decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                                image: AssetImage("assets/images/user 1.png"),
-                                fit: BoxFit.contain)),
-                      ),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(60),
+                      child: user?.photoUrl == null
+                          ? Image.asset(
+                              "assets/icons/default-picture.jpeg",
+                              height: 80,
+                              width: 80,
+                              fit: BoxFit.cover,
+                            )
+                          : CachedNetworkImage(
+                              imageUrl: user!.photoUrl!,
+                              height: 80,
+                              width: 80,
+                              fit: BoxFit.cover,
+                            ),
                     ),
                     const SizedBox(
                       width: 10,
@@ -116,13 +126,16 @@ class _ProfilePageState extends State<ProfilePage>
                   Option(
                     icon: "assets/icons/epg.svg",
                     title: "EPG",
-                    onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => const EPGPage(),
-                      //   ),
-                      // );
+                    onPressed: () async {
+                      await Navigator.push(
+                        context,
+                        PageTransition(
+                          child: const SourceManagementPage(
+                            fromInit: false,
+                          ),
+                          type: PageTransitionType.leftToRight,
+                        ),
+                      );
                     },
                   ),
                   Option(

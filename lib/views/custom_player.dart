@@ -1,9 +1,10 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, use_build_context_synchronously
 
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:seizhtv/extensions/color.dart';
 import 'package:seizhtv/globals/loader.dart';
 import 'package:seizhtv/globals/palette.dart';
 import 'package:video_player/video_player.dart';
@@ -15,6 +16,7 @@ class CustomPlayer extends StatefulWidget {
     required this.id,
     required this.name,
     required this.image,
+    this.isLive = false,
     required this.popOnError,
   }) : super(key: key);
   String? id;
@@ -23,6 +25,7 @@ class CustomPlayer extends StatefulWidget {
   final String image;
   final String name;
   // final String path;
+  final bool isLive;
   @override
   State<CustomPlayer> createState() => _CustomPlayerState();
 }
@@ -48,12 +51,33 @@ class _CustomPlayerState extends State<CustomPlayer> with ColorPalette {
           autoPlay: true,
           looping: false,
           showControls: true,
-          // isLive: true,
+          isLive: widget.isLive,
           allowFullScreen: true,
-          // allowMuting: true,
           allowPlaybackSpeedChanging: true,
           allowedScreenSleep: false,
           showOptions: true,
+          additionalOptions: (_) => [
+            OptionItem(
+              onTap: () async {
+                Navigator.of(context).pop(null);
+                await Future.delayed(const Duration(milliseconds: 200));
+                Navigator.of(context).pop(null);
+              },
+              iconData: Icons.cancel_presentation_rounded,
+              title: "Close",
+            ),
+          ],
+          materialProgressColors: ChewieProgressColors(
+            bufferedColor: orange.darken(),
+            playedColor: orange,
+          ),
+          cupertinoProgressColors: ChewieProgressColors(
+            bufferedColor: orange.darken(),
+            playedColor: orange,
+          ),
+          placeholder: const SeizhTvLoader(
+            hasBackgroundColor: false,
+          ),
           deviceOrientationsAfterFullScreen: [
             DeviceOrientation.portraitUp,
           ],
@@ -61,6 +85,7 @@ class _CustomPlayerState extends State<CustomPlayer> with ColorPalette {
         _chewieWidget = Chewie(
           controller: _chewieController,
         );
+        if (mounted) setState(() {});
       });
       // _videoController.
 
@@ -98,7 +123,9 @@ class _CustomPlayerState extends State<CustomPlayer> with ColorPalette {
   void dispose() {
     // TODO: implement dispose
     _videoController.dispose();
-    _chewieController.dispose();
+    if (_chewieWidget != null) {
+      _chewieController.dispose();
+    }
     super.dispose();
   }
 
@@ -109,9 +136,14 @@ class _CustomPlayerState extends State<CustomPlayer> with ColorPalette {
       return LayoutBuilder(builder: (context, c) {
         final double w = c.maxWidth;
         return _chewieWidget != null
-            ? AspectRatio(
-                aspectRatio: _videoController.value.aspectRatio,
-                child: _chewieWidget,
+            ? Container(
+                width: w,
+                height: c.maxHeight,
+                color: Colors.black,
+                child: AspectRatio(
+                  aspectRatio: _videoController.value.aspectRatio,
+                  child: _chewieWidget,
+                ),
               )
             : unableToPlay
                 ? ClipRRect(
