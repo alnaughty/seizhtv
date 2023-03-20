@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:seizhtv/globals/data.dart';
 import 'package:seizhtv/globals/data_cacher.dart';
@@ -207,7 +208,47 @@ class _LoadWithPlaylistState extends State<LoadWithPlaylist>
                             itemCount: _sources.length,
                           );
                         }),
-                    const LoadPlaylist()
+                    const LoadPlaylist(),
+                    MaterialButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      height: 50,
+                      color: Colors.white,
+                      child: const Center(
+                          child: Text(
+                        "Cancel",
+                        style: TextStyle(color: Colors.black),
+                      )),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 30),
+                      child: RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          text:
+                              'By using this application, you agree to the \n',
+                          style: const TextStyle(
+                            fontSize: 14,
+                          ),
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: 'Terms & Conditions',
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  print('Terms & Conditions');
+                                },
+                              style: TextStyle(
+                                height: 1.3,
+                                color: ColorPalette().orange,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

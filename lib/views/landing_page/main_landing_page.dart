@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart' as cup;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:seizhtv/data_containers/favorites.dart';
@@ -9,6 +10,7 @@ import 'package:seizhtv/data_containers/loaded_m3u_data.dart';
 import 'package:seizhtv/globals/data.dart';
 import 'package:seizhtv/globals/data_cacher.dart';
 import 'package:seizhtv/globals/palette.dart';
+import 'package:seizhtv/services/firestore_listener.dart';
 import 'package:seizhtv/views/landing_page/children/favorites.dart';
 import 'package:seizhtv/views/landing_page/children/home.dart';
 import 'package:seizhtv/views/landing_page/children/live.dart';
@@ -28,8 +30,8 @@ class _MainLandingPageState extends State<MainLandingPage> with ColorPalette {
   final DataCacher _cacher = DataCacher.instance;
   final ZM3UHandler _handler = ZM3UHandler.instance;
   final LoadedM3uData _vm = LoadedM3uData.instance;
-  final Favorites _favVm = Favorites.instance;
-  final History _hisVm = History.instance;
+  final FirestoreListener _firestoreListener = FirestoreListener.instance;
+
   late final PageController _controller;
   final GlobalKey<ZNavbarState> _kNavState = GlobalKey<ZNavbarState>();
   final List<ZTab> _tabs = [
@@ -86,30 +88,25 @@ class _MainLandingPageState extends State<MainLandingPage> with ColorPalette {
       await _cacher.clearData();
       return;
     }
-    await _handler.getData(File(file)).then((value) async {
+    try {
+      final CategorizedM3UData? value = await runExpensiveOperation(File(file));
       if (value == null) {
+        // ignore: use_build_context_synchronously
         await Navigator.pushReplacementNamed(context, "/auth");
         await _cacher.clearData();
       } else {
         _vm.populate(value);
       }
-    });
-    _handler
-        .getDataFrom(type: CollectionType.favorites, refId: refId!)
-        .then((value) {
-      if (value != null) {
-        print("FETCH DATA FROM FAV: $value");
-        _favVm.populate(value);
-      }
-    });
-    _handler
-        .getDataFrom(type: CollectionType.history, refId: refId!)
-        .then((value) {
-      if (value != null) {
-        print("FETCH DATA FROM HISTORY: $value");
-        _hisVm.populate(value);
-      }
-    });
+    } catch (e) {
+      // handle error
+      await Navigator.pushReplacementNamed(context, "/auth");
+      await _cacher.clearData();
+      return;
+    }
+  }
+
+  Future<CategorizedM3UData?> runExpensiveOperation(File file) async {
+    return await compute(_handler.getData, file);
   }
 
   @override
@@ -117,11 +114,11 @@ class _MainLandingPageState extends State<MainLandingPage> with ColorPalette {
     _controller = PageController();
     refId = _cacher.refId;
     print("REF ID : $refId");
+    super.initState();
+    _firestoreListener.listen();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await initPlatform();
     });
-    // TODO: implement initState
-    super.initState();
   }
 
   @override

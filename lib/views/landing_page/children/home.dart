@@ -8,6 +8,7 @@ import 'package:seizhtv/globals/data_cacher.dart';
 import 'package:seizhtv/globals/palette.dart';
 import 'package:seizhtv/globals/ui_additional.dart';
 import 'package:seizhtv/views/landing_page/source_management.dart';
+import 'package:z_m3u_handler/extension.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -163,7 +164,7 @@ class _HomePageState extends State<HomePage> with ColorPalette, UIAdditional {
                                                 width: 5,
                                               ),
                                               Text(
-                                                "${_data.live.length} Channels",
+                                                "${_data.live.expand((element) => element.data).length} Channels",
                                               ),
                                             ],
                                           )
@@ -203,7 +204,8 @@ class _HomePageState extends State<HomePage> with ColorPalette, UIAdditional {
                                   title: "Movies",
                                   index: 2,
                                   color: ColorPalette().orange,
-                                  total: "${_data.movies.length}",
+                                  total:
+                                      "${_data.movies.expand((element) => element.data.classify()).length}",
                                 ),
                               ),
                               SizedBox(
@@ -215,7 +217,8 @@ class _HomePageState extends State<HomePage> with ColorPalette, UIAdditional {
                                   color: Colors.purple,
                                   imagePath: "assets/images/Groupframe.png",
                                   title: "Series",
-                                  total: "${_data.series.length}",
+                                  total:
+                                      "${_data.series.expand((element) => element.data.classify()).length}",
                                 ),
                               ),
                             ],

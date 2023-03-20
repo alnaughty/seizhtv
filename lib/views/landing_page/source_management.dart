@@ -91,35 +91,6 @@ class _SourceManagementPageState extends State<SourceManagementPage>
                         bottomText: "Manage Sources",
                       ),
                     ),
-                    if (!widget.fromInit) ...{
-                      MaterialButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        height: 50,
-                        color: Colors.white,
-                        child: Center(
-                            child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ShaderMask(
-                              shaderCallback: (Rect bounds) =>
-                                  const LinearGradient(
-                                          colors: [Colors.black, Colors.black])
-                                      .createShader(bounds),
-                              child: const BackButtonIcon(),
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            const Text(
-                              "Back",
-                              style: TextStyle(color: Colors.black),
-                            )
-                          ],
-                        )),
-                      ),
-                    },
                     const SizedBox(
                       height: 10,
                     ),
@@ -227,6 +198,20 @@ class _SourceManagementPageState extends State<SourceManagementPage>
                         }),
                     const SizedBox(height: 10),
                     const LoadPlaylist(),
+                    if (!widget.fromInit) ...{
+                      MaterialButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        height: 50,
+                        color: Colors.white,
+                        child: const Center(
+                            child: Text(
+                          "Cancel",
+                          style: TextStyle(color: Colors.black),
+                        )),
+                      ),
+                    },
                     Container(
                       margin: const EdgeInsets.symmetric(vertical: 30),
                       child: RichText(

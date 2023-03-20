@@ -39,9 +39,8 @@ class _MoviePageState extends State<MoviePage>
   void initState() {
     _scrollController = ScrollController();
     _search = TextEditingController();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      initStream();
-    });
+    initStream();
+
     super.initState();
   }
 
@@ -56,123 +55,145 @@ class _MoviePageState extends State<MoviePage>
   final LoadedM3uData _vm = LoadedM3uData.instance;
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: card,
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(60),
-          child: appbar(2, onSearchPressed: () {
-            showSearchField = !showSearchField;
-            if (mounted) setState(() {});
-          }),
-        ),
-        body: Column(
-          children: [
-            AnimatedPadding(
-              duration: const Duration(milliseconds: 400),
-              padding:
-                  EdgeInsets.symmetric(horizontal: showSearchField ? 20 : 0),
-              child: AnimatedContainer(
-                duration: const Duration(
-                  milliseconds: 500,
+        // appBar: PreferredSize(
+        //   preferredSize: const Size.fromHeight(60),
+        // child: appbar(2, onSearchPressed: () {
+        //   showSearchField = !showSearchField;
+        //   if (mounted) setState(() {});
+        // }),
+        // ),
+        body: Scrollbar(
+          controller: _scrollController,
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            child: Column(
+              children: [
+                SizedBox(
+                  height: size.height * .7,
+                  width: size.width,
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: Container(
+                          color: Colors.red,
+                        ),
+                      ),
+                      appbar(2, onSearchPressed: () {
+                        showSearchField = !showSearchField;
+                        if (mounted) setState(() {});
+                      })
+                    ],
+                  ),
                 ),
-                padding:
-                    EdgeInsets.symmetric(horizontal: showSearchField ? 10 : 0),
-                height: showSearchField ? 50 : 0,
-                width: double.maxFinite,
-                decoration: BoxDecoration(
-                    color: highlight,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: highlight.darken().withOpacity(1),
-                        offset: const Offset(2, 2),
-                        blurRadius: 2,
-                      )
-                    ]),
-                child: Row(
-                  children: [
-                    SvgPicture.asset(
-                      "assets/icons/search.svg",
-                      height: 20,
-                      width: 20,
-                      color: white,
+                AnimatedPadding(
+                  duration: const Duration(milliseconds: 400),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: showSearchField ? 20 : 0),
+                  child: AnimatedContainer(
+                    duration: const Duration(
+                      milliseconds: 500,
                     ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Expanded(
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        child: showSearchField
-                            ? TextField(
-                                onChanged: (text) {
-                                  if (text.isEmpty) {
-                                    displayData = List.from(_data);
-                                  } else {
-                                    displayData = List.from(
-                                      _data.where(
-                                        (element) =>
-                                            element.name.toLowerCase().contains(
+                    margin: EdgeInsets.only(top: showSearchField ? 10 : 0),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: showSearchField ? 10 : 0),
+                    height: showSearchField ? 50 : 0,
+                    width: double.maxFinite,
+                    decoration: BoxDecoration(
+                        color: highlight,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: highlight.darken().withOpacity(1),
+                            offset: const Offset(2, 2),
+                            blurRadius: 2,
+                          )
+                        ]),
+                    child: Row(
+                      children: [
+                        SvgPicture.asset(
+                          "assets/icons/search.svg",
+                          height: 20,
+                          width: 20,
+                          color: white,
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            child: showSearchField
+                                ? TextField(
+                                    onChanged: (text) {
+                                      if (text.isEmpty) {
+                                        displayData = List.from(_data);
+                                      } else {
+                                        displayData = List.from(
+                                          _data.where(
+                                            (element) => element.name
+                                                .toLowerCase()
+                                                .contains(
                                                   text.toLowerCase(),
                                                 ),
-                                      ),
-                                    );
-                                  }
-                                  displayData!
-                                      .sort((a, b) => a.name.compareTo(b.name));
-                                  if (mounted) setState(() {});
-                                  // if (text.isEmpty) {
-                                  //   _displyData = List.from(data);
-                                  // } else {
-                                  // _displyData = List.from(
-                                  //   data.where(
-                                  //     (element) =>
-                                  //         element.title.toLowerCase().contains(
-                                  //               text.toLowerCase(),
-                                  //             ),
-                                  //   ),
-                                  // );
-                                  // }
-                                },
-                                cursorColor: orange,
-                                controller: _search,
-                                decoration: const InputDecoration(
-                                  hintText: "Search",
-                                ),
-                              )
-                            : Container(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if (showSearchField) ...{
-              const SizedBox(
-                height: 10,
-              ),
-            },
-            Expanded(
-              child: displayData == null
-                  ? const SeizhTvLoader(
-                      label: "Retrieving Data",
-                    )
-                  : displayData!.isEmpty
-                      ? Center(
-                          child: Text(
-                            "No Result Found for `${_search.text}`",
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(.5),
-                            ),
+                                          ),
+                                        );
+                                      }
+                                      displayData!.sort(
+                                          (a, b) => a.name.compareTo(b.name));
+                                      if (mounted) setState(() {});
+                                      // if (text.isEmpty) {
+                                      //   _displyData = List.from(data);
+                                      // } else {
+                                      // _displyData = List.from(
+                                      //   data.where(
+                                      //     (element) =>
+                                      //         element.title.toLowerCase().contains(
+                                      //               text.toLowerCase(),
+                                      //             ),
+                                      //   ),
+                                      // );
+                                      // }
+                                    },
+                                    cursorColor: orange,
+                                    controller: _search,
+                                    decoration: const InputDecoration(
+                                      hintText: "Search",
+                                    ),
+                                  )
+                                : Container(),
                           ),
-                        )
-                      : Scrollbar(
-                          controller: _scrollController,
-                          child: ListView.separated(
-                            controller: _scrollController,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                if (showSearchField) ...{
+                  const SizedBox(
+                    height: 10,
+                  ),
+                },
+                displayData == null
+                    ? const SeizhTvLoader(
+                        label: "Retrieving Data",
+                      )
+                    : displayData!.isEmpty
+                        ? Center(
+                            child: Text(
+                              "No Result Found for `${_search.text}`",
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(.5),
+                              ),
+                            ),
+                          )
+                        : ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
                             itemBuilder: (_, i) {
                               final ClassifiedData data = displayData![i];
                               return ListTile(
@@ -210,9 +231,9 @@ class _MoviePageState extends State<MoviePage>
                             ),
                             itemCount: displayData!.length,
                           ),
-                        ),
+              ],
             ),
-          ],
+          ),
         ),
         // body: StreamBuilder<CategorizedM3UData>(
         //   stream: _vm.stream,

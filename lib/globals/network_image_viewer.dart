@@ -14,62 +14,84 @@ class NetworkImageViewer extends StatelessWidget
       this.fit = BoxFit.contain,
       required this.height,
       required this.color});
-  final String url;
+  final String? url;
   final double height;
   final double width;
   final Color color;
   final BoxFit fit;
   @override
   Widget build(BuildContext context) {
-    return CachedNetworkImage(
-      imageUrl: url,
-      width: width,
-      height: height,
-      placeholder: (_, url) => Container(
-        color: color.darken(),
-        child: Center(
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              shimmerLoading(
-                color,
-                height,
-                width: width,
+    return url == null
+        ? Container(
+            color: cardColor.darken().withOpacity(.5),
+            child: Center(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // shimmerLoading(
+                  //   color,
+                  //   height,
+                  //   width: width,
+                  // ),
+                  SvgPicture.asset(
+                    "assets/icons/logo-ico.svg",
+                    width: width * .7,
+                    color: Colors.red.withOpacity(.5),
+                    fit: BoxFit.contain,
+                  ),
+                ],
               ),
-              SvgPicture.asset(
-                "assets/icons/logo-ico.svg",
-                width: width * .7,
-                color: cardColor.withOpacity(.7),
-                fit: BoxFit.contain,
+            ),
+          )
+        : CachedNetworkImage(
+            imageUrl: url!,
+            width: width,
+            height: height,
+            placeholder: (_, url) => Container(
+              color: color.darken(),
+              child: Center(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    shimmerLoading(
+                      color,
+                      height,
+                      width: width,
+                    ),
+                    SvgPicture.asset(
+                      "assets/icons/logo-ico.svg",
+                      width: width * .7,
+                      color: cardColor.withOpacity(.7),
+                      fit: BoxFit.contain,
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
-      ),
-      fit: fit,
-      placeholderFadeInDuration: const Duration(milliseconds: 500),
-      errorWidget: (_, url, error) => Container(
-        color: cardColor.darken().withOpacity(.5),
-        child: Center(
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // shimmerLoading(
-              //   color,
-              //   height,
-              //   width: width,
-              // ),
-              SvgPicture.asset(
-                "assets/icons/logo-ico.svg",
-                width: width * .7,
-                color: Colors.red.withOpacity(.5),
-                fit: BoxFit.contain,
+            ),
+            fit: fit,
+            placeholderFadeInDuration: const Duration(milliseconds: 500),
+            errorWidget: (_, url, error) => Container(
+              color: cardColor.darken().withOpacity(.5),
+              child: Center(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // shimmerLoading(
+                    //   color,
+                    //   height,
+                    //   width: width,
+                    // ),
+                    SvgPicture.asset(
+                      "assets/icons/logo-ico.svg",
+                      width: width * .7,
+                      color: Colors.red.withOpacity(.5),
+                      fit: BoxFit.contain,
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
+            ),
+          );
     // Image.network("");
     // return Image(
     //   fit: fit,

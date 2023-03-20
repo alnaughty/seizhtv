@@ -44,9 +44,7 @@ class _SeriesPageState extends State<SeriesPage>
   void initState() {
     _scrollController = ScrollController();
     _search = TextEditingController();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      initStream();
-    });
+    initStream();
     super.initState();
   }
 

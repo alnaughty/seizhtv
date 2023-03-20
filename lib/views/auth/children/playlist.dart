@@ -322,7 +322,7 @@ class _LoadPlaylistState extends State<LoadPlaylist>
               ),
             ),
             const SizedBox(
-              height: 20,
+              height: 10,
             )
           ],
         ));
