@@ -186,7 +186,7 @@ packages:
     source: hosted
     version: "2.0.1"
   dio:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: dio
       sha256: "7d328c4d898a61efc3cd93655a0955858e29a0aa647f0f9e02d59b3bb275e2e8"
@@ -326,13 +326,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.3.0"
-  flutter_cast_framework:
-    dependency: "direct main"
-    description:
-      path: "/Users/qonvexmacmini/Desktop/flutter_cast_framework"
-      relative: false
-    source: path
-    version: "0.0.1-alpha.1"
   flutter_dotenv:
     dependency: "direct main"
     description:
@@ -341,6 +334,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.0.2"
+  flutter_inappwebview:
+    dependency: transitive
+    description:
+      name: flutter_inappwebview
+      sha256: f73505c792cf083d5566e1a94002311be497d984b5607f25be36d685cf6361cf
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.7.2+3"
   flutter_launcher_icons:
     dependency: "direct main"
     description:
@@ -1076,12 +1077,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.1"
+  youtube_player_flutter:
+    dependency: "direct main"
+    description:
+      name: youtube_player_flutter
+      sha256: "72d487e1a1b9155a2dc9d448c137380791101a0ff623723195275ac275ac6942"
+      url: "https://pub.dev"
+    source: hosted
+    version: "8.1.2"
   z_m3u_handler:
     dependency: "direct main"
     description:
-      path: "/Users/qonvexmacmini/Desktop/z_m3u_handler"
-      relative: false
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "8ed73bf98962f00178e743437fad0141c55f80e6"
+      url: "https://github.com/alnaughty/z_m3u_handler"
+    source: git
     version: "0.1.5"
   znavbar:
     dependency: "direct main"

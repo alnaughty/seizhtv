@@ -110,19 +110,49 @@ class _HomePageState extends State<HomePage> with ColorPalette, UIAdditional {
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(20)),
                               padding: const EdgeInsets.all(18),
-                              height: 170,
+                              height: 190,
                               width: double.infinity,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Opacity(
-                                    opacity: 0.2,
-                                    child: Text(
-                                      "Last update : ${timeago.format(_cacher.date!)}",
-                                      style: const TextStyle(fontSize: 14),
-                                    ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Opacity(
+                                        opacity: 0.2,
+                                        child: Text(
+                                          "Last update : ${timeago.format(_cacher.date!)}",
+                                          style: const TextStyle(fontSize: 14),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 26,
+                                        width: 26,
+                                        child: IconButton(
+                                            padding: const EdgeInsets.all(0),
+                                            onPressed: () {
+                                              setState(() {
+                                                print("refresh");
+                                              });
+                                            },
+                                            icon: Container(
+                                              height: 26,
+                                              width: 26,
+                                              padding: const EdgeInsets.all(5),
+                                              decoration: BoxDecoration(
+                                                  color: ColorPalette()
+                                                      .white
+                                                      .withOpacity(0.1),
+                                                  shape: BoxShape.circle),
+                                              child: SvgPicture.asset(
+                                                "assets/icons/sync.svg",
+                                              ),
+                                            )),
+                                      )
+                                    ],
                                   ),
                                   Row(
                                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -200,26 +230,26 @@ class _HomePageState extends State<HomePage> with ColorPalette, UIAdditional {
                             children: [
                               Expanded(
                                 child: smallCardHome(
-                                  imagePath: "assets/images/Grouppopcorn.png",
-                                  title: "Movies",
-                                  index: 2,
-                                  color: ColorPalette().orange,
-                                  total:
-                                      "${_data.movies.expand((element) => element.data.classify()).length}",
-                                ),
+                                    imagePath: "assets/images/Grouppopcorn.png",
+                                    title: "Movies",
+                                    index: 2,
+                                    color: ColorPalette().orange,
+                                    total:
+                                        "${_data.movies.expand((element) => element.data.classify()).length}",
+                                    onPressed: () {}),
                               ),
                               SizedBox(
                                 width: space,
                               ),
                               Expanded(
                                 child: smallCardHome(
-                                  index: 3,
-                                  color: Colors.purple,
-                                  imagePath: "assets/images/Groupframe.png",
-                                  title: "Series",
-                                  total:
-                                      "${_data.series.expand((element) => element.data.classify()).length}",
-                                ),
+                                    index: 3,
+                                    color: Colors.purple,
+                                    imagePath: "assets/images/Groupframe.png",
+                                    title: "Series",
+                                    total:
+                                        "${_data.series.expand((element) => element.data.classify()).length}",
+                                    onPressed: () {}),
                               ),
                             ],
                           ),
@@ -399,7 +429,8 @@ class _HomePageState extends State<HomePage> with ColorPalette, UIAdditional {
           required String title,
           required String total,
           required int index,
-          required Color color}) =>
+          required Color color,
+          required Function() onPressed}) =>
       Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
@@ -425,15 +456,21 @@ class _HomePageState extends State<HomePage> with ColorPalette, UIAdditional {
                           imagePath,
                           fit: BoxFit.fitHeight,
                         ),
-                        Container(
-                          height: 26,
-                          width: 26,
-                          padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                              color: ColorPalette().white.withOpacity(0.1),
-                              shape: BoxShape.circle),
-                          child: SvgPicture.asset(
-                            "assets/icons/sync.svg",
+                        GestureDetector(
+                          onTap: () {
+                            print("refresh");
+                            onPressed();
+                          },
+                          child: Container(
+                            height: 26,
+                            width: 26,
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                                color: ColorPalette().white.withOpacity(0.1),
+                                shape: BoxShape.circle),
+                            child: SvgPicture.asset(
+                              "assets/icons/sync.svg",
+                            ),
                           ),
                         )
                       ],

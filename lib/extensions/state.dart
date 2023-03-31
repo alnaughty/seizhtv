@@ -147,13 +147,60 @@ extension EXT on State {
             ),
           ),
         ),
-        IconButton(
-          onPressed: () {},
+        // IconButton(
+        //   onPressed: () {
+        //     print("Press");
+        //   },
+        //   icon: Icon(
+        //     CupertinoIcons.ellipsis_vertical,
+        //     color: palette.white,
+        //   ),
+        // ),
+        PopupMenuButton(
+          elevation: 0,
+          color: Colors.white,
           icon: Icon(
             CupertinoIcons.ellipsis_vertical,
             color: palette.white,
           ),
-        ),
+          onSelected: (value) {
+            // your logic
+          },
+          itemBuilder: (BuildContext bc) {
+            return [
+              PopupMenuItem(
+                value: 'Change Source',
+                child: Row(
+                  children: [
+                    SvgPicture.asset(
+                      "assets/icons/change.svg",
+                    ),
+                    const SizedBox(width: 10),
+                    const Text(
+                      "Change Source",
+                      style: TextStyle(color: Colors.black),
+                    )
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'Upate Channels',
+                child: Row(
+                  children: [
+                    SvgPicture.asset(
+                      "assets/icons/update.svg",
+                    ),
+                    const SizedBox(width: 10),
+                    const Text(
+                      "Upate Channels",
+                      style: TextStyle(color: Colors.black),
+                    )
+                  ],
+                ),
+              ),
+            ];
+          },
+        )
       ],
       title: title ?? defaultTitle(index),
     );
