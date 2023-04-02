@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:seizhtv/data_containers/favorites.dart';
-import 'package:seizhtv/extensions/color.dart';
 import 'package:seizhtv/extensions/m3u_entry.dart';
 import 'package:seizhtv/globals/data.dart';
 import 'package:seizhtv/globals/network_image_viewer.dart';
@@ -83,8 +82,12 @@ class _MovieDetailsState extends State<MovieDetails> with ColorPalette {
                                     : MaterialButton(
                                         padding: EdgeInsets.zero,
                                         elevation: 0,
-                                        onPressed:
-                                            chosenIndex == i ? () {} : null,
+                                        onPressed: chosenIndex == i
+                                            ? () {
+                                                print("press");
+                                                print("$chosenIndex");
+                                              }
+                                            : null,
                                         child: Center(
                                           child: Text(
                                             _data.existsInFavorites("movie")

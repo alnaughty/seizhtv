@@ -58,4 +58,26 @@ class FeaturedAPI {
       return;
     }
   }
+
+  // Future<void> getVideos({required int id}) async{
+  //   try{
+  //     return dio
+  //         .get("${Network.tmdbDomain}/movie/$id/videos?api_key=$_apiKey",
+  //             options: Options(headers: {
+  //               "accept": "application/json",
+  //             }))
+  //         .then((response) {
+  //       if (response.statusCode == 200) {
+  //         final List data = response.data['results'];
+  //         _topRatedTVShowViewModel
+  //             .populate(data.map((e) => TVShowDetails.fromJson(e)).toList());
+  //         return;
+  //       }
+  //       return;
+  //     });
+  //   }
+  //   catch (e){
+  //     return;
+  //   }
+  // }
 }

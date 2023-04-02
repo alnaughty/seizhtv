@@ -17,7 +17,7 @@ import 'package:seizhtv/views/landing_page/children/series.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
 import 'package:znavbar/znavbar.dart';
 
-import '../../services/featured_api.dart';
+import '../../services/api.dart';
 
 class MainLandingPage extends StatefulWidget {
   const MainLandingPage({super.key});

@@ -147,15 +147,6 @@ extension EXT on State {
             ),
           ),
         ),
-        // IconButton(
-        //   onPressed: () {
-        //     print("Press");
-        //   },
-        //   icon: Icon(
-        //     CupertinoIcons.ellipsis_vertical,
-        //     color: palette.white,
-        //   ),
-        // ),
         PopupMenuButton(
           elevation: 0,
           color: Colors.white,
@@ -163,9 +154,7 @@ extension EXT on State {
             CupertinoIcons.ellipsis_vertical,
             color: palette.white,
           ),
-          onSelected: (value) {
-            // your logic
-          },
+          onSelected: (value) {},
           itemBuilder: (BuildContext bc) {
             return [
               PopupMenuItem(
