@@ -110,7 +110,7 @@ class _HomePageState extends State<HomePage> with ColorPalette, UIAdditional {
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(20)),
                               padding: const EdgeInsets.all(18),
-                              height: 190,
+                              height: 180,
                               width: double.infinity,
                               child: Column(
                                 mainAxisAlignment:

@@ -13,11 +13,14 @@ import 'package:seizhtv/globals/palette.dart';
 import 'package:seizhtv/globals/ui_additional.dart';
 import 'package:seizhtv/globals/video_loader.dart';
 import 'package:seizhtv/models/tvshow_details.dart';
+import 'package:seizhtv/services/api.dart';
 import 'package:seizhtv/views/landing_page/children/series_children/classified_series_data.dart';
 import 'package:z_m3u_handler/extension.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
-import '../../../globals/network.dart';
+import '../../../globals/video_player.dart';
+import '../../../models/get_video.dart';
 import '../../../viewmodel/tvshow_vm.dart';
+import '../../../viewmodel/video_vm.dart';
 
 class SeriesPage extends StatefulWidget {
   const SeriesPage({super.key});
@@ -27,8 +30,9 @@ class SeriesPage extends StatefulWidget {
 }
 
 class _SeriesPageState extends State<SeriesPage>
-    with ColorPalette, UIAdditional, VideoLoader {
+    with ColorPalette, UIAdditional, VideoLoader, FeaturedAPI {
   late final ScrollController _scrollController;
+  static final TVVideoViewModel _videoViewModel = TVVideoViewModel.instance;
   static final TopRatedTVShowViewModel _viewModel =
       TopRatedTVShowViewModel.instance;
   late final TextEditingController _search;
@@ -69,13 +73,6 @@ class _SeriesPageState extends State<SeriesPage>
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: card,
-        // appBar: PreferredSize(
-        //   preferredSize: const Size.fromHeight(60),
-        //   child: appbar(3, onSearchPressed: () {
-        //     showSearchField = !showSearchField;
-        //     if (mounted) setState(() {});
-        //   }),
-        // ),
         body: Scrollbar(
           controller: _scrollController,
           child: SingleChildScrollView(
@@ -83,122 +80,116 @@ class _SeriesPageState extends State<SeriesPage>
             child: Column(
               children: [
                 StreamBuilder<List<TVShowDetails>>(
-                    stream: _viewModel.stream,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData && !snapshot.hasError) {
-                        if (snapshot.data!.isNotEmpty) {
-                          final List<TVShowDetails> result = snapshot.data!;
+                  stream: _viewModel.stream,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData && !snapshot.hasError) {
+                      if (snapshot.data!.isNotEmpty) {
+                        final List<TVShowDetails> result = snapshot.data!;
+                        getTVVideos(id: result[0].id);
 
-                          return SizedBox(
-                            height: size.height * .5,
-                            width: size.width,
-                            child: Stack(
-                              children: [
-                                Positioned.fill(
-                                  child: SizedBox(
-                                    child: Image.network(
-                                      "${Network.imageUrl}${result[0].backdropPath}",
-                                      fit: BoxFit.cover,
+                        return SizedBox(
+                          width: size.width,
+                          child: Column(
+                            children: [
+                              appbar(3, onSearchPressed: () {
+                                showSearchField = !showSearchField;
+                                if (mounted) setState(() {});
+                              }),
+                              StreamBuilder<List<Video>>(
+                                stream: _videoViewModel.stream,
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData && !snapshot.hasError) {
+                                    if (snapshot.data!.isNotEmpty) {
+                                      final List<Video> result = snapshot.data!;
+                                      return Videoplayer(
+                                        url: result[0].key,
+                                      );
+                                    }
+                                  }
+                                  return const Center(
+                                    child: CircularProgressIndicator(
+                                      color: Colors.grey,
                                     ),
-                                  ),
-                                ),
-                                Positioned(
-                                  bottom: 0,
-                                  child: Container(
-                                    width: size.width,
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.transparent,
-                                          card,
-                                        ],
-                                        stops: const [0.0, 0.35],
-                                        begin: FractionalOffset.topCenter,
-                                        end: FractionalOffset.bottomCenter,
-                                        tileMode: TileMode.repeated,
+                                  );
+                                },
+                              ),
+                              // const Videoplayer(
+                              //   url: 'WrEqXdt85j8',
+                              // ),
+                              Container(
+                                width: size.width,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 15),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      result[0].title,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 24,
+                                        height: 1.1,
                                       ),
                                     ),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 15),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                    const SizedBox(height: 5),
+                                    Row(
                                       children: [
-                                        Text(
-                                          result[0].title,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 24,
-                                            height: 1.1,
+                                        Text(DateFormat('MMM dd, yyyy')
+                                            .format(result[0].date!)),
+                                        const SizedBox(width: 10),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 5),
+                                          decoration: BoxDecoration(
+                                            border:
+                                                Border.all(color: Colors.white),
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                              Radius.circular(5),
+                                            ),
                                           ),
-                                        ),
-                                        const SizedBox(height: 5),
-                                        Row(
-                                          children: [
-                                            Text(DateFormat('MMM dd, yyyy')
-                                                .format(result[0].date!)),
-                                            const SizedBox(width: 10),
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 5),
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                    color: Colors.white),
-                                                borderRadius:
-                                                    const BorderRadius.all(
-                                                  Radius.circular(5),
-                                                ),
-                                              ),
-                                              child: Text(
-                                                  "${result[0].voteAverage}"),
-                                            )
-                                          ],
-                                        ),
+                                          child:
+                                              Text("${result[0].voteAverage}"),
+                                        )
                                       ],
                                     ),
-                                  ),
+                                  ],
                                 ),
-                                appbar(3, onSearchPressed: () {
-                                  showSearchField = !showSearchField;
-                                  if (mounted) setState(() {});
-                                })
-                              ],
-                            ),
-                          );
-                        }
+                              ),
+                            ],
+                          ),
+                        );
                       }
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          color: Colors.grey,
-                        ),
-                      );
-                    }),
+                    }
+                    return const Center(
+                      child: CircularProgressIndicator(color: Colors.grey),
+                    );
+                  },
+                ),
                 AnimatedPadding(
                   duration: const Duration(milliseconds: 400),
                   padding: EdgeInsets.symmetric(
                       horizontal: showSearchField ? 20 : 0),
                   child: AnimatedContainer(
-                    duration: const Duration(
-                      milliseconds: 500,
-                    ),
+                    duration: const Duration(milliseconds: 500),
                     margin: EdgeInsets.only(top: showSearchField ? 10 : 0),
                     padding: EdgeInsets.symmetric(
                         horizontal: showSearchField ? 10 : 0),
                     height: showSearchField ? 50 : 0,
                     width: double.maxFinite,
                     decoration: BoxDecoration(
-                        color: highlight,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: highlight.darken().withOpacity(1),
-                            offset: const Offset(2, 2),
-                            blurRadius: 2,
-                          )
-                        ]),
+                      color: highlight,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: highlight.darken().withOpacity(1),
+                          offset: const Offset(2, 2),
+                          blurRadius: 2,
+                        )
+                      ],
+                    ),
                     child: Row(
                       children: [
                         SvgPicture.asset(
@@ -301,9 +292,10 @@ class _SeriesPageState extends State<SeriesPage>
                               );
                             },
                             separatorBuilder: (_, i) => Divider(
-                                  color: Colors.white.withOpacity(.3),
-                                ),
-                            itemCount: displayData!.length),
+                              color: Colors.white.withOpacity(.3),
+                            ),
+                            itemCount: displayData!.length,
+                          ),
               ],
             ),
           ),
