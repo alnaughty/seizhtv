@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -9,6 +11,10 @@ import 'package:seizhtv/globals/palette.dart';
 import 'package:seizhtv/globals/ui_additional.dart';
 import 'package:seizhtv/models/option.dart';
 import 'package:seizhtv/views/landing_page/source_management.dart';
+
+import 'profile_children/general_setting.dart';
+import 'profile_children/parental_control.dart';
+import 'profile_children/record.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -32,7 +38,7 @@ class _ProfilePageState extends State<ProfilePage>
             elevation: 0,
             title: const Text("Profile"),
           ),
-          body: Column(
+          body: ListView(
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 10),
@@ -88,8 +94,7 @@ class _ProfilePageState extends State<ProfilePage>
                           //     ),
                           //   ),
                           // ),
-                          const Text("Exp. Date : Nov. 12, 2022"),
-                          // Text("Exp. Date : Nov. 12, 2022")
+                          Text("Exp. Date :  $expDate"),
                         ],
                       ),
                     ),
@@ -103,51 +108,51 @@ class _ProfilePageState extends State<ProfilePage>
                     icon: "assets/icons/settings.svg",
                     title: "General Setting",
                     onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => const GeneralSettingPage(),
-                      //   ),
-                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const GeneralSettingPage(),
+                        ),
+                      );
                     },
                   ),
-                  Option(
-                    icon: "assets/icons/records.svg",
-                    title: "Records",
-                    onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => const RecordPage(),
-                      //   ),
-                      // );
-                    },
-                  ),
+                  // Option(
+                  //   icon: "assets/icons/records.svg",
+                  //   title: "Records",
+                  //   onPressed: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) => const RecordPage(),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                   Option(
                     icon: "assets/icons/epg.svg",
                     title: "EPG",
                     onPressed: () async {
-                      await Navigator.push(
-                        context,
-                        PageTransition(
-                          child: const SourceManagementPage(
-                            fromInit: false,
-                          ),
-                          type: PageTransitionType.leftToRight,
-                        ),
-                      );
+                      // await Navigator.push(
+                      //   context,
+                      //   PageTransition(
+                      //     child: const SourceManagementPage(
+                      //       fromInit: false,
+                      //     ),
+                      //     type: PageTransitionType.leftToRight,
+                      //   ),
+                      // );
                     },
                   ),
                   Option(
                     icon: "assets/icons/parental-control.svg",
                     title: "Parental Control",
                     onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => const ParentalControlPage(),
-                      //   ),
-                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ParentalControlPage(),
+                        ),
+                      );
                     },
                   ),
                   Option(
@@ -162,30 +167,30 @@ class _ProfilePageState extends State<ProfilePage>
                       // );
                     },
                   ),
-                  Option(
-                    icon: "assets/icons/speedtest.svg",
-                    title: "Speed Test",
-                    onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => const SpeedTestPage(),
-                      //   ),
-                      // );
-                    },
-                  ),
-                  Option(
-                    icon: "assets/icons/vpn.svg",
-                    title: "VPN",
-                    onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => const VPNPage(),
-                      //   ),
-                      // );
-                    },
-                  ),
+                  // Option(
+                  //   icon: "assets/icons/speedtest.svg",
+                  //   title: "Speed Test",
+                  //   onPressed: () {
+                  //     // Navigator.push(
+                  //     //   context,
+                  //     //   MaterialPageRoute(
+                  //     //     builder: (context) => const SpeedTestPage(),
+                  //     //   ),
+                  //     // );
+                  //   },
+                  // ),
+                  // Option(
+                  //   icon: "assets/icons/vpn.svg",
+                  //   title: "VPN",
+                  //   onPressed: () {
+                  //     // Navigator.push(
+                  //     //   context,
+                  //     //   MaterialPageRoute(
+                  //     //     builder: (context) => const VPNPage(),
+                  //     //   ),
+                  //     // );
+                  //   },
+                  // ),
                   Option(
                     icon: "assets/icons/termcondition.svg",
                     title: "Terms & Conditions",
@@ -208,7 +213,7 @@ class _ProfilePageState extends State<ProfilePage>
                     });
                     await _cacher.clearData();
                     // ignore: use_build_context_synchronously
-                    await Navigator.pushReplacementNamed(context, "/auth");
+                    await Navigator.pushReplacementNamed(context, "/login");
                   },
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 15),

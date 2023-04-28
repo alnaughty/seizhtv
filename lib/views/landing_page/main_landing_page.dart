@@ -17,7 +17,8 @@ import 'package:seizhtv/views/landing_page/children/series.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
 import 'package:znavbar/znavbar.dart';
 
-import '../../services/api.dart';
+import '../../services/tv_series_api.dart';
+import '../../services/movie_api.dart';
 
 class MainLandingPage extends StatefulWidget {
   const MainLandingPage({super.key});
@@ -27,7 +28,7 @@ class MainLandingPage extends StatefulWidget {
 }
 
 class _MainLandingPageState extends State<MainLandingPage>
-    with ColorPalette, FeaturedAPI {
+    with ColorPalette, TVSeriesAPI, MovieAPI {
   final DataCacher _cacher = DataCacher.instance;
   final ZM3UHandler _handler = ZM3UHandler.instance;
   final LoadedM3uData _vm = LoadedM3uData.instance;
@@ -115,6 +116,8 @@ class _MainLandingPageState extends State<MainLandingPage>
     init();
     _controller = PageController();
     refId = _cacher.refId;
+    expDate = _cacher.expDate;
+    print("EXP DATE: $expDate ");
     print("REF ID : $refId");
     super.initState();
     _firestoreListener.listen();
@@ -126,7 +129,6 @@ class _MainLandingPageState extends State<MainLandingPage>
   @override
   void dispose() {
     _controller.dispose();
-    // TODO: implement dispose
     super.dispose();
   }
 

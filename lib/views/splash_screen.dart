@@ -8,6 +8,8 @@ import 'package:seizhtv/globals/logo.dart';
 import 'package:seizhtv/globals/palette.dart';
 import 'package:seizhtv/views/landing_page/source_management.dart';
 
+import 'auth/login.dart';
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -23,17 +25,20 @@ class _SplashScreenState extends State<SplashScreen> {
     refId = _cacher.refId;
     user = _cacher.m3uUser;
 
+    print("REF ID: $refId");
+    print("USER: $user");
+
     if (file != null) {
       await Navigator.pushReplacementNamed(context, "/landing-page");
       return;
     }
     if (refId == null || user == null) {
-      await Navigator.pushReplacementNamed(context, "/auth");
+      await Navigator.pushReplacementNamed(context, "/login");
     } else {
       await Navigator.pushReplacement(
         context,
         PageTransition(
-          child: const SourceManagementPage(),
+          child: const LoginPage(),
           type: PageTransitionType.leftToRight,
         ),
       );

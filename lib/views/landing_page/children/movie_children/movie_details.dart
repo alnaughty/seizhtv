@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:seizhtv/data_containers/favorites.dart';
@@ -25,7 +27,6 @@ class _MovieDetailsState extends State<MovieDetails> with ColorPalette {
         .getDataFrom(type: CollectionType.favorites, refId: refId!)
         .then((value) {
       if (value != null) {
-        print("FETCH DATA FROM FAV: $value");
         _vm.populate(value);
       }
     });
@@ -34,11 +35,11 @@ class _MovieDetailsState extends State<MovieDetails> with ColorPalette {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 230,
+      height: 250,
       width: double.maxFinite,
       padding: const EdgeInsets.symmetric(
         horizontal: 20,
-        vertical: 20,
+        vertical: 10,
       ),
       decoration: BoxDecoration(
         color: cardColor,
@@ -74,7 +75,6 @@ class _MovieDetailsState extends State<MovieDetails> with ColorPalette {
                               ),
                               width: chosenIndex == i ? c.maxWidth : 0,
                               height: chosenIndex == i ? 40 : 0,
-                              // color: Colors.red,
                               child: AnimatedSwitcher(
                                 duration: const Duration(milliseconds: 300),
                                 child: chosenIndex == null
@@ -82,17 +82,66 @@ class _MovieDetailsState extends State<MovieDetails> with ColorPalette {
                                     : MaterialButton(
                                         padding: EdgeInsets.zero,
                                         elevation: 0,
-                                        onPressed: chosenIndex == i
-                                            ? () {
-                                                print("press");
-                                                print("$chosenIndex");
-                                              }
-                                            : null,
+                                        onPressed: () async {
+                                          await showDialog(
+                                            barrierDismissible: false,
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              Future.delayed(
+                                                const Duration(seconds: 3),
+                                                () {
+                                                  Navigator.of(context)
+                                                      .pop(true);
+                                                },
+                                              );
+                                              return Dialog(
+                                                alignment: Alignment.topCenter,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                    10.0,
+                                                  ),
+                                                ),
+                                                child: Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                    vertical: 5,
+                                                    horizontal: 20,
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Expanded(
+                                                        child: Text(
+                                                          "${_data.title} Removed from Favorites",
+                                                        ),
+                                                      ),
+                                                      IconButton(
+                                                        onPressed: () {
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                        },
+                                                        icon: const Icon(Icons
+                                                            .close_rounded),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          );
+                                          await widget.data.data[chosenIndex!]
+                                              .removeFromFavorites(refId!);
+                                          Navigator.of(context).pop();
+                                        },
                                         child: Center(
                                           child: Text(
                                             _data.existsInFavorites("movie")
                                                 ? "Remove from\nfavorites"
                                                 : "Add to favorites",
+                                            // "Remove from\nfavorites",
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
                                               fontSize: 10,
@@ -103,7 +152,6 @@ class _MovieDetailsState extends State<MovieDetails> with ColorPalette {
                                         ),
                                       ),
                               ),
-                              // child: ,
                             ),
                             onTap: () {
                               chosenIndex = i;

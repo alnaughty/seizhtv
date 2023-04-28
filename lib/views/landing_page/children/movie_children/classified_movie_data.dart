@@ -1,13 +1,19 @@
+// ignore_for_file: deprecated_member_use, no_leading_underscores_for_local_identifiers
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:seizhtv/extensions/color.dart';
-import 'package:seizhtv/globals/data.dart';
 import 'package:seizhtv/globals/network_image_viewer.dart';
 import 'package:seizhtv/globals/palette.dart';
 import 'package:seizhtv/globals/video_loader.dart';
+import 'package:seizhtv/services/movie_api.dart';
 import 'package:seizhtv/views/landing_page/children/movie_children/movie_details.dart';
+import 'package:seizhtv/views/landing_page/children/search/search_movies.dart';
 import 'package:z_m3u_handler/extension.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
+import '../../../../globals/data.dart';
+import 'details.dart';
 
 class ClassifiedMovieData extends StatefulWidget {
   const ClassifiedMovieData({
@@ -20,17 +26,17 @@ class ClassifiedMovieData extends StatefulWidget {
 }
 
 class _ClassifiedMovieDataState extends State<ClassifiedMovieData>
-    with ColorPalette, VideoLoader {
+    with ColorPalette, VideoLoader, MovieAPI {
   late final List<ClassifiedData> _data = widget.data.data.classify().toList()
     ..sort((a, b) => a.name.compareTo(b.name));
   late List<ClassifiedData> _displayData = List.from(_data);
   late final ScrollController _scrollController;
   late final TextEditingController _search;
+
   @override
   void initState() {
     _search = TextEditingController();
     _scrollController = ScrollController();
-    // TODO: implement initState
     super.initState();
   }
 
@@ -38,7 +44,6 @@ class _ClassifiedMovieDataState extends State<ClassifiedMovieData>
   void dispose() {
     _search.dispose();
     _scrollController.dispose();
-    // TODO: implement dispose
     super.dispose();
   }
 
@@ -51,12 +56,6 @@ class _ClassifiedMovieDataState extends State<ClassifiedMovieData>
         appBar: AppBar(
           elevation: 0,
           backgroundColor: Colors.transparent,
-          // actions: [
-          //   IconButton(
-          //     onPressed: () {},
-          //     icon: Icon(Icons.search),
-          //   ),
-          // ],
           title: Row(
             children: [
               SvgPicture.asset(
@@ -182,48 +181,89 @@ class _ClassifiedMovieDataState extends State<ClassifiedMovieData>
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         crossAxisCount: 3,
                         childAspectRatio: .6,
-                        children: List.generate(_displayData.length, (index) {
-                          final ClassifiedData _entry = _displayData[index];
-                          return LayoutBuilder(builder: (context, c) {
-                            final double w = c.maxWidth;
-                            final double h = c.maxHeight;
-                            return ClipRRect(
-                              borderRadius: BorderRadius.circular(5),
-                              child: Tooltip(
-                                message: _entry.name,
-                                child: GestureDetector(
-                                  onTap: () async {
-                                    await showModalBottomSheet(
-                                        context: context,
-                                        isDismissible: true,
-                                        backgroundColor: Colors.transparent,
-                                        constraints: const BoxConstraints(
-                                          maxHeight: 230,
-                                        ),
-                                        builder: (_) {
-                                          return MovieDetails(
-                                            data: _entry,
-                                            onLoadVideo:
-                                                (M3uEntry entry) async {
-                                              Navigator.of(context).pop(null);
-                                              entry.addToHistory(refId!);
-                                              await loadVideo(context, entry);
-                                            },
-                                          );
-                                        });
-                                  },
-                                  child: NetworkImageViewer(
-                                    url: _entry.data[0].attributes['tvg-logo'],
-                                    width: w,
-                                    height: h,
-                                    fit: BoxFit.cover,
-                                    color: highlight,
+                        children: List.generate(
+                          _displayData.length,
+                          (index) {
+                            final ClassifiedData _entry = _displayData[index];
+
+                            return LayoutBuilder(
+                              builder: (context, c) {
+                                final double w = c.maxWidth;
+                                final double h = c.maxHeight;
+                                return ClipRRect(
+                                  borderRadius: BorderRadius.circular(5),
+                                  child: Tooltip(
+                                    message: _entry.name,
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        String str1 = _entry.name;
+                                        String result1 = str1.replaceAll(
+                                            RegExp(
+                                                r"[(]+[0-9]+[)]|[|]\s+[0-9]+\s[|]"),
+                                            '');
+                                        String result2 = result1.replaceAll(
+                                            RegExp(
+                                                r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|] "),
+                                            '');
+
+                                        await searchMovie(title: result2).then(
+                                          (value) {
+                                            if (value == null) {
+                                              return showModalBottomSheet(
+                                                context: context,
+                                                isDismissible: true,
+                                                backgroundColor:
+                                                    Colors.transparent,
+                                                constraints:
+                                                    const BoxConstraints(
+                                                  maxHeight: 230,
+                                                ),
+                                                builder: (_) {
+                                                  return MovieDetails(
+                                                    data: _entry,
+                                                    onLoadVideo:
+                                                        (M3uEntry entry) async {
+                                                      Navigator.of(context)
+                                                          .pop(null);
+                                                      entry
+                                                          .addToHistory(refId!);
+                                                      await loadVideo(
+                                                          context, entry);
+                                                    },
+                                                  );
+                                                },
+                                              );
+                                            } else {
+                                              return Navigator.push(
+                                                context,
+                                                PageTransition(
+                                                  child: MovieDetailsPage(
+                                                    data: _entry,
+                                                    title: result2,
+                                                  ),
+                                                  type: PageTransitionType
+                                                      .leftToRight,
+                                                ),
+                                              );
+                                            }
+                                          },
+                                        );
+                                      },
+                                      child: NetworkImageViewer(
+                                        url: _entry
+                                            .data[0].attributes['tvg-logo'],
+                                        width: w,
+                                        height: h,
+                                        fit: BoxFit.cover,
+                                        color: highlight,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
+                                );
+                              },
                             );
-                          });
-                        }),
+                          },
+                        ),
                       ),
                     ),
             )

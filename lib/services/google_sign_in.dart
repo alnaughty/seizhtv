@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_nullable_for_final_variable_declarations
+
 import 'dart:async';
 import 'dart:io';
 
@@ -38,6 +40,7 @@ class GoogleSignInService {
       final GoogleSignInAuthentication? googleAuth =
           await googleUser.authentication;
       if (googleAuth == null) return null;
+      print("GOGGLE AUTH: $googleUser");
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,

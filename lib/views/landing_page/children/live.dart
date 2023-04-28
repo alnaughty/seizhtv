@@ -1,22 +1,22 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:seizhtv/data_containers/loaded_m3u_data.dart';
 import 'package:seizhtv/extensions/color.dart';
 import 'package:seizhtv/extensions/list.dart';
 import 'package:seizhtv/extensions/state.dart';
 import 'package:seizhtv/globals/loader.dart';
-import 'package:seizhtv/globals/network_image_viewer.dart';
 import 'package:seizhtv/globals/palette.dart';
 import 'package:seizhtv/globals/ui_additional.dart';
-import 'package:seizhtv/views/landing_page/children/live_children/classified_live_data.dart';
 import 'package:seizhtv/views/landing_page/children/live_children/live_list.dart';
-import 'package:seizhtv/views/landing_page/children/search_content_page.dart';
-import 'package:z_m3u_handler/extension.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
+
+import '../../../globals/data.dart';
+import '../../../globals/video_loader.dart';
 
 class LivePage extends StatefulWidget {
   const LivePage({super.key});
@@ -25,7 +25,8 @@ class LivePage extends StatefulWidget {
   State<LivePage> createState() => _LivePageState();
 }
 
-class _LivePageState extends State<LivePage> with ColorPalette, UIAdditional {
+class _LivePageState extends State<LivePage>
+    with ColorPalette, UIAdditional, VideoLoader {
   final int _itemsPerPage = 20; // number of items to show per page
   int _currentPage = 0; // current page index
   final LoadedM3uData _vm = LoadedM3uData.instance;
@@ -35,6 +36,8 @@ class _LivePageState extends State<LivePage> with ColorPalette, UIAdditional {
   List<M3uEntry>? displayData;
   late final StreamSubscription<CategorizedM3UData> _streamer;
   int loadLength = 100;
+  bool update = false;
+
   initStream() {
     _streamer = _vm.stream.listen((event) {
       _data = List.from(
@@ -78,98 +81,115 @@ class _LivePageState extends State<LivePage> with ColorPalette, UIAdditional {
         backgroundColor: card,
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(60),
-          child: appbar(1, onSearchPressed: () async {
-            // await Navigator.push(
-            //     context,
-            //     PageTransition(
-            //         child: const SearchContentPage(
-            //           type: 0,
-            //         ),
-            //         type: PageTransitionType.leftToRight));
-            showSearchField = !showSearchField;
-            if (mounted) setState(() {});
-          }),
-        ),
-        body: Column(
-          children: [
-            AnimatedPadding(
-              duration: const Duration(milliseconds: 400),
-              padding:
-                  EdgeInsets.symmetric(horizontal: showSearchField ? 20 : 0),
-              child: AnimatedContainer(
-                duration: const Duration(
-                  milliseconds: 500,
-                ),
-                padding:
-                    EdgeInsets.symmetric(horizontal: showSearchField ? 10 : 0),
-                height: showSearchField ? 50 : 0,
-                width: double.maxFinite,
-                decoration: BoxDecoration(
-                    color: highlight,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: highlight.darken().withOpacity(1),
-                        offset: const Offset(2, 2),
-                        blurRadius: 2,
-                      )
-                    ]),
-                child: Row(
-                  children: [
-                    SvgPicture.asset(
-                      "assets/icons/search.svg",
-                      height: 20,
-                      width: 20,
-                      color: white,
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Expanded(
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        child: showSearchField
-                            ? TextField(
-                                onChanged: (text) {
-                                  print(displayData!.length);
-                                  if (_kList.currentState != null) {
-                                    _kList.currentState!.search(text);
-                                  }
-                                  if (mounted) setState(() {});
-                                },
-                                cursorColor: orange,
-                                controller: _search,
-                                decoration: const InputDecoration(
-                                  hintText: "Search",
-                                ),
-                              )
-                            : Container(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if (showSearchField) ...{
-              const SizedBox(
-                height: 10,
-              ),
+          child: appbar(
+            1,
+            onSearchPressed: () async {
+              showSearchField = !showSearchField;
+              if (mounted) setState(() {});
             },
-            Expanded(
-              child: displayData == null
-                  ? const SeizhTvLoader(
-                      label: "Retrieving Data",
-                    )
-                  : Scrollbar(
-                      controller: _scrollController,
-                      child: LiveList(
-                        key: _kList,
-                        data: displayData!,
-                        controller: _scrollController,
-                        onPressed: (M3uEntry entry) {},
-                      ),
+            onUpdateChannel: () {
+              setState(() {
+                update = true;
+                Future.delayed(
+                  const Duration(seconds: 6),
+                  () {
+                    setState(() {
+                      update = false;
+                    });
+                  },
+                );
+              });
+            },
+          ),
+        ),
+        body: Stack(
+          children: [
+            Column(
+              children: [
+                AnimatedPadding(
+                  duration: const Duration(milliseconds: 400),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: showSearchField ? 20 : 0),
+                  child: AnimatedContainer(
+                    duration: const Duration(
+                      milliseconds: 500,
                     ),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: showSearchField ? 10 : 0),
+                    height: showSearchField ? 50 : 0,
+                    width: double.maxFinite,
+                    decoration: BoxDecoration(
+                        color: highlight,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: highlight.darken().withOpacity(1),
+                            offset: const Offset(2, 2),
+                            blurRadius: 2,
+                          )
+                        ]),
+                    child: Row(
+                      children: [
+                        SvgPicture.asset(
+                          "assets/icons/search.svg",
+                          height: 20,
+                          width: 20,
+                          color: white,
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            child: showSearchField
+                                ? TextField(
+                                    onChanged: (text) {
+                                      if (_kList.currentState != null) {
+                                        _kList.currentState!.search(text);
+                                      }
+                                      if (mounted) setState(() {});
+                                    },
+                                    cursorColor: orange,
+                                    controller: _search,
+                                    decoration: const InputDecoration(
+                                      hintText: "Search",
+                                    ),
+                                  )
+                                : Container(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                if (showSearchField) ...{
+                  const SizedBox(
+                    height: 10,
+                  ),
+                },
+                Expanded(
+                  child: displayData == null
+                      ? const SeizhTvLoader(
+                          label: "Retrieving Data",
+                        )
+                      : Scrollbar(
+                          controller: _scrollController,
+                          child: LiveList(
+                            key: _kList,
+                            data: displayData!,
+                            controller: _scrollController,
+                            onPressed: (M3uEntry entry) async {
+                              print("LIVE DATA: ${entry}");
+                              await loadVideo(context, entry);
+                              await entry.addToHistory(refId!);
+                            },
+                          ),
+                        ),
+                ),
+              ],
             ),
+            update == true ? loader() : Container()
           ],
         ),
         // body: Column(

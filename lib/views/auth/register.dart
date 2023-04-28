@@ -14,6 +14,8 @@ import 'package:seizhtv/services/google_sign_in.dart';
 import 'package:seizhtv/views/landing_page/source_management.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
 
+import 'login.dart';
+
 class MainRegisterPage extends StatefulWidget {
   const MainRegisterPage({super.key});
 
@@ -75,8 +77,8 @@ class _MainRegisterPageState extends State<MainRegisterPage>
                       children: [
                         LabeledTextField(
                           controller: _email,
-                          label: "Username",
-                          hinttext: "Username",
+                          label: "Email",
+                          hinttext: "Email",
                           validator: (text) {
                             if (text == null) {
                               return "Unprocessable";
@@ -120,6 +122,7 @@ class _MainRegisterPageState extends State<MainRegisterPage>
                           if (u != null) {
                             refId = u.user.uid;
                             user = M3uUser.fromProvider(u);
+                            print("${user}");
                             _cacher.saveRefID(refId!);
                             _cacher.saveM3uUser(user!);
                             _cacher.saveLoginType(0);
@@ -127,7 +130,7 @@ class _MainRegisterPageState extends State<MainRegisterPage>
                             await Navigator.pushReplacement(
                               context,
                               PageTransition(
-                                child: const SourceManagementPage(),
+                                child: const LoginPage(),
                                 type: PageTransitionType.leftToRight,
                               ),
                             );
@@ -209,7 +212,7 @@ class _MainRegisterPageState extends State<MainRegisterPage>
                         await Navigator.pushReplacement(
                           context,
                           PageTransition(
-                            child: const SourceManagementPage(),
+                            child: const LoginPage(),
                             type: PageTransitionType.leftToRight,
                           ),
                         );
@@ -238,7 +241,8 @@ class _MainRegisterPageState extends State<MainRegisterPage>
                         )
                       ],
                     ),
-                  )
+                  ),
+                  const SizedBox(height: 30),
                 ],
               ),
             ),

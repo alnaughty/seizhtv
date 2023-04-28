@@ -28,7 +28,6 @@ class _SeriesDetailsSheetState extends State<SeriesDetailsSheet>
         .getDataFrom(type: CollectionType.favorites, refId: refId!)
         .then((value) {
       if (value != null) {
-        print("FETCH DATA FROM FAV: $value");
         _vm.populate(value);
       }
     });
@@ -118,7 +117,53 @@ class _SeriesDetailsSheetState extends State<SeriesDetailsSheet>
                             Navigator.of(context).pop(null);
                             if (!isFavorite) {
                               // await widget.data.data[0].addToFavorites(refId!);
-
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  Future.delayed(
+                                    const Duration(seconds: 5),
+                                    () {
+                                      Navigator.of(context).pop(true);
+                                    },
+                                  );
+                                  return Dialog(
+                                    alignment: Alignment.topCenter,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                        10.0,
+                                      ),
+                                    ),
+                                    child: Container(
+                                      height: 50,
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 15,
+                                        horizontal: 20,
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text(
+                                            "Added to Favorites",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                          IconButton(
+                                            padding: const EdgeInsets.all(0),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: const Icon(
+                                              Icons.close_rounded,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
                               for (M3uEntry m3u in widget.data.data) {
                                 await m3u.addToFavorites(refId!);
                               }
@@ -154,47 +199,48 @@ class _SeriesDetailsSheetState extends State<SeriesDetailsSheet>
               ],
             ),
             ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (_, i) {
-                  final M3uEntry e = widget.data.data[i];
-                  return ListTile(
-                    onTap: () async {
-                      widget.onLoadVideo(e);
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (_, i) {
+                final M3uEntry e = widget.data.data[i];
+                return ListTile(
+                  onTap: () async {
+                    widget.onLoadVideo(e);
+                  },
+                  contentPadding: EdgeInsets.zero,
+                  trailing: FavoriteIconButton(
+                    onPressedCallback: (bool f) async {
+                      if (f) {
+                        await e.addToFavorites(refId!);
+                      } else {
+                        await e.removeFromFavorites(refId!);
+                      }
+                      await fetchFav();
                     },
-                    contentPadding: EdgeInsets.zero,
-                    trailing: FavoriteIconButton(
-                      onPressedCallback: (bool f) async {
-                        if (f) {
-                          await e.addToFavorites(refId!);
-                        } else {
-                          await e.removeFromFavorites(refId!);
-                        }
-                        await fetchFav();
-                      },
-                      initValue: e.existsInFavorites("series"),
-                      iconSize: 20,
-                    ),
-                    leading: SizedBox(
-                      width: 85,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: NetworkImageViewer(
-                          url: e.attributes['tvg-logo']!,
-                          height: 60,
-                          width: 85,
-                          color: highlight,
-                          fit: BoxFit.cover,
-                        ),
+                    initValue: e.existsInFavorites("series"),
+                    iconSize: 20,
+                  ),
+                  leading: SizedBox(
+                    width: 85,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: NetworkImageViewer(
+                        url: e.attributes['tvg-logo']!,
+                        height: 60,
+                        width: 85,
+                        color: highlight,
+                        fit: BoxFit.cover,
                       ),
                     ),
-                    title: Text(e.title),
-                  );
-                },
-                separatorBuilder: (_, i) => Divider(
-                      color: Colors.white.withOpacity(.3),
-                    ),
-                itemCount: widget.data.data.length)
+                  ),
+                  title: Text(e.title),
+                );
+              },
+              separatorBuilder: (_, i) => Divider(
+                color: Colors.white.withOpacity(.3),
+              ),
+              itemCount: widget.data.data.length,
+            )
             // ...widget.data.data.map(
             // (e) => ListTile(
             //   onTap: () async {

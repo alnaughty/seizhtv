@@ -110,8 +110,6 @@ class _CustomPlayerState extends State<CustomPlayer> with ColorPalette {
   bool unableToPlay = false;
   @override
   void initState() {
-    // TODO: implement initState
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await init();
     });
@@ -121,7 +119,6 @@ class _CustomPlayerState extends State<CustomPlayer> with ColorPalette {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _videoController.dispose();
     if (_chewieWidget != null) {
       _chewieController.dispose();

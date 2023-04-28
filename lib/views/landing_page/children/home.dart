@@ -1,3 +1,6 @@
+// ignore_for_file: deprecated_member_use, unused_import
+
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:page_transition/page_transition.dart';
@@ -24,404 +27,665 @@ class _HomePageState extends State<HomePage> with ColorPalette, UIAdditional {
   final DataCacher _cacher = DataCacher.instance;
   late final String? savedUrl = _cacher.savedUrl;
   final double space = 8;
+  bool showSearchField = false;
+  late final TextEditingController _search;
+  late final ScrollController _scrollController;
+  late final List<ClassifiedData> _data;
+  List<ClassifiedData>? displayData;
+  bool update = false;
+
+  initStream() {
+    _vm.stream.listen((event) {
+      _data = List.from(event.movies);
+      _data.sort((a, b) => a.name.compareTo(b.name));
+      displayData = List.from(_data);
+      print("DATA: $_data");
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void initState() {
+    initStream();
+    _scrollController = ScrollController();
+    _search = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _search.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: card,
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(60),
-          child: appbar(0),
+      backgroundColor: card,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: appbar(
+          0,
+          // onSearchPressed: () async {
+          //   showSearchField = !showSearchField;
+          //   if (mounted) setState(() {});
+          // },
+          onUpdateChannel: () {
+            setState(() {
+              update = true;
+              Future.delayed(
+                const Duration(seconds: 6),
+                () {
+                  setState(() {
+                    update = false;
+                    _cacher.saveDate(DateTime.now().toString());
+                  });
+                },
+              );
+            });
+          },
         ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(15),
-            child: Column(
-              children: [
-                StreamBuilder<CategorizedM3UData>(
-                  stream: _vm.stream,
-                  builder: (_, snapshot) {
-                    if (!snapshot.hasData || snapshot.hasError) {
-                      return Column(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(18),
-                            child: shimmerLoading(
-                              highlight,
-                              170,
-                              width: double.maxFinite,
+      ),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child:
+                // showSearchField ? Container(
+                //         color: Colors.red,
+                //         child: Column(
+                //           children: [
+                //             AnimatedPadding(
+                //               duration: const Duration(milliseconds: 400),
+                //               padding: EdgeInsets.symmetric(
+                //                   horizontal: showSearchField ? 20 : 0),
+                //               child: AnimatedContainer(
+                //                 duration: const Duration(
+                //                   milliseconds: 500,
+                //                 ),
+                //                 margin:
+                //                     EdgeInsets.only(top: showSearchField ? 10 : 0),
+                //                 padding: EdgeInsets.symmetric(
+                //                     horizontal: showSearchField ? 10 : 0),
+                //                 height: showSearchField ? 50 : 0,
+                //                 width: double.maxFinite,
+                //                 decoration: BoxDecoration(
+                //                     color: highlight,
+                //                     borderRadius: BorderRadius.circular(10),
+                //                     boxShadow: [
+                //                       BoxShadow(
+                //                         color: highlight.darken().withOpacity(1),
+                //                         offset: const Offset(2, 2),
+                //                         blurRadius: 2,
+                //                       )
+                //                     ]),
+                //                 child: Row(
+                //                   children: [
+                //                     SvgPicture.asset(
+                //                       "assets/icons/search.svg",
+                //                       height: 20,
+                //                       width: 20,
+                //                       color: white,
+                //                     ),
+                //                     const SizedBox(
+                //                       width: 10,
+                //                     ),
+                //                     Expanded(
+                //                       child: AnimatedSwitcher(
+                //                         duration: const Duration(milliseconds: 300),
+                //                         child: showSearchField
+                //                             ? TextField(
+                //                                 onChanged: (text) {
+                //                                   if (text.isEmpty) {
+                //                                     displayData = List.from(_data);
+                //                                   } else {
+                //                                     displayData = List.from(
+                //                                       _data.where(
+                //                                         (element) => element.name
+                //                                             .toLowerCase()
+                //                                             .contains(
+                //                                               text.toLowerCase(),
+                //                                             ),
+                //                                       ),
+                //                                     );
+                //                                   }
+                //                                   displayData!.sort((a, b) =>
+                //                                       a.name.compareTo(b.name));
+                //                                   if (mounted) setState(() {});
+                //                                   // if (text.isEmpty) {
+                //                                   //   _displyData = List.from(data);
+                //                                   // } else {
+                //                                   // _displyData = List.from(
+                //                                   //   data.where(
+                //                                   //     (element) =>
+                //                                   //         element.title.toLowerCase().contains(
+                //                                   //               text.toLowerCase(),
+                //                                   //             ),
+                //                                   //   ),
+                //                                   // );
+                //                                   // }
+                //                                 },
+                //                                 cursorColor: orange,
+                //                                 controller: _search,
+                //                                 decoration: const InputDecoration(
+                //                                   hintText: "Search",
+                //                                 ),
+                //                               )
+                //                             : Container(),
+                //                       ),
+                //                     ),
+                //                   ],
+                //                 ),
+                //               ),
+                //             ),
+                //             Container(
+                //               color: Colors.grey,
+                //               child: displayData!.isEmpty
+                //                   ? Center(
+                //                       child: Text(
+                //                         "No Result Found for `${_search.text}`",
+                //                         style: TextStyle(
+                //                           color: Colors.white.withOpacity(.5),
+                //                         ),
+                //                       ),
+                //                     )
+                //                   : Container(),
+                //             )
+                //           ],
+                //         ),
+                //       ) :
+                Padding(
+              padding: const EdgeInsets.all(15),
+              child: Column(
+                children: [
+                  StreamBuilder<CategorizedM3UData>(
+                    stream: _vm.stream,
+                    builder: (_, snapshot) {
+                      if (!snapshot.hasData || snapshot.hasError) {
+                        return Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(18),
+                              child: shimmerLoading(
+                                highlight,
+                                170,
+                                width: double.maxFinite,
+                              ),
                             ),
-                          ),
-                          SizedBox(
-                            height: space,
-                          ),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 15,
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(18),
-                                    child: shimmerLoading(
-                                      highlight,
-                                      150,
+                            SizedBox(
+                              height: space,
+                            ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 15,
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(18),
+                                      child: shimmerLoading(
+                                        highlight,
+                                        150,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(
-                                width: space + 15,
-                              ),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 15,
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(18),
-                                    child: shimmerLoading(
-                                      highlight,
-                                      150,
+                                SizedBox(
+                                  width: space + 15,
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 15,
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(18),
+                                      child: shimmerLoading(
+                                        highlight,
+                                        150,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      );
-                    }
-                    final CategorizedM3UData _data = snapshot.data!;
-                    return Column(
-                      children: [
-                        Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18)),
-                          color: highlight,
-                          child: MaterialButton(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18)),
-                            onPressed: () {
-                              widget.onPagePressed(1);
-                            },
-                            padding: EdgeInsets.zero,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20)),
-                              padding: const EdgeInsets.all(18),
-                              height: 180,
-                              width: double.infinity,
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
+                              ],
+                            ),
+                          ],
+                        );
+                      }
+                      final CategorizedM3UData _data = snapshot.data!;
+                      return update == true
+                          ? Column(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(18),
+                                  child: shimmerLoading(
+                                    highlight,
+                                    170,
+                                    width: double.maxFinite,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: space,
+                                ),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 15,
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(18),
+                                          child: shimmerLoading(
+                                            highlight,
+                                            150,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: space + 15,
+                                    ),
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 15,
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(18),
+                                          child: shimmerLoading(
+                                            highlight,
+                                            150,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            )
+                          : Column(
+                              children: [
+                                Card(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(18)),
+                                  color: highlight,
+                                  child: MaterialButton(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(18)),
+                                    onPressed: () {
+                                      widget.onPagePressed(1);
+                                    },
+                                    padding: EdgeInsets.zero,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
+                                      padding: const EdgeInsets.all(18),
+                                      height: 180,
+                                      width: double.infinity,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Opacity(
+                                                opacity: 0.2,
+                                                child: Text(
+                                                  "Last update : ${timeago.format(_cacher.date!)}",
+                                                  style: const TextStyle(
+                                                      fontSize: 14),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 26,
+                                                width: 26,
+                                                child: IconButton(
+                                                  padding:
+                                                      const EdgeInsets.all(0),
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      update = true;
+                                                      _vm.populate(_data);
+                                                      Future.delayed(
+                                                        const Duration(
+                                                            seconds: 6),
+                                                        () {
+                                                          setState(() {
+                                                            update = false;
+                                                            _cacher.saveDate(
+                                                                DateTime.now()
+                                                                    .toString());
+                                                          });
+                                                        },
+                                                      );
+                                                    });
+                                                  },
+                                                  icon: Container(
+                                                    height: 26,
+                                                    width: 26,
+                                                    padding:
+                                                        const EdgeInsets.all(5),
+                                                    decoration: BoxDecoration(
+                                                        color: ColorPalette()
+                                                            .white
+                                                            .withOpacity(0.1),
+                                                        shape: BoxShape.circle),
+                                                    child: SvgPicture.asset(
+                                                      "assets/icons/sync.svg",
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            children: [
+                                              Expanded(
+                                                  child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.end,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      liveContainer(
+                                                        height: 40,
+                                                        width: 60,
+                                                        fontSize: 24,
+                                                      ),
+                                                      const SizedBox(width: 8),
+                                                      const Text(
+                                                        "Tv",
+                                                        style: TextStyle(
+                                                          fontSize: 32,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.circle,
+                                                        color:
+                                                            ColorPalette().red,
+                                                        size: 10,
+                                                      ),
+                                                      const SizedBox(width: 5),
+                                                      Text(
+                                                        "${_data.live.expand((element) => element.data).length} Channels",
+                                                      ),
+                                                    ],
+                                                  )
+                                                ],
+                                              )),
+                                              Expanded(
+                                                  child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                children: [
+                                                  Image.asset(
+                                                    "assets/images/tv.png",
+                                                    scale: 3,
+                                                    fit: BoxFit.fitWidth,
+                                                  ),
+                                                ],
+                                              ))
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: space),
+                                SizedBox(
+                                  height: 144,
+                                  width: double.infinity,
+                                  child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Opacity(
-                                        opacity: 0.2,
-                                        child: Text(
-                                          "Last update : ${timeago.format(_cacher.date!)}",
-                                          style: const TextStyle(fontSize: 14),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 26,
-                                        width: 26,
-                                        child: IconButton(
-                                            padding: const EdgeInsets.all(0),
+                                      Expanded(
+                                        child: smallCardHome(
+                                            imagePath:
+                                                "assets/images/Grouppopcorn.png",
+                                            title: "Movies",
+                                            index: 2,
+                                            color: ColorPalette().orange,
+                                            total:
+                                                "${_data.movies.expand((element) => element.data.classify()).length}",
                                             onPressed: () {
                                               setState(() {
-                                                print("refresh");
+                                                update = true;
+                                                _vm.populate(_data);
+                                                Future.delayed(
+                                                  const Duration(seconds: 6),
+                                                  () {
+                                                    setState(() {
+                                                      update = false;
+                                                      _cacher.saveDate(
+                                                          DateTime.now()
+                                                              .toString());
+                                                    });
+                                                  },
+                                                );
                                               });
-                                            },
-                                            icon: Container(
-                                              height: 26,
-                                              width: 26,
-                                              padding: const EdgeInsets.all(5),
-                                              decoration: BoxDecoration(
-                                                  color: ColorPalette()
-                                                      .white
-                                                      .withOpacity(0.1),
-                                                  shape: BoxShape.circle),
-                                              child: SvgPicture.asset(
-                                                "assets/icons/sync.svg",
-                                              ),
-                                            )),
-                                      )
+                                            }),
+                                      ),
+                                      SizedBox(width: space),
+                                      Expanded(
+                                        child: smallCardHome(
+                                            index: 3,
+                                            color: Colors.purple,
+                                            imagePath:
+                                                "assets/images/Groupframe.png",
+                                            title: "Series",
+                                            total:
+                                                "${_data.series.expand((element) => element.data.classify()).length}",
+                                            onPressed: () {
+                                              setState(() {
+                                                update = true;
+                                                _vm.populate(_data);
+                                                Future.delayed(
+                                                  const Duration(seconds: 6),
+                                                  () {
+                                                    setState(() {
+                                                      update = false;
+                                                      _cacher.saveDate(
+                                                          DateTime.now()
+                                                              .toString());
+                                                    });
+                                                  },
+                                                );
+                                              });
+                                            }),
+                                      ),
                                     ],
                                   ),
-                                  Row(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Expanded(
-                                          child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              liveContainer(
-                                                height: 40,
-                                                width: 60,
-                                                fontSize: 24,
-                                              ),
-                                              const SizedBox(
-                                                width: 8,
-                                              ),
-                                              const Text(
-                                                "Tv",
-                                                style: TextStyle(
-                                                    fontSize: 32,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              Icon(
-                                                Icons.circle,
-                                                color: ColorPalette().red,
-                                                size: 10,
-                                              ),
-                                              const SizedBox(
-                                                width: 5,
-                                              ),
-                                              Text(
-                                                "${_data.live.expand((element) => element.data).length} Channels",
-                                              ),
-                                            ],
-                                          )
-                                        ],
-                                      )),
-                                      Expanded(
-                                          child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          Image.asset(
-                                            "assets/images/tv.png",
-                                            scale: 3,
-                                            fit: BoxFit.fitWidth,
-                                          ),
-                                        ],
-                                      ))
-                                    ],
+                                ),
+                              ],
+                            );
+                    },
+                  ),
+                  SizedBox(height: space),
+                  MaterialButton(
+                    onPressed: null,
+                    color: highlight,
+                    disabledColor: highlight.darken(),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18)),
+                    height: 65,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                              color: ColorPalette().cardButton,
+                              borderRadius: BorderRadius.circular(12)),
+                          padding: const EdgeInsets.all(8),
+                          child: SvgPicture.asset("assets/icons/Widget_add.svg",
+                              color: ColorPalette().white),
+                        ),
+                        const Text(
+                          "Multi-Screen",
+                          style: TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.w600),
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: space),
+                  MaterialButton(
+                    onPressed: () async {
+                      // await Navigator.push(
+                      //   context,
+                      //   PageTransition(
+                      //       child: const SourceManagementPage(
+                      //         fromInit: false,
+                      //       ),
+                      //       type: PageTransitionType.leftToRight),
+                      // );
+                    },
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18)),
+                    color: highlight,
+                    height: 65,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                              color: ColorPalette().cardButton,
+                              borderRadius: BorderRadius.circular(12)),
+                          height: 50,
+                          width: 50,
+                          padding: const EdgeInsets.all(8),
+                          child: SvgPicture.asset(
+                            "assets/icons/epg.svg",
+                            color: ColorPalette().white,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            liveContainer(fontSize: 15, height: 30, width: 50),
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            const Text(
+                              "with EPG",
+                              style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: space),
+                  SizedBox(
+                    height: 65,
+                    width: double.infinity,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: MaterialButton(
+                            onPressed: () async {
+                              await Navigator.pushNamed(
+                                  context, "/history-page");
+                            },
+                            color: highlight,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18)),
+                            height: 65,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: ColorPalette().cardButton,
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                                ],
-                              ),
+                                  height: 40,
+                                  width: 40,
+                                  padding: const EdgeInsets.all(5),
+                                  child: SvgPicture.asset(
+                                    "assets/icons/time.svg",
+                                    color: ColorPalette().white,
+                                  ),
+                                ),
+                                const Text(
+                                  "Catch Up",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                )
+                              ],
                             ),
                           ),
                         ),
-                        SizedBox(
-                          height: space,
-                        ),
-                        SizedBox(
-                          height: 144,
-                          width: double.infinity,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: smallCardHome(
-                                    imagePath: "assets/images/Grouppopcorn.png",
-                                    title: "Movies",
-                                    index: 2,
-                                    color: ColorPalette().orange,
-                                    total:
-                                        "${_data.movies.expand((element) => element.data.classify()).length}",
-                                    onPressed: () {}),
-                              ),
-                              SizedBox(
-                                width: space,
-                              ),
-                              Expanded(
-                                child: smallCardHome(
-                                    index: 3,
-                                    color: Colors.purple,
-                                    imagePath: "assets/images/Groupframe.png",
-                                    title: "Series",
-                                    total:
-                                        "${_data.series.expand((element) => element.data.classify()).length}",
-                                    onPressed: () {}),
-                              ),
-                            ],
+                        SizedBox(width: space),
+                        Expanded(
+                          child: MaterialButton(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                            height: 65,
+                            disabledColor: highlight.darken(),
+                            color: highlight,
+                            onPressed: null,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                      color: cardButton,
+                                      borderRadius: BorderRadius.circular(12)),
+                                  height: 40,
+                                  width: 40,
+                                  padding: const EdgeInsets.all(5),
+                                  child: SvgPicture.asset(
+                                    "assets/icons/radio.svg",
+                                    color: ColorPalette().white,
+                                  ),
+                                ),
+                                const Text(
+                                  "Radio",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600),
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ],
-                    );
-                  },
-                ),
-                SizedBox(
-                  height: space,
-                ),
-                MaterialButton(
-                  onPressed: null,
-                  color: highlight,
-                  disabledColor: highlight.darken(),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18)),
-                  height: 65,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                            color: ColorPalette().cardButton,
-                            borderRadius: BorderRadius.circular(12)),
-                        padding: const EdgeInsets.all(8),
-                        child: SvgPicture.asset(
-                          "assets/icons/Widget_add.svg",
-                          color: ColorPalette().white,
-                        ),
-                      ),
-                      const Text(
-                        "Multi-Screen",
-                        style: TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.w600),
-                      )
-                    ],
+                    ),
                   ),
-                ),
-                SizedBox(
-                  height: space,
-                ),
-                MaterialButton(
-                  onPressed: () async {
-                    await Navigator.push(
-                      context,
-                      PageTransition(
-                          child: const SourceManagementPage(
-                            fromInit: false,
-                          ),
-                          type: PageTransitionType.leftToRight),
-                    );
-                  },
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18)),
-                  color: highlight,
-                  height: 65,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                            color: ColorPalette().cardButton,
-                            borderRadius: BorderRadius.circular(12)),
-                        height: 50,
-                        width: 50,
-                        padding: const EdgeInsets.all(8),
-                        child: SvgPicture.asset(
-                          "assets/icons/epg.svg",
-                          color: ColorPalette().white,
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          liveContainer(fontSize: 15, height: 30, width: 50),
-                          const SizedBox(
-                            width: 8,
-                          ),
-                          const Text(
-                            "with EPG",
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w600),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: space,
-                ),
-                SizedBox(
-                  height: 65,
-                  width: double.infinity,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: MaterialButton(
-                          onPressed: () async {
-                            await Navigator.pushNamed(context, "/history-page");
-                          },
-                          color: highlight,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18)),
-                          height: 65,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                    color: ColorPalette().cardButton,
-                                    borderRadius: BorderRadius.circular(12)),
-                                height: 40,
-                                width: 40,
-                                padding: const EdgeInsets.all(5),
-                                child: SvgPicture.asset(
-                                  "assets/icons/time.svg",
-                                  color: ColorPalette().white,
-                                ),
-                              ),
-                              const Text(
-                                "Catch Up",
-                                style: TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.w600),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: space,
-                      ),
-                      Expanded(
-                        child: MaterialButton(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18)),
-                          height: 65,
-                          disabledColor: highlight.darken(),
-                          color: highlight,
-                          onPressed: null,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                    color: cardButton,
-                                    borderRadius: BorderRadius.circular(12)),
-                                height: 40,
-                                width: 40,
-                                padding: const EdgeInsets.all(5),
-                                child: SvgPicture.asset(
-                                  "assets/icons/radio.svg",
-                                  color: ColorPalette().white,
-                                ),
-                              ),
-                              const Text(
-                                "Radio",
-                                style: TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.w600),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ));
+          update == true ? loader() : Container()
+        ],
+      ),
+    );
   }
 
   Widget smallCardHome(
@@ -458,7 +722,6 @@ class _HomePageState extends State<HomePage> with ColorPalette, UIAdditional {
                         ),
                         GestureDetector(
                           onTap: () {
-                            print("refresh");
                             onPressed();
                           },
                           child: Container(
@@ -494,9 +757,7 @@ class _HomePageState extends State<HomePage> with ColorPalette, UIAdditional {
                                 color: color,
                                 size: 10,
                               ),
-                              const SizedBox(
-                                width: 5,
-                              ),
+                              const SizedBox(width: 5),
                               Text(
                                 "$total Channels",
                                 style: const TextStyle(fontSize: 10),

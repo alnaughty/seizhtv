@@ -1,10 +1,14 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:seizhtv/globals/data.dart';
 import 'package:seizhtv/globals/palette.dart';
+import '../views/landing_page/source_management.dart';
 
 extension EXT on State {
   static ColorPalette palette = ColorPalette();
@@ -81,33 +85,36 @@ extension EXT on State {
   }
 
   Widget appbar(int index,
-      {bool showLeading = false, Widget? title, Function()? onSearchPressed}) {
+      {bool showLeading = false,
+      Widget? title,
+      Function()? onSearchPressed,
+      Function()? onUpdateChannel}) {
     return AppBar(
       elevation: 0,
       backgroundColor: Colors.transparent,
       foregroundColor: palette.white,
       automaticallyImplyLeading: showLeading,
       actions: [
-        if (index > 0) ...{
-          IconButton(
-            // onPressed: () async {
-            //   if (index == 1) {
-            //     await Navigator.pushNamed(context, "/search-live-page");
-            //   } else if (index == 2) {
-            //     await Navigator.pushNamed(context, "/search-movies-page");
-            //   } else {
-            //     await Navigator.pushNamed(context, "/search-series-page");
-            //   }
-            // },
-            onPressed: onSearchPressed,
-            icon: SvgPicture.asset(
-              "assets/icons/search.svg",
-              height: 25,
-              width: 25,
-              color: palette.white,
-            ),
+        // if (index > 0) ...{
+        IconButton(
+          // onPressed: () async {
+          //   if (index == 1) {
+          //     await Navigator.pushNamed(context, "/search-live-page");
+          //   } else if (index == 2) {
+          //     await Navigator.pushNamed(context, "/search-movies-page");
+          //   } else {
+          //     await Navigator.pushNamed(context, "/search-series-page");
+          //   }
+          // },
+          onPressed: onSearchPressed,
+          icon: SvgPicture.asset(
+            "assets/icons/search.svg",
+            height: 25,
+            width: 25,
+            color: palette.white,
           ),
-        },
+        ),
+        // },
         Center(
           child: ClipRRect(
             borderRadius: BorderRadius.circular(50),
@@ -124,11 +131,7 @@ extension EXT on State {
                 height: 40,
                 padding: EdgeInsets.zero,
                 onPressed: () {
-                  Navigator.pushNamed(context, "/profile-page"
-                      // MaterialPageRoute(
-                      //   builder: (context) => const ProfilePage(),
-                      // ),
-                      );
+                  Navigator.pushNamed(context, "/profile-page");
                 },
                 child: user?.photoUrl == null
                     ? Image.asset(
@@ -154,16 +157,26 @@ extension EXT on State {
             CupertinoIcons.ellipsis_vertical,
             color: palette.white,
           ),
-          onSelected: (value) {},
+          onSelected: (value) {
+            if (value == "Change Source") {
+              Navigator.push(
+                context,
+                PageTransition(
+                  child: const SourceManagementPage(),
+                  type: PageTransitionType.leftToRight,
+                ),
+              );
+            } else {
+              onUpdateChannel;
+            }
+          },
           itemBuilder: (BuildContext bc) {
             return [
               PopupMenuItem(
                 value: 'Change Source',
                 child: Row(
                   children: [
-                    SvgPicture.asset(
-                      "assets/icons/change.svg",
-                    ),
+                    SvgPicture.asset("assets/icons/change.svg"),
                     const SizedBox(width: 10),
                     const Text(
                       "Change Source",
@@ -173,17 +186,16 @@ extension EXT on State {
                 ),
               ),
               PopupMenuItem(
-                value: 'Upate Channels',
+                value: 'Update Channels',
+                onTap: onUpdateChannel,
                 child: Row(
                   children: [
-                    SvgPicture.asset(
-                      "assets/icons/update.svg",
-                    ),
+                    SvgPicture.asset("assets/icons/update.svg"),
                     const SizedBox(width: 10),
                     const Text(
-                      "Upate Channels",
+                      "Update Channels",
                       style: TextStyle(color: Colors.black),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -195,22 +207,22 @@ extension EXT on State {
     );
   }
 
-  Widget appbar1() {
+  Widget appbar1({Function()? onUpdateChannel}) {
     final DateTime now = DateTime.now();
     return AppBar(
       elevation: 0,
       backgroundColor: Colors.transparent,
       foregroundColor: palette.white,
       actions: [
-        IconButton(
-          onPressed: () {},
-          icon: SvgPicture.asset(
-            "assets/icons/search.svg",
-            height: 25,
-            width: 25,
-            color: palette.white,
-          ),
-        ),
+        // IconButton(
+        //   onPressed: () {},
+        //   icon: SvgPicture.asset(
+        //     "assets/icons/search.svg",
+        //     height: 25,
+        //     width: 25,
+        //     color: palette.white,
+        //   ),
+        // ),
         Center(
           child: ClipRRect(
             child: Container(
@@ -222,22 +234,69 @@ extension EXT on State {
               child: MaterialButton(
                 height: 40,
                 onPressed: () {
-                  // Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //         builder: (context) => const ProfilePage()));
+                  Navigator.pushNamed(context, "/profile-page");
                 },
               ),
             ),
           ),
         ),
-        IconButton(
-          onPressed: () {},
-          icon: Icon(
-            CupertinoIcons.ellipsis_vertical,
-            color: palette.white,
-          ),
-        ),
+        const SizedBox(width: 20),
+        // PopupMenuButton(
+        //   elevation: 0,
+        //   color: Colors.white,
+        //   icon: Icon(
+        //     CupertinoIcons.ellipsis_vertical,
+        //     color: palette.white,
+        //   ),
+        //   onSelected: (value) {
+        //     if (value == "Change Source") {
+        //       Navigator.push(
+        //         context,
+        //         PageTransition(
+        //           child: const SourceManagementPage(),
+        //           type: PageTransitionType.leftToRight,
+        //         ),
+        //       );
+        //     } else {
+        //       onUpdateChannel;
+        //     }
+        //   },
+        //   itemBuilder: (BuildContext bc) {
+        //     return [
+        //       PopupMenuItem(
+        //         value: 'Change Source',
+        //         child: Row(
+        //           children: [
+        //             SvgPicture.asset(
+        //               "assets/icons/change.svg",
+        //             ),
+        //             const SizedBox(width: 10),
+        //             const Text(
+        //               "Change Source",
+        //               style: TextStyle(color: Colors.black),
+        //             )
+        //           ],
+        //         ),
+        //       ),
+        //       PopupMenuItem(
+        //         value: 'Update Channels',
+        //         onTap: onUpdateChannel,
+        //         child: Row(
+        //           children: [
+        //             SvgPicture.asset(
+        //               "assets/icons/update.svg",
+        //             ),
+        //             const SizedBox(width: 10),
+        //             const Text(
+        //               "Update Channels",
+        //               style: TextStyle(color: Colors.black),
+        //             ),
+        //           ],
+        //         ),
+        //       ),
+        //     ];
+        //   },
+        // )
       ],
     );
   }

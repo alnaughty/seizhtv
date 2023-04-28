@@ -10,7 +10,6 @@ import 'package:seizhtv/globals/logo.dart';
 import 'package:seizhtv/globals/palette.dart';
 import 'package:seizhtv/globals/ui_additional.dart';
 import 'package:seizhtv/services/google_sign_in.dart';
-import 'package:seizhtv/views/auth/children/load_mac_address.dart';
 import 'package:seizhtv/views/auth/children/load_playlist.dart';
 import 'package:seizhtv/views/auth/register.dart';
 import 'package:seizhtv/views/landing_page/source_management.dart';
@@ -34,7 +33,6 @@ class _MainAuthPageState extends State<MainAuthPage>
   late final TextEditingController _email, _password;
   @override
   void initState() {
-    // TODO: implement initState
     _email = TextEditingController();
     _password = TextEditingController();
     super.initState();
@@ -70,7 +68,7 @@ class _MainAuthPageState extends State<MainAuthPage>
                   const Hero(
                     tag: "auth-logo",
                     child: LogoSVG(
-                      bottomText: "Login with credentials",
+                      bottomText: "Login your account",
                     ),
                   ),
                   Form(
@@ -215,7 +213,7 @@ class _MainAuthPageState extends State<MainAuthPage>
                         _cacher.saveRefID(refId!);
                         _cacher.saveM3uUser(user!);
                         _cacher.saveLoginType(0);
-                        print("USER : $user");
+
                         await Navigator.pushReplacement(
                           context,
                           PageTransition(
@@ -253,20 +251,32 @@ class _MainAuthPageState extends State<MainAuthPage>
                   const SizedBox(
                     height: 10,
                   ),
-                  button2(
-                    title: "Load your playlist (File/URL)",
-                    assetPath: "assets/icons/folder.svg",
-                    onPressed: () async {
-                      await Navigator.push(
-                        context,
-                        PageTransition(
-                          child: const LoadWithPlaylist(),
-                          type: PageTransitionType.leftToRight,
-                        ),
-                      );
+                  MaterialButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
                     },
-                    foregroundColor: Colors.black,
+                    height: 50,
+                    color: Colors.white,
+                    child: const Center(
+                        child: Text(
+                      "Cancel",
+                      style: TextStyle(color: Colors.black),
+                    )),
                   ),
+                  // button2(
+                  //   title: "Load your playlist (File/URL)",
+                  //   assetPath: "assets/icons/folder.svg",
+                  //   onPressed: () async {
+                  //     await Navigator.push(
+                  //       context,
+                  //       PageTransition(
+                  //         child: const LoadWithPlaylist(),
+                  //         type: PageTransitionType.leftToRight,
+                  //       ),
+                  //     );
+                  //   },
+                  //   foregroundColor: Colors.black,
+                  // ),
                   // const SizedBox(
                   //   height: 10,
                   // ),

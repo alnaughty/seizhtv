@@ -12,16 +12,16 @@ import 'package:seizhtv/globals/loader.dart';
 import 'package:seizhtv/globals/palette.dart';
 import 'package:seizhtv/globals/ui_additional.dart';
 import 'package:seizhtv/globals/video_loader.dart';
-import 'package:seizhtv/models/movie_details.dart';
-import 'package:seizhtv/services/api.dart';
 import 'package:seizhtv/viewmodel/movie_vm.dart';
 import 'package:seizhtv/views/landing_page/children/movie_children/classified_movie_data.dart';
 import 'package:z_m3u_handler/extension.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
-
 import '../../../globals/video_player.dart';
 import '../../../models/get_video.dart';
+import '../../../models/topmovie.dart';
+import '../../../services/movie_api.dart';
 import '../../../viewmodel/video_vm.dart';
+import '../source_management.dart';
 
 class MoviePage extends StatefulWidget {
   const MoviePage({super.key});
@@ -31,7 +31,7 @@ class MoviePage extends StatefulWidget {
 }
 
 class _MoviePageState extends State<MoviePage>
-    with ColorPalette, UIAdditional, VideoLoader, FeaturedAPI {
+    with ColorPalette, UIAdditional, VideoLoader, MovieAPI {
   static final TopRatedMovieViewModel _viewModel =
       TopRatedMovieViewModel.instance;
   static final MovieVideoViewModel _videoViewModel =
@@ -40,6 +40,8 @@ class _MoviePageState extends State<MoviePage>
   late final TextEditingController _search;
   late final List<ClassifiedData> _data;
   List<ClassifiedData>? displayData;
+  bool showSearchField = false;
+  bool update = false;
 
   initStream() {
     _vm.stream.listen((event) {
@@ -65,7 +67,6 @@ class _MoviePageState extends State<MoviePage>
     super.dispose();
   }
 
-  bool showSearchField = false;
   final LoadedM3uData _vm = LoadedM3uData.instance;
   @override
   Widget build(BuildContext context) {
@@ -75,109 +76,33 @@ class _MoviePageState extends State<MoviePage>
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: card,
-        // appBar: PreferredSize(
-        //   preferredSize: const Size.fromHeight(60),
-        // child: appbar(2, onSearchPressed: () {
-        //   showSearchField = !showSearchField;
-        //   if (mounted) setState(() {});
-        // }),
-        // ),
-        body: Scrollbar(
-          controller: _scrollController,
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            child: Column(
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: appbar(
+            2,
+            onSearchPressed: () async {
+              showSearchField = !showSearchField;
+              if (mounted) setState(() {});
+            },
+            onUpdateChannel: () {
+              setState(() {
+                update = true;
+                Future.delayed(
+                  const Duration(seconds: 6),
+                  () {
+                    setState(() {
+                      update = false;
+                    });
+                  },
+                );
+              });
+            },
+          ),
+        ),
+        body: Stack(
+          children: [
+            Column(
               children: [
-                StreamBuilder<List<MovieDetails>>(
-                    stream: _viewModel.stream,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData && !snapshot.hasError) {
-                        if (snapshot.data!.isNotEmpty) {
-                          final List<MovieDetails> result = snapshot.data!;
-                          getMovieVideos(id: result[0].id);
-
-                          return SizedBox(
-                            width: size.width,
-                            child: Column(
-                              children: [
-                                appbar(2, onSearchPressed: () {
-                                  showSearchField = !showSearchField;
-                                  if (mounted) setState(() {});
-                                }),
-                                StreamBuilder<List<Video>>(
-                                  stream: _videoViewModel.stream,
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData &&
-                                        !snapshot.hasError) {
-                                      if (snapshot.data!.isNotEmpty) {
-                                        final List<Video> result =
-                                            snapshot.data!;
-                                        return Videoplayer(
-                                          url: result[0].key,
-                                        );
-                                      }
-                                    }
-                                    return const Center(
-                                      child: CircularProgressIndicator(
-                                        color: Colors.grey,
-                                      ),
-                                    );
-                                  },
-                                ),
-                                Container(
-                                  width: size.width,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 15),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        result[0].title,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 24,
-                                          height: 1.1,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 5),
-                                      Row(
-                                        children: [
-                                          Text(DateFormat('MMM dd, yyyy')
-                                              .format(result[0].date!)),
-                                          const SizedBox(width: 10),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 5),
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                  color: Colors.white),
-                                              borderRadius:
-                                                  const BorderRadius.all(
-                                                Radius.circular(5),
-                                              ),
-                                            ),
-                                            child: Text(
-                                                "${result[0].voteAverage}"),
-                                          )
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                      }
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          color: Colors.grey,
-                        ),
-                      );
-                    }),
                 AnimatedPadding(
                   duration: const Duration(milliseconds: 400),
                   padding: EdgeInsets.symmetric(
@@ -265,63 +190,181 @@ class _MoviePageState extends State<MoviePage>
                     height: 10,
                   ),
                 },
-                displayData == null
-                    ? const SeizhTvLoader(
-                        label: "Retrieving Data",
-                      )
-                    : displayData!.isEmpty
-                        ? Center(
-                            child: Text(
-                              "No Result Found for `${_search.text}`",
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(.5),
-                              ),
-                            ),
-                          )
-                        : ListView.separated(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemBuilder: (_, i) {
-                              final ClassifiedData data = displayData![i];
-                              // print("CLASSified DATA: $data");
-                              return ListTile(
-                                onTap: () async {
-                                  await Navigator.push(
-                                    context,
-                                    PageTransition(
-                                        child: ClassifiedMovieData(data: data),
-                                        type: PageTransitionType.leftToRight),
+                Expanded(
+                  child: displayData == null
+                      ? const SeizhTvLoader(
+                          label: "Retrieving Data",
+                        )
+                      : Scrollbar(
+                          controller: _scrollController,
+                          child: ListView(
+                            children: [
+                              StreamBuilder<List<TopMovieModel>>(
+                                stream: _viewModel.stream,
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData && !snapshot.hasError) {
+                                    if (snapshot.data!.isNotEmpty) {
+                                      final List<TopMovieModel> result =
+                                          snapshot.data!;
+                                      getMovieVideos(id: result[0].id);
+
+                                      return SizedBox(
+                                        width: size.width,
+                                        child: Column(
+                                          children: [
+                                            StreamBuilder<List<Video>>(
+                                              stream: _videoViewModel.stream,
+                                              builder: (context, snapshot) {
+                                                if (snapshot.hasData &&
+                                                    !snapshot.hasError) {
+                                                  if (snapshot
+                                                      .data!.isNotEmpty) {
+                                                    final List<Video> result =
+                                                        snapshot.data!;
+                                                    return Videoplayer(
+                                                      url: result[0].key,
+                                                    );
+                                                  }
+                                                }
+                                                return const Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    color: Colors.grey,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                            Container(
+                                              width: size.width,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 15),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    result[0].title,
+                                                    maxLines: 2,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontSize: 22,
+                                                      height: 1.1,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 5),
+                                                  Row(
+                                                    children: [
+                                                      Text(DateFormat(
+                                                              'MMM dd, yyyy')
+                                                          .format(
+                                                              result[0].date!)),
+                                                      const SizedBox(width: 10),
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .symmetric(
+                                                                horizontal: 5),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          border: Border.all(
+                                                              color:
+                                                                  Colors.white),
+                                                          borderRadius:
+                                                              const BorderRadius
+                                                                  .all(
+                                                            Radius.circular(5),
+                                                          ),
+                                                        ),
+                                                        child: Text(
+                                                            "${result[0].voteAverage}"),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }
+                                  }
+                                  return const Center(
+                                    child: CircularProgressIndicator(
+                                      color: Colors.grey,
+                                    ),
                                   );
                                 },
-                                trailing: const Icon(Icons.chevron_right),
-                                contentPadding:
-                                    const EdgeInsets.symmetric(horizontal: 15),
-                                subtitle: Text(
-                                    "${data.data.classify().length} Entries"),
-                                leading: SvgPicture.asset(
-                                  "assets/icons/logo-ico.svg",
-                                  width: 50,
-                                  color: orange,
-                                  fit: BoxFit.contain,
-                                ),
-                                title: Hero(
-                                  tag: data.name.toUpperCase(),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    elevation: 0,
-                                    child: Text(data.name),
-                                  ),
-                                ),
-                              );
-                            },
-                            separatorBuilder: (_, i) => Divider(
-                              color: Colors.white.withOpacity(.3),
-                            ),
-                            itemCount: displayData!.length,
+                              ),
+                              displayData!.isEmpty
+                                  ? Center(
+                                      child: Text(
+                                        "No Result Found for `${_search.text}`",
+                                        style: TextStyle(
+                                          color: Colors.white.withOpacity(.5),
+                                        ),
+                                      ),
+                                    )
+                                  : ListView.separated(
+                                      shrinkWrap: true,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      itemBuilder: (_, i) {
+                                        final ClassifiedData data =
+                                            displayData![i];
+                                        return ListTile(
+                                          onTap: () async {
+                                            await Navigator.push(
+                                              context,
+                                              PageTransition(
+                                                child: ClassifiedMovieData(
+                                                  data: data,
+                                                ),
+                                                type: PageTransitionType
+                                                    .leftToRight,
+                                              ),
+                                            );
+                                          },
+                                          trailing:
+                                              const Icon(Icons.chevron_right),
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 15),
+                                          subtitle: Text(
+                                              "${data.data.classify().length} Entries"),
+                                          leading: SvgPicture.asset(
+                                            "assets/icons/logo-ico.svg",
+                                            width: 50,
+                                            color: orange,
+                                            fit: BoxFit.contain,
+                                          ),
+                                          title: Hero(
+                                            tag: data.name.toUpperCase(),
+                                            child: Material(
+                                              color: Colors.transparent,
+                                              elevation: 0,
+                                              child: Text(data.name),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      separatorBuilder: (_, i) => Divider(
+                                        color: Colors.white.withOpacity(.3),
+                                      ),
+                                      itemCount: displayData!.length,
+                                    ),
+                            ],
                           ),
+                        ),
+                ),
               ],
             ),
-          ),
+            update == true ? loader() : Container()
+          ],
         ),
         // body: StreamBuilder<CategorizedM3UData>(
         //   stream: _vm.stream,

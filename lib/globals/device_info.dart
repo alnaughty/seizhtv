@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/services.dart';
 // import 'package:get_mac_address/get_mac_address.dart';
 import 'package:platform_device_id/platform_device_id.dart';

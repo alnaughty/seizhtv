@@ -23,7 +23,7 @@ class _VideoplayerState extends State<Videoplayer> {
       initialVideoId: widget.url,
       flags: const YoutubePlayerFlags(
         mute: false,
-        autoPlay: true,
+        autoPlay: false,
         disableDragSeek: true,
         loop: false,
         isLive: false,

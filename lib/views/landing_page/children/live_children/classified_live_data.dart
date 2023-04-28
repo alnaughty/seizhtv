@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:seizhtv/extensions/color.dart';
@@ -26,7 +28,6 @@ class _ClassifiedLiveDataState extends State<ClassifiedLiveData>
   void initState() {
     _search = TextEditingController();
     _scrollController = ScrollController();
-    // TODO: implement initState
     super.initState();
   }
 
@@ -34,7 +35,6 @@ class _ClassifiedLiveDataState extends State<ClassifiedLiveData>
   void dispose() {
     _search.dispose();
     _scrollController.dispose();
-    // TODO: implement dispose
     super.dispose();
   }
 

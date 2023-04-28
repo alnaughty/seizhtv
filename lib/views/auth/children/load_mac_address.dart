@@ -207,7 +207,7 @@ class _LoadWithMacAddressState extends State<LoadWithMacAddress>
                             itemCount: _sources.length,
                           );
                         }),
-                    const LoadPlaylist()
+                    LoadPlaylist()
                   ],
                 ),
               ),

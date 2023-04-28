@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:seizhtv/extensions/color.dart';
@@ -47,7 +49,7 @@ class UIAdditional {
       MaterialButton(
         onPressed: onPressed,
         height: 50,
-        color: Colors.white,
+        color: ColorPalette().card,
         child: Center(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -56,16 +58,16 @@ class UIAdditional {
                 assetPath,
                 height: 20,
                 width: 20,
-                color: foregroundColor,
+                color: Colors.white,
               ),
               const SizedBox(
                 width: 14,
               ),
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 15,
-                  color: foregroundColor,
+                  color: Colors.white,
                 ),
               ),
             ],
@@ -114,6 +116,33 @@ class UIAdditional {
           ),
         ),
       );
+
+  Widget button3(
+      {required String title,
+      required String icon,
+      required Function() onpress}) {
+    return Column(
+      children: [
+        IconButton(
+          onPressed: () {
+            onpress();
+          },
+          icon: SvgPicture.asset(
+            icon,
+            height: 30,
+            color: ColorPalette().white,
+          ),
+        ),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 12,
+          ),
+        )
+      ],
+    );
+  }
+
   Widget options({required List<Option> childrenData}) {
     return Expanded(
         child: Padding(
@@ -172,5 +201,33 @@ class UIAdditional {
         ],
       ),
     ));
+  }
+
+  loader() {
+    return Expanded(
+      child: Container(
+        color: Colors.black.withOpacity(0.7),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              "assets/images/update.gif",
+              fit: BoxFit.fitWidth,
+              height: 95,
+              width: double.maxFinite,
+              alignment: AlignmentDirectional.centerEnd,
+              isAntiAlias: true,
+            ),
+            const Text(
+              "Updating please wait ...",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

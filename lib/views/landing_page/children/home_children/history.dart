@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:seizhtv/data_containers/history.dart';
@@ -28,7 +30,6 @@ class _HistoryPageState extends State<HistoryPage>
         .getDataFrom(type: CollectionType.history, refId: refId!)
         .then((value) {
       if (value != null) {
-        print("FETCH DATA FROM HISTORY: $value");
         _vm.populate(value);
       }
     });
@@ -239,9 +240,10 @@ class _HistoryPageState extends State<HistoryPage>
                       separatorBuilder: (_, i) => const SizedBox(
                         width: 10,
                       ),
-                      itemCount: _result.movies
-                          .expand((element) => element.data)
-                          .toList()
+                      itemCount: _result
+                          .movies
+                          // .expand((element) => element.data)
+                          // .toList()
                           .length,
                     ),
                   ),

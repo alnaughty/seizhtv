@@ -1,13 +1,9 @@
 import 'package:seizhtv/models/details.dart';
 
-class TVShowDetails extends Details {
-  final List<String> originCountry;
-
-  const TVShowDetails({
+class TopSeriesModel extends Details {
+  const TopSeriesModel({
     required super.backdropPath,
-    required super.genres,
     required super.id,
-    required this.originCountry,
     required super.origLanguage,
     required super.originalName,
     required super.overview,
@@ -19,16 +15,11 @@ class TVShowDetails extends Details {
     required super.voteCount,
   });
 
-  factory TVShowDetails.fromJson(Map<String, dynamic> json) {
-    final List genres = json['genre_ids'] ?? [];
-    final List country = json['origin_country'] ?? [];
-
-    return TVShowDetails(
+  factory TopSeriesModel.fromJson(Map<String, dynamic> json) {
+    return TopSeriesModel(
       id: json['id'].toInt(),
       title: json['name'],
       backdropPath: json['backdrop_path'],
-      genres: genres.map((e) => int.parse(e.toString())).toList(),
-      originCountry: country.map((e) => e.toString()).toList(),
       originalName: json['original_name'],
       origLanguage: json["original_language"],
       overview: json['overview'],

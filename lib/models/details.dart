@@ -6,7 +6,6 @@ class Details {
   final String origLanguage;
   final String originalName;
   final String? overview;
-  final List<int>? genres;
   final String? posterPath;
   final double voteAverage;
   final int voteCount;
@@ -17,7 +16,6 @@ class Details {
     required this.title,
     required this.backdropPath,
     this.date,
-    required this.genres,
     required this.overview,
     required this.origLanguage,
     required this.originalName,

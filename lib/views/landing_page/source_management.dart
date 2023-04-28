@@ -1,10 +1,11 @@
+// ignore_for_file: implementation_imports, avoid_print
+
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:seizhtv/data_containers/loaded_m3u_data.dart';
 import 'package:seizhtv/globals/data.dart';
 import 'package:seizhtv/globals/data_cacher.dart';
 import 'package:seizhtv/globals/loader.dart';
@@ -35,7 +36,6 @@ class _SourceManagementPageState extends State<SourceManagementPage>
     if (mounted) setState(() {});
     await _cacher.saveFile(data);
     await _cacher.saveDate(DateTime.now().toString());
-    // ignore: use_build_context_synchronously
     await Navigator.pushReplacementNamed(context, "/landing-page");
     print(data);
     _isLoading = false;
@@ -107,84 +107,107 @@ class _SourceManagementPageState extends State<SourceManagementPage>
                                       as List)
                                   .map((e) => M3uSource.fromFirestore(e))
                                   .toList();
+
+                          print("SOURCE: $_sources");
                           return ListView.separated(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             itemBuilder: (_, i) {
                               final M3uSource _source = _sources[i];
-                              return ClipRRect(
-                                borderRadius: BorderRadius.circular(5),
-                                child: Container(
-                                  color: card,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 5),
-                                  child: ListTile(
-                                    title: Text(_source.name),
-                                    trailing: PopupMenuButton<String>(
-                                      itemBuilder: (
-                                        _,
-                                      ) =>
-                                          ["Load Source", "Delete Source"]
-                                              .map(
-                                                (e) => PopupMenuItem<String>(
-                                                  value: e,
-                                                  child: Text(e),
-                                                ),
-                                              )
-                                              .toList(),
-                                      onSelected: (String? value) async {
-                                        if (value == null) return;
-                                        print(value);
-                                        if (value == "Load Source") {
-                                          if (_source.isFile) {
-                                            _cacher
-                                                .savePlaylistName(_source.name);
-                                            await onSuccess(
-                                              File(_source.source),
-                                            );
-                                          } else {
-                                            await download(_source);
-                                          }
-                                        } else {
-                                          await _service.firestore
-                                              .collection("user-source")
-                                              .doc(refId)
-                                              .set(
-                                            {
-                                              "sources": FieldValue.arrayRemove(
-                                                  [_source.toJson()])
-                                            },
-                                          );
-                                        }
-                                      },
-                                      offset: const Offset(0, 30),
-                                    ),
-                                    subtitle: Text(
-                                      _source.source,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    leading: ClipRRect(
-                                      borderRadius: BorderRadius.circular(60),
-                                      child: user == null
-                                          ? Image.asset(
-                                              "assets/icons/default-picture.jpeg",
-                                              height: 40,
-                                              width: 40,
-                                              fit: BoxFit.cover,
-                                            )
-                                          : user!.photoUrl == null
-                                              ? Image.asset(
-                                                  "assets/icons/default-picture.jpeg",
-                                                  height: 40,
-                                                  width: 40,
-                                                  fit: BoxFit.cover,
+                              return GestureDetector(
+                                onTap: () async {
+                                  if (_source.isFile) {
+                                    _cacher.savePlaylistName(_source.name);
+                                    _cacher.saveExpDate(
+                                        _source.expDate.toString());
+                                    await onSuccess(
+                                      File(_source.source),
+                                    );
+                                  } else {
+                                    await download(_source);
+                                    _cacher.saveExpDate(
+                                        _source.expDate.toString());
+                                  }
+                                },
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(5),
+                                  child: Container(
+                                    color: card,
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 5),
+                                    child: ListTile(
+                                      title: Text(_source.name),
+                                      trailing: PopupMenuButton<String>(
+                                        itemBuilder: (
+                                          _,
+                                        ) =>
+                                            ["Load Source", "Delete Source"]
+                                                .map(
+                                                  (e) => PopupMenuItem<String>(
+                                                    value: e,
+                                                    child: Text(e),
+                                                  ),
                                                 )
-                                              : CachedNetworkImage(
-                                                  imageUrl: user!.photoUrl!,
-                                                  height: 40,
-                                                  width: 40,
-                                                ),
+                                                .toList(),
+                                        onSelected: (String? value) async {
+                                          if (value == null) return;
+                                          print(value);
+                                          if (value == "Load Source") {
+                                            if (_source.isFile) {
+                                              _cacher.savePlaylistName(
+                                                  _source.name);
+                                              _cacher.saveExpDate(
+                                                  _source.expDate.toString());
+                                              await onSuccess(
+                                                File(_source.source),
+                                              );
+                                            } else {
+                                              await download(_source);
+                                              _cacher.saveExpDate(
+                                                  _source.expDate.toString());
+                                            }
+                                          } else {
+                                            await _service.firestore
+                                                .collection("user-source")
+                                                .doc(refId)
+                                                .set(
+                                              {
+                                                "sources":
+                                                    FieldValue.arrayRemove(
+                                                        [_source.toJson()])
+                                              },
+                                            );
+                                          }
+                                        },
+                                        offset: const Offset(0, 30),
+                                      ),
+                                      subtitle: Text(
+                                        _source.source,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      leading: ClipRRect(
+                                        borderRadius: BorderRadius.circular(60),
+                                        child: user == null
+                                            ? Image.asset(
+                                                "assets/icons/default-picture.jpeg",
+                                                height: 40,
+                                                width: 40,
+                                                fit: BoxFit.cover,
+                                              )
+                                            : user!.photoUrl == null
+                                                ? Image.asset(
+                                                    "assets/icons/default-picture.jpeg",
+                                                    height: 40,
+                                                    width: 40,
+                                                    fit: BoxFit.cover,
+                                                  )
+                                                : CachedNetworkImage(
+                                                    imageUrl: user!.photoUrl!,
+                                                    height: 40,
+                                                    width: 40,
+                                                  ),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -196,50 +219,51 @@ class _SourceManagementPageState extends State<SourceManagementPage>
                             itemCount: _sources.length,
                           );
                         }),
-                    const SizedBox(height: 10),
-                    const LoadPlaylist(),
-                    if (!widget.fromInit) ...{
-                      MaterialButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        height: 50,
-                        color: Colors.white,
-                        child: const Center(
-                            child: Text(
+                    const SizedBox(height: 30),
+                    LoadPlaylist(),
+                    // if (!widget.fromInit) ...{
+                    MaterialButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      height: 50,
+                      color: white,
+                      child: const Center(
+                        child: Text(
                           "Cancel",
                           style: TextStyle(color: Colors.black),
-                        )),
-                      ),
-                    },
-                    Container(
-                      margin: const EdgeInsets.symmetric(vertical: 30),
-                      child: RichText(
-                        textAlign: TextAlign.center,
-                        text: TextSpan(
-                          text:
-                              'By using this application, you agree to the \n',
-                          style: const TextStyle(
-                            fontSize: 14,
-                          ),
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: 'Terms & Conditions',
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  print('Terms & Conditions');
-                                },
-                              style: TextStyle(
-                                height: 1.3,
-                                color: ColorPalette().orange,
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ],
                         ),
                       ),
                     ),
+                    // },
+                    // Container(
+                    //   margin: const EdgeInsets.symmetric(vertical: 30),
+                    //   child: RichText(
+                    //     textAlign: TextAlign.center,
+                    //     text: TextSpan(
+                    //       text:
+                    //           'By using this application, you agree to the \n',
+                    //       style: const TextStyle(
+                    //         fontSize: 14,
+                    //       ),
+                    //       children: <TextSpan>[
+                    //         TextSpan(
+                    //           text: 'Terms & Conditions',
+                    //           recognizer: TapGestureRecognizer()
+                    //             ..onTap = () {
+                    //               print('Terms & Conditions');
+                    //             },
+                    //           style: TextStyle(
+                    //             height: 1.3,
+                    //             color: ColorPalette().orange,
+                    //             fontWeight: FontWeight.bold,
+                    //             decoration: TextDecoration.underline,
+                    //           ),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),

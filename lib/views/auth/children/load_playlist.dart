@@ -1,7 +1,6 @@
-import 'dart:io';
+// ignore_for_file: implementation_imports, avoid_print, must_be_immutable, unused_field
 
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/gestures.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:seizhtv/globals/data.dart';
 import 'package:seizhtv/globals/data_cacher.dart';
@@ -15,7 +14,10 @@ import 'package:z_m3u_handler/src/firebase/firestore_services.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
 
 class LoadWithPlaylist extends StatefulWidget {
-  const LoadWithPlaylist({super.key});
+  LoadWithPlaylist({super.key, required this.isUpdate, this.data});
+
+  final bool isUpdate;
+  M3uSource? data;
 
   @override
   State<LoadWithPlaylist> createState() => _LoadWithPlaylistState();
@@ -26,6 +28,7 @@ class _LoadWithPlaylistState extends State<LoadWithPlaylist>
   final M3uFirestoreServices _service = M3uFirestoreServices();
   final DataCacher _cacher = DataCacher.instance;
   final ZM3UHandler _handler = ZM3UHandler.instance;
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -33,13 +36,11 @@ class _LoadWithPlaylistState extends State<LoadWithPlaylist>
       await _cacher.saveRefID(refId!);
       if (mounted) setState(() {});
     });
-    // TODO: implement initState
     super.initState();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
   }
 
@@ -98,7 +99,7 @@ class _LoadWithPlaylistState extends State<LoadWithPlaylist>
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   children: [
                     const SizedBox(
-                      height: 80,
+                      height: 50,
                     ),
                     const Hero(
                       tag: "auth-logo",
@@ -106,109 +107,114 @@ class _LoadWithPlaylistState extends State<LoadWithPlaylist>
                         bottomText: "Load your Playlist(File/URL)",
                       ),
                     ),
-                    StreamBuilder(
-                        stream: _service.getListener(
-                            collection: "user-source", docId: refId!),
-                        builder: (_, snapshot) {
-                          if (snapshot.hasError || !snapshot.hasData) {
-                            return Container();
-                          }
-                          if (snapshot.data!.data() == null) return Container();
-                          final List<M3uSource> _sources =
-                              ((snapshot.data!.data() as Map)['sources']
-                                      as List)
-                                  .map((e) => M3uSource.fromFirestore(e))
-                                  .toList();
-                          return ListView.separated(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemBuilder: (_, i) {
-                              final M3uSource _source = _sources[i];
-                              return ClipRRect(
-                                borderRadius: BorderRadius.circular(5),
-                                child: Container(
-                                  color: card,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 5),
-                                  child: ListTile(
-                                    title: Text(_source.name),
-                                    trailing: PopupMenuButton<String>(
-                                      itemBuilder: (
-                                        _,
-                                      ) =>
-                                          ["Load Source", "Delete Source"]
-                                              .map(
-                                                (e) => PopupMenuItem<String>(
-                                                  value: e,
-                                                  child: Text(e),
-                                                ),
-                                              )
-                                              .toList(),
-                                      onSelected: (String? value) async {
-                                        if (value == null) return;
-                                        print(value);
-                                        if (value == "Load Source") {
-                                          if (_source.isFile) {
-                                            _cacher
-                                                .savePlaylistName(_source.name);
-                                            await onSuccess(
-                                              File(_source.source),
-                                            );
-                                          } else {
-                                            await download(_source);
-                                          }
-                                        } else {
-                                          await _service.firestore
-                                              .collection("user-source")
-                                              .doc(refId)
-                                              .set(
-                                            {
-                                              "sources": FieldValue.arrayRemove(
-                                                  [_source.toJson()])
-                                            },
-                                          );
-                                        }
-                                      },
-                                      offset: const Offset(0, 30),
-                                    ),
-                                    subtitle: Text(
-                                      _source.source,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    leading: ClipRRect(
-                                      borderRadius: BorderRadius.circular(60),
-                                      child: user == null
-                                          ? Image.asset(
-                                              "assets/icons/default-picture.jpeg",
-                                              height: 40,
-                                              width: 40,
-                                              fit: BoxFit.cover,
-                                            )
-                                          : user!.photoUrl == null
-                                              ? Image.asset(
-                                                  "assets/icons/default-picture.jpeg",
-                                                  height: 40,
-                                                  width: 40,
-                                                  fit: BoxFit.cover,
-                                                )
-                                              : CachedNetworkImage(
-                                                  imageUrl: user!.photoUrl!,
-                                                  height: 40,
-                                                  width: 40,
-                                                ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                            separatorBuilder: (_, i) => const SizedBox(
-                              height: 10,
-                            ),
-                            itemCount: _sources.length,
-                          );
-                        }),
-                    const LoadPlaylist(),
+                    // StreamBuilder(
+                    //     stream: _service.getListener(
+                    //         collection: "user-source", docId: refId!),
+                    //     builder: (_, snapshot) {
+                    //       if (snapshot.hasError || !snapshot.hasData) {
+                    //         return Container();
+                    //       }
+                    //       if (snapshot.data!.data() == null)
+                    //         return Container();
+                    //       final List<M3uSource> _sources =
+                    //           ((snapshot.data!.data() as Map)['sources']
+                    //                   as List)
+                    //               .map((e) => M3uSource.fromFirestore(e))
+                    //               .toList();
+                    //       return ListView.separated(
+                    //         shrinkWrap: true,
+                    //         physics: const NeverScrollableScrollPhysics(),
+                    //         itemBuilder: (_, i) {
+                    //           final M3uSource _source = _sources[i];
+                    //           return ClipRRect(
+                    //             borderRadius: BorderRadius.circular(5),
+                    //             child: Container(
+                    //               color: card,
+                    //               padding:
+                    //                   const EdgeInsets.symmetric(vertical: 5),
+                    //               child: ListTile(
+                    //                 title: Text(_source.name),
+                    //                 trailing: PopupMenuButton<String>(
+                    //                   itemBuilder: (
+                    //                     _,
+                    //                   ) =>
+                    //                       ["Load Source", "Delete Source"]
+                    //                           .map(
+                    //                             (e) => PopupMenuItem<String>(
+                    //                               value: e,
+                    //                               child: Text(e),
+                    //                             ),
+                    //                           )
+                    //                           .toList(),
+                    //                   onSelected: (String? value) async {
+                    //                     if (value == null) return;
+                    //                     print(value);
+                    //                     if (value == "Load Source") {
+                    //                       if (_source.isFile) {
+                    //                         _cacher.savePlaylistName(
+                    //                             _source.name);
+                    //                         await onSuccess(
+                    //                           File(_source.source),
+                    //                         );
+                    //                       } else {
+                    //                         await download(_source);
+                    //                       }
+                    //                     } else {
+                    //                       await _service.firestore
+                    //                           .collection("user-source")
+                    //                           .doc(refId)
+                    //                           .set(
+                    //                         {
+                    //                           "sources":
+                    //                               FieldValue.arrayRemove(
+                    //                                   [_source.toJson()])
+                    //                         },
+                    //                       );
+                    //                     }
+                    //                   },
+                    //                   offset: const Offset(0, 30),
+                    //                 ),
+                    //                 subtitle: Text(
+                    //                   _source.source,
+                    //                   maxLines: 2,
+                    //                   overflow: TextOverflow.ellipsis,
+                    //                 ),
+                    //                 leading: ClipRRect(
+                    //                   borderRadius: BorderRadius.circular(60),
+                    //                   child: user == null
+                    //                       ? Image.asset(
+                    //                           "assets/icons/default-picture.jpeg",
+                    //                           height: 40,
+                    //                           width: 40,
+                    //                           fit: BoxFit.cover,
+                    //                         )
+                    //                       : user!.photoUrl == null
+                    //                           ? Image.asset(
+                    //                               "assets/icons/default-picture.jpeg",
+                    //                               height: 40,
+                    //                               width: 40,
+                    //                               fit: BoxFit.cover,
+                    //                             )
+                    //                           : CachedNetworkImage(
+                    //                               imageUrl: user!.photoUrl!,
+                    //                               height: 40,
+                    //                               width: 40,
+                    //                             ),
+                    //                 ),
+                    //               ),
+                    //             ),
+                    //           );
+                    //         },
+                    //         separatorBuilder: (_, i) => const SizedBox(
+                    //           height: 10,
+                    //         ),
+                    //         itemCount: _sources.length,
+                    //       );
+                    //     }),
+                    LoadPlaylist(
+                      isUpdate: widget.isUpdate,
+                      data: widget.data,
+                    ),
                     MaterialButton(
                       onPressed: () {
                         Navigator.of(context).pop();
@@ -216,39 +222,13 @@ class _LoadWithPlaylistState extends State<LoadWithPlaylist>
                       height: 50,
                       color: Colors.white,
                       child: const Center(
-                          child: Text(
-                        "Cancel",
-                        style: TextStyle(color: Colors.black),
-                      )),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.symmetric(vertical: 30),
-                      child: RichText(
-                        textAlign: TextAlign.center,
-                        text: TextSpan(
-                          text:
-                              'By using this application, you agree to the \n',
-                          style: const TextStyle(
-                            fontSize: 14,
-                          ),
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: 'Terms & Conditions',
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  print('Terms & Conditions');
-                                },
-                              style: TextStyle(
-                                height: 1.3,
-                                color: ColorPalette().orange,
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ],
+                        child: Text(
+                          "Cancel",
+                          style: TextStyle(color: Colors.black),
                         ),
                       ),
                     ),
+                    const SizedBox(height: 30),
                   ],
                 ),
               ),

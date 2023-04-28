@@ -1,5 +1,8 @@
+// ignore_for_file: deprecated_member_use, avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:seizhtv/extensions/color.dart';
 import 'package:seizhtv/globals/data.dart';
 import 'package:seizhtv/globals/network_image_viewer.dart';
@@ -8,6 +11,8 @@ import 'package:seizhtv/globals/video_loader.dart';
 import 'package:seizhtv/views/landing_page/children/series_children/series_details_sheet.dart';
 import 'package:z_m3u_handler/extension.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
+import '../../../../services/tv_series_api.dart';
+import 'details.dart';
 
 class ClassifiedSeriesData extends StatefulWidget {
   const ClassifiedSeriesData({super.key, required this.data});
@@ -17,7 +22,7 @@ class ClassifiedSeriesData extends StatefulWidget {
 }
 
 class _ClassifiedSeriesDataState extends State<ClassifiedSeriesData>
-    with ColorPalette, VideoLoader {
+    with ColorPalette, VideoLoader, TVSeriesAPI {
   late final List<ClassifiedData> _data = widget.data.data.classify()
     ..sort((a, b) => a.name.compareTo(b.name));
   late List<ClassifiedData> _displayData = List.from(_data);
@@ -27,7 +32,6 @@ class _ClassifiedSeriesDataState extends State<ClassifiedSeriesData>
   void initState() {
     _search = TextEditingController();
     _scrollController = ScrollController();
-    // TODO: implement initState
     super.initState();
   }
 
@@ -35,7 +39,6 @@ class _ClassifiedSeriesDataState extends State<ClassifiedSeriesData>
   void dispose() {
     _search.dispose();
     _scrollController.dispose();
-    // TODO: implement dispose
     super.dispose();
   }
 
@@ -178,20 +181,59 @@ class _ClassifiedSeriesDataState extends State<ClassifiedSeriesData>
                           return ListTile(
                             title: Text(_d.name),
                             onTap: () async {
-                              await showModalBottomSheet(
-                                context: context,
-                                isDismissible: true,
-                                backgroundColor: Colors.transparent,
-                                isScrollControlled: true,
-                                builder: (_) => SeriesDetailsSheet(
-                                  data: _d,
-                                  onLoadVideo: (M3uEntry entry) async {
-                                    Navigator.of(context).pop(null);
-                                    await loadVideo(context, entry);
-                                    await entry.addToHistory(refId!);
-                                  },
-                                ),
-                              );
+                              String str1 = _d.name;
+                              String result1 = str1.replaceAll(
+                                  RegExp(
+                                      r"[(]+[a-zA-Z]+[)]|[|]\s+[0-9]+\s[|]|([HD]|[FHD])"),
+                                  '');
+                              String result2 = result1.replaceAll(
+                                  RegExp(r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|] "),
+                                  '');
+
+                              await searchTV(title: result2).then((value) {
+                                if (value == null) {
+                                  return showModalBottomSheet(
+                                    context: context,
+                                    isDismissible: true,
+                                    backgroundColor: Colors.transparent,
+                                    isScrollControlled: true,
+                                    builder: (_) => SeriesDetailsSheet(
+                                      data: _d,
+                                      onLoadVideo: (M3uEntry entry) async {
+                                        Navigator.of(context).pop(null);
+                                        await loadVideo(context, entry);
+                                        await entry.addToHistory(refId!);
+                                      },
+                                    ),
+                                  );
+                                } else {
+                                  print("VALUEEE: $value");
+                                  return Navigator.push(
+                                    context,
+                                    PageTransition(
+                                      child: SeriesDetailsPage(
+                                        data: _d,
+                                        title: result2,
+                                      ),
+                                      type: PageTransitionType.leftToRight,
+                                    ),
+                                  );
+                                }
+                              });
+                              // await showModalBottomSheet(
+                              //   context: context,
+                              //   isDismissible: true,
+                              //   backgroundColor: Colors.transparent,
+                              //   isScrollControlled: true,
+                              //   builder: (_) => SeriesDetailsSheet(
+                              //     data: _d,
+                              //     onLoadVideo: (M3uEntry entry) async {
+                              //       Navigator.of(context).pop(null);
+                              //       await loadVideo(context, entry);
+                              //       await entry.addToHistory(refId!);
+                              //     },
+                              //   ),
+                              // );
                               // await showModalBottomSheet(
                               //     context: context,
                               //     isDismissible: true,

@@ -98,4 +98,13 @@ class DataCacher {
 
   Future<bool> removePlaylistName() async =>
       await sharedPreferences.remove("playlist_name");
+
+  /// Exp. Date functions
+  Future<bool> saveExpDate(String date) async =>
+      await sharedPreferences.setString("exp_date", date);
+
+  String? get expDate => sharedPreferences.getString("exp_date");
+
+  Future<bool> removeExpDate() async =>
+      await sharedPreferences.remove("exp_date");
 }

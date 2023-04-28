@@ -1,46 +1,52 @@
 import 'package:seizhtv/models/details.dart';
-import 'package:seizhtv/models/genre.dart';
+import 'createdby.dart';
+import 'genre.dart';
 
-class MovieDetails extends Details {
-  final bool video;
-  final bool isForAdult;
+class TVSeriesDetails extends Details {
+  final List<String> originCountry;
   final List<Genre>? genres;
+  final List<CreatedbyModel>? createdby;
+  final int? numOfSeason;
 
-  const MovieDetails({
+  const TVSeriesDetails({
     required super.backdropPath,
     required this.genres,
     required super.id,
+    required this.originCountry,
     required super.origLanguage,
     required super.originalName,
     required super.overview,
     required super.popularity,
     required super.posterPath,
-    required this.isForAdult,
     required super.date,
     required super.title,
-    required this.video,
     required super.voteAverage,
+    required this.createdby,
     required super.voteCount,
+    required this.numOfSeason,
   });
 
-  factory MovieDetails.fromJson(Map<String, dynamic> json) {
+  factory TVSeriesDetails.fromJson(Map<String, dynamic> json) {
     final List genres = json['genres'] ?? [];
+    final List country = json['origin_country'] ?? [];
+    final List creator = json['created_by'] ?? [];
 
-    return MovieDetails(
+    return TVSeriesDetails(
       id: json['id'].toInt(),
-      title: json['title'],
+      title: json['name'],
       backdropPath: json['backdrop_path'],
-      isForAdult: json['adult'] ?? false,
+      createdby: creator.map((e) => CreatedbyModel.fromJson(e)).toList(),
       genres: genres.map((e) => Genre.fromJson(e)).toList(),
-      originalName: json['original_title'],
+      numOfSeason: json['number_of_seasons'].toInt(),
+      originCountry: country.map((e) => e.toString()).toList(),
+      originalName: json['original_name'],
       origLanguage: json["original_language"],
       overview: json['overview'],
       popularity: json['popularity'].toDouble(),
       posterPath: json['poster_path'],
-      date: json['release_date'] == null
+      date: json['first_air_date'] == null
           ? null
-          : DateTime.parse(json["release_date"]),
-      video: json['video'] ?? false,
+          : DateTime.parse(json['first_air_date'].toString()),
       voteAverage: json['vote_average'].toDouble(),
       voteCount: json['vote_count'].toInt(),
     );
