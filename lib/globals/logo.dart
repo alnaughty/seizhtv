@@ -1,6 +1,7 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:seizhtv/globals/palette.dart';
 
 class LogoSVG extends StatelessWidget {
   final String bottomText;
@@ -21,12 +22,9 @@ class LogoSVG extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SvgPicture.asset(
-                "assets/images/logo-full.svg",
+                "assets/images/logo.svg",
                 height: 50,
-                // theme: SvgTheme(
-                //   currentColor:
-                // ),
-                color: ColorPalette().orange,
+                // color: ColorPalette().orange,
               ),
               if (bottomText.isNotEmpty) ...{
                 const SizedBox(

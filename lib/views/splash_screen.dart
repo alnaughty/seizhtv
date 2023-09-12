@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
@@ -7,8 +7,6 @@ import 'package:seizhtv/globals/data_cacher.dart';
 import 'package:seizhtv/globals/logo.dart';
 import 'package:seizhtv/globals/palette.dart';
 import 'package:seizhtv/views/landing_page/source_management.dart';
-
-import 'auth/login.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -20,26 +18,32 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   final DataCacher _cacher = DataCacher.instance;
   Future<void> check() async {
-    // await _cacher.clearData();
-    String? file = _cacher.filePath;
     refId = _cacher.refId;
     user = _cacher.m3uUser;
+    sourceUrl = _cacher.source;
+    playlistName = _cacher.playlistName;
+    language = _cacher.language;
+    file = _cacher.filePath;
 
     print("REF ID: $refId");
     print("USER: $user");
+    print("SOURCE URL: $sourceUrl");
+    print("PLAYLIST NAME: $playlistName");
+    print("LANGUAGE: $language");
+    print("FILE: $file");
 
     if (file != null) {
       await Navigator.pushReplacementNamed(context, "/landing-page");
       return;
     }
     if (refId == null || user == null) {
-      await Navigator.pushReplacementNamed(context, "/login");
+      await Navigator.pushReplacementNamed(context, "/auth");
     } else {
       await Navigator.pushReplacement(
         context,
         PageTransition(
-          child: const LoginPage(),
-          type: PageTransitionType.leftToRight,
+          child: const SourceManagementPage(),
+          type: PageTransitionType.rightToLeft,
         ),
       );
     }
@@ -48,7 +52,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await check();
     });
@@ -57,7 +60,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
   }
 

@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -18,24 +19,23 @@ extension EXT on State {
   );
   static final List<Widget> _titles = [
     SvgPicture.asset(
-      "assets/images/logo-full.svg",
+      "assets/images/logo.svg",
       height: 25,
-      color: palette.orange,
     ),
     Text(
-      "Live TV",
+      "Live_Tv".tr(),
       style: titleStyle,
     ),
     Text(
-      "Movies",
+      "Movies".tr(),
       style: titleStyle,
     ),
     Text(
-      "Series",
+      "Series".tr(),
       style: titleStyle,
     ),
     Text(
-      "Favorites",
+      "favorites".tr(),
       style: titleStyle,
     ),
   ];
@@ -158,7 +158,7 @@ extension EXT on State {
             color: palette.white,
           ),
           onSelected: (value) {
-            if (value == "Change Source") {
+            if (value == "Change_Source".tr()) {
               Navigator.push(
                 context,
                 PageTransition(
@@ -173,28 +173,28 @@ extension EXT on State {
           itemBuilder: (BuildContext bc) {
             return [
               PopupMenuItem(
-                value: 'Change Source',
+                value: 'Change_Source'.tr(),
                 child: Row(
                   children: [
                     SvgPicture.asset("assets/icons/change.svg"),
                     const SizedBox(width: 10),
-                    const Text(
-                      "Change Source",
-                      style: TextStyle(color: Colors.black),
+                    Text(
+                      "Change_Source".tr(),
+                      style: const TextStyle(color: Colors.black),
                     )
                   ],
                 ),
               ),
               PopupMenuItem(
-                value: 'Update Channels',
+                value: 'Update_Channels'.tr(),
                 onTap: onUpdateChannel,
                 child: Row(
                   children: [
                     SvgPicture.asset("assets/icons/update.svg"),
                     const SizedBox(width: 10),
-                    const Text(
-                      "Update Channels",
-                      style: TextStyle(color: Colors.black),
+                    Text(
+                      "Update_Channels".tr(),
+                      style: const TextStyle(color: Colors.black),
                     ),
                   ],
                 ),
@@ -208,7 +208,6 @@ extension EXT on State {
   }
 
   Widget appbar1({Function()? onUpdateChannel}) {
-    final DateTime now = DateTime.now();
     return AppBar(
       elevation: 0,
       backgroundColor: Colors.transparent,
@@ -223,19 +222,55 @@ extension EXT on State {
         //     color: palette.white,
         //   ),
         // ),
+        // Center(
+        //   child: ClipRRect(
+        //     child: Container(
+        //       width: 40,
+        //       decoration: BoxDecoration(
+        //         shape: BoxShape.circle,
+        //         color: palette.white,
+        //       ),
+        //       child: MaterialButton(
+        //         height: 40,
+        //         onPressed: () {
+        //           Navigator.pushNamed(context, "/profile-page");
+        //         },
+
+        //       ),
+        //     ),
+        //   ),
+        // ),
         Center(
           child: ClipRRect(
+            borderRadius: BorderRadius.circular(50),
             child: Container(
               width: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: palette.white,
-              ),
+              height: 40,
+              color: Colors.white,
+              // decoration: BoxDecoration(
+              //   shape: BoxShape.circle,
+              //   color: palette.white,
+              //   image: DecorationImage(image: user!.photoUrl == null ? AssetImage("assetName") : )
+              // ),
               child: MaterialButton(
                 height: 40,
+                padding: EdgeInsets.zero,
                 onPressed: () {
                   Navigator.pushNamed(context, "/profile-page");
                 },
+                child: user?.photoUrl == null
+                    ? Image.asset(
+                        "assets/icons/default-picture.jpeg",
+                        height: 40,
+                        width: 40,
+                        fit: BoxFit.cover,
+                      )
+                    : CachedNetworkImage(
+                        imageUrl: user!.photoUrl!,
+                        height: 40,
+                        width: 40,
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
           ),

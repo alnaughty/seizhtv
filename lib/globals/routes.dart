@@ -12,8 +12,6 @@ import 'package:seizhtv/views/landing_page/main_landing_page.dart';
 import 'package:seizhtv/views/splash_screen.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
 
-import '../views/auth/login.dart';
-
 class Routes {
   Routes._pr();
   static final Routes _instance = Routes._pr();
@@ -80,13 +78,13 @@ class Routes {
           duration: _transitionDuration,
           reverseDuration: _transitionDuration,
         );
-      case "/login":
-        return PageTransition(
-          child: const LoginPage(),
-          type: PageTransitionType.rightToLeft,
-          duration: _transitionDuration,
-          reverseDuration: _transitionDuration,
-        );
+      // case "/login":
+      //   return PageTransition(
+      //     child: const LoginPage(),
+      //     type: PageTransitionType.rightToLeft,
+      //     duration: _transitionDuration,
+      //     reverseDuration: _transitionDuration,
+      //   );
 
       case "/auth":
         return PageTransition(

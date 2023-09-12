@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:seizhtv/extensions/classified_data.dart';
 import 'package:seizhtv/extensions/m3u_entry.dart';
@@ -55,12 +56,22 @@ class _EpisodePageState extends State<EpisodePage>
                   children: [
                     Column(
                       children: [
-                        Text(
-                          "${widget.data.data.length} Episode${widget.data.data.length > 1 ? "s" : ""}",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.white.withOpacity(.5),
+                        RichText(
+                          text: TextSpan(
+                            text: "${widget.data.data.length} ",
+                            style: TextStyle(
+                              fontFamily: "Poppins",
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.white.withOpacity(.5),
+                            ),
+                            children: [
+                              TextSpan(
+                                text:
+                                    "Episode${widget.data.data.length > 1 ? "s" : ""}"
+                                        .tr(),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 5),
@@ -118,9 +129,9 @@ class _EpisodePageState extends State<EpisodePage>
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                const Text(
-                                                  "Added to Favorites",
-                                                  style: TextStyle(
+                                                Text(
+                                                  "Added_to_Favorites".tr(),
+                                                  style: const TextStyle(
                                                     fontSize: 16,
                                                   ),
                                                 ),
@@ -156,8 +167,8 @@ class _EpisodePageState extends State<EpisodePage>
                                 child: Center(
                                   child: Text(
                                     isFavorite
-                                        ? "Remove from\nfavorites"
-                                        : "Add to favorites",
+                                        ? "Remove_from_favorites".tr()
+                                        : "Add_to_favorites".tr(),
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontSize: 10,

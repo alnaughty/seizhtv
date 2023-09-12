@@ -161,7 +161,6 @@ class _SearchSeriesState extends State<SearchSeries>
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: LayoutBuilder(
                               builder: (context, c) {
-                                final double w = c.maxWidth;
                                 return GridView.count(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 20),

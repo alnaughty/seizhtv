@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:page_transition/page_transition.dart';
@@ -10,11 +11,8 @@ import 'package:seizhtv/globals/loader.dart';
 import 'package:seizhtv/globals/palette.dart';
 import 'package:seizhtv/globals/ui_additional.dart';
 import 'package:seizhtv/models/option.dart';
-import 'package:seizhtv/views/landing_page/source_management.dart';
-
 import 'profile_children/general_setting.dart';
 import 'profile_children/parental_control.dart';
-import 'profile_children/record.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -36,7 +34,7 @@ class _ProfilePageState extends State<ProfilePage>
           appBar: AppBar(
             backgroundColor: card,
             elevation: 0,
-            title: const Text("Profile"),
+            title: Text("Profile".tr()),
           ),
           body: ListView(
             children: [
@@ -94,7 +92,8 @@ class _ProfilePageState extends State<ProfilePage>
                           //     ),
                           //   ),
                           // ),
-                          Text("Exp. Date :  $expDate"),
+                          const Text("Exp. Date :  "),
+                          // $expDate
                         ],
                       ),
                     ),
@@ -106,12 +105,13 @@ class _ProfilePageState extends State<ProfilePage>
                 childrenData: [
                   Option(
                     icon: "assets/icons/settings.svg",
-                    title: "General Setting",
+                    title: "General_Setting".tr(),
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const GeneralSettingPage(),
+                        PageTransition(
+                          child: const GeneralSettingPage(),
+                          type: PageTransitionType.rightToLeft,
                         ),
                       );
                     },
@@ -121,48 +121,49 @@ class _ProfilePageState extends State<ProfilePage>
                   //   title: "Records",
                   //   onPressed: () {
                   //     Navigator.push(
-                  //       context,
-                  //       MaterialPageRoute(
-                  //         builder: (context) => const RecordPage(),
-                  //       ),
-                  //     );
+                  //   context,
+                  //   PageTransition(
+                  //     child: const GeneralSettingPage(),
+                  //     type: PageTransitionType.rightToLeft,
+                  //   ),
+                  // );
                   //   },
                   // ),
                   Option(
                     icon: "assets/icons/epg.svg",
                     title: "EPG",
                     onPressed: () async {
-                      // await Navigator.push(
+                      // Navigator.push(
                       //   context,
                       //   PageTransition(
-                      //     child: const SourceManagementPage(
-                      //       fromInit: false,
-                      //     ),
-                      //     type: PageTransitionType.leftToRight,
+                      //     child: const GeneralSettingPage(),
+                      //     type: PageTransitionType.rightToLeft,
                       //   ),
                       // );
                     },
                   ),
                   Option(
                     icon: "assets/icons/parental-control.svg",
-                    title: "Parental Control",
+                    title: "Parental_Control".tr(),
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const ParentalControlPage(),
+                        PageTransition(
+                          child: const ParentalControlPage(),
+                          type: PageTransitionType.rightToLeft,
                         ),
                       );
                     },
                   ),
                   Option(
                     icon: "assets/icons/player.svg",
-                    title: "Player",
+                    title: "Player".tr(),
                     onPressed: () {
                       // Navigator.push(
                       //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => const PlayerPage(),
+                      //   PageTransition(
+                      //     child: const GeneralSettingPage(),
+                      //     type: PageTransitionType.rightToLeft,
                       //   ),
                       // );
                     },
@@ -171,34 +172,37 @@ class _ProfilePageState extends State<ProfilePage>
                   //   icon: "assets/icons/speedtest.svg",
                   //   title: "Speed Test",
                   //   onPressed: () {
-                  //     // Navigator.push(
-                  //     //   context,
-                  //     //   MaterialPageRoute(
-                  //     //     builder: (context) => const SpeedTestPage(),
-                  //     //   ),
-                  //     // );
+                  //     Navigator.push(
+                  //   context,
+                  //   PageTransition(
+                  //     child: const GeneralSettingPage(),
+                  //     type: PageTransitionType.rightToLeft,
+                  //   ),
+                  // );
                   //   },
                   // ),
                   // Option(
                   //   icon: "assets/icons/vpn.svg",
                   //   title: "VPN",
                   //   onPressed: () {
-                  //     // Navigator.push(
-                  //     //   context,
-                  //     //   MaterialPageRoute(
-                  //     //     builder: (context) => const VPNPage(),
-                  //     //   ),
-                  //     // );
+                  //     Navigator.push(
+                  //   context,
+                  //   PageTransition(
+                  //     child: const GeneralSettingPage(),
+                  //     type: PageTransitionType.rightToLeft,
+                  //   ),
+                  // );
                   //   },
                   // ),
                   Option(
                     icon: "assets/icons/termcondition.svg",
-                    title: "Terms & Conditions",
+                    title: "Terms_&_Conditions".tr(),
                     onPressed: () {
                       // Navigator.push(
                       //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => const TermsConditionPage(),
+                      //   PageTransition(
+                      //     child: const GeneralSettingPage(),
+                      //     type: PageTransitionType.rightToLeft,
                       //   ),
                       // );
                     },
@@ -212,8 +216,7 @@ class _ProfilePageState extends State<ProfilePage>
                       _isLoading = true;
                     });
                     await _cacher.clearData();
-                    // ignore: use_build_context_synchronously
-                    await Navigator.pushReplacementNamed(context, "/login");
+                    await Navigator.pushReplacementNamed(context, "/auth");
                   },
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
@@ -228,7 +231,7 @@ class _ProfilePageState extends State<ProfilePage>
                       ),
                       const SizedBox(width: 15),
                       Text(
-                        "Logout",
+                        "Logout".tr(),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -246,7 +249,13 @@ class _ProfilePageState extends State<ProfilePage>
         if (_isLoading) ...{
           const Positioned.fill(
             child: SeizhTvLoader(
-              label: "Logging out",
+              label: Text(
+                "Logging out",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
               opacity: .7,
             ),
           )

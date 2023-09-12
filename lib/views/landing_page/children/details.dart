@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:seizhtv/globals/ui_additional.dart';
@@ -60,11 +61,19 @@ class _DetailsPageState extends State<DetailsPage>
             const SizedBox(height: 20),
             Row(
               children: [
-                const Text(
-                  "Directors :",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
+                RichText(
+                  text: TextSpan(
+                    text: "Directors".tr(),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      fontFamily: "Poppins",
+                    ),
+                    children: const [
+                      TextSpan(
+                        text: " :",
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(width: 20),
@@ -98,11 +107,19 @@ class _DetailsPageState extends State<DetailsPage>
             const SizedBox(height: 20),
             Row(
               children: [
-                const Text(
-                  "Release Date :",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
+                RichText(
+                  text: TextSpan(
+                    text: "Release_Date".tr(),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      fontFamily: "Poppins",
+                    ),
+                    children: const [
+                      TextSpan(
+                        text: " :",
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(width: 15),
@@ -122,11 +139,19 @@ class _DetailsPageState extends State<DetailsPage>
             const SizedBox(height: 20),
             Row(
               children: [
-                const Text(
-                  "Genre :",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
+                RichText(
+                  text: TextSpan(
+                    text: "Genre".tr(),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      fontFamily: "Poppins",
+                    ),
+                    children: const [
+                      TextSpan(
+                        text: " :",
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(width: 20),
@@ -159,9 +184,9 @@ class _DetailsPageState extends State<DetailsPage>
               ],
             ),
             const SizedBox(height: 20),
-            const Text(
-              "Cast",
-              style: TextStyle(
+            Text(
+              "Cast".tr(),
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
               ),
@@ -174,10 +199,10 @@ class _DetailsPageState extends State<DetailsPage>
                 builder: (context, snapshot) {
                   if (snapshot.hasData && !snapshot.hasError) {
                     if (snapshot.data!.isEmpty) {
-                      return const Center(
+                      return Center(
                         child: Text(
-                          "No data available",
-                          style: TextStyle(
+                          "No_data_available".tr(),
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
@@ -216,7 +241,7 @@ class _DetailsPageState extends State<DetailsPage>
                                       ),
                                       errorWidget: (context, url, error) =>
                                           Image.asset(
-                                        "assets/images/app-icon.png",
+                                        "assets/images/logo.png",
                                         fit: BoxFit.cover,
                                       ),
                                     ),

@@ -1,19 +1,15 @@
 // ignore_for_file: deprecated_member_use, no_leading_underscores_for_local_identifiers
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:seizhtv/extensions/color.dart';
 import 'package:seizhtv/globals/network_image_viewer.dart';
 import 'package:seizhtv/globals/palette.dart';
 import 'package:seizhtv/globals/video_loader.dart';
 import 'package:seizhtv/services/movie_api.dart';
-import 'package:seizhtv/views/landing_page/children/movie_children/movie_details.dart';
-import 'package:seizhtv/views/landing_page/children/search/search_movies.dart';
 import 'package:z_m3u_handler/extension.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
-import '../../../../globals/data.dart';
-import 'details.dart';
 
 class ClassifiedMovieData extends StatefulWidget {
   const ClassifiedMovieData({
@@ -92,14 +88,27 @@ class _ClassifiedMovieDataState extends State<ClassifiedMovieData>
                         ),
                       ),
                     ),
-                    Text(
-                      "${_data.length} Entries",
-                      style: TextStyle(
-                        color: white.withOpacity(.5),
-                        fontSize: 11,
-                        height: 1,
-                        fontWeight: FontWeight.w300,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          "${_data.length} ",
+                          style: TextStyle(
+                            color: white.withOpacity(.5),
+                            fontSize: 11,
+                            height: 1,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ),
+                        Text(
+                          "Entries".tr(),
+                          style: TextStyle(
+                            color: white.withOpacity(.5),
+                            fontSize: 11,
+                            height: 1,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ),
+                      ],
                     )
                   ],
                 ),
@@ -155,8 +164,8 @@ class _ClassifiedMovieDataState extends State<ClassifiedMovieData>
                         },
                         cursorColor: orange,
                         controller: _search,
-                        decoration: const InputDecoration(
-                          hintText: "Search",
+                        decoration: InputDecoration(
+                          hintText: "Search".tr(),
                         ),
                       ),
                     ),
@@ -206,48 +215,19 @@ class _ClassifiedMovieDataState extends State<ClassifiedMovieData>
                                                 r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|] "),
                                             '');
 
-                                        await searchMovie(title: result2).then(
-                                          (value) {
-                                            if (value == null) {
-                                              return showModalBottomSheet(
-                                                context: context,
-                                                isDismissible: true,
-                                                backgroundColor:
-                                                    Colors.transparent,
-                                                constraints:
-                                                    const BoxConstraints(
-                                                  maxHeight: 230,
-                                                ),
-                                                builder: (_) {
-                                                  return MovieDetails(
-                                                    data: _entry,
-                                                    onLoadVideo:
-                                                        (M3uEntry entry) async {
-                                                      Navigator.of(context)
-                                                          .pop(null);
-                                                      entry
-                                                          .addToHistory(refId!);
-                                                      await loadVideo(
-                                                          context, entry);
-                                                    },
-                                                  );
-                                                },
-                                              );
-                                            } else {
-                                              return Navigator.push(
-                                                context,
-                                                PageTransition(
-                                                  child: MovieDetailsPage(
-                                                    data: _entry,
-                                                    title: result2,
-                                                  ),
-                                                  type: PageTransitionType
-                                                      .leftToRight,
-                                                ),
-                                              );
-                                            }
-                                          },
-                                        );
+                                        print("MOVIE TITLE: $result2");
+
+                                        // Navigator.push(
+                                        //   context,
+                                        //   PageTransition(
+                                        //     child: MovieDetailsPage(
+                                        //       data: _entry,
+                                        //       title: result2,
+                                        //     ),
+                                        //     type:
+                                        //         PageTransitionType.leftToRight,
+                                        //   ),
+                                        // );
                                       },
                                       child: NetworkImageViewer(
                                         url: _entry

@@ -1,3 +1,5 @@
+// ignore_for_file: implementation_imports
+
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -25,6 +27,7 @@ class _LoadWithMacAddressState extends State<LoadWithMacAddress>
   final M3uFirestoreServices _service = M3uFirestoreServices();
   final DataCacher _cacher = DataCacher.instance;
   final ZM3UHandler _handler = ZM3UHandler.instance;
+  bool isLoading = false;
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -32,42 +35,39 @@ class _LoadWithMacAddressState extends State<LoadWithMacAddress>
       await _cacher.saveRefID(refId!);
       if (mounted) setState(() {});
     });
-    // TODO: implement initState
     super.initState();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
   }
 
   Future<void> onSuccess(File? data) async {
     if (data == null) return;
-    _isLoading = true;
+    isLoading = true;
     if (mounted) setState(() {});
     await _cacher.saveFile(data);
     await _cacher.saveDate(DateTime.now().toString());
     // ignore: use_build_context_synchronously
     await Navigator.pushReplacementNamed(context, "/landing-page");
     print(data);
-    _isLoading = false;
+    isLoading = false;
     if (mounted) setState(() {});
   }
 
-  bool _isLoading = false;
   String? label;
   download(M3uSource source) async {
     FocusScope.of(context).unfocus();
     setState(() {
-      _isLoading = true;
+      isLoading = true;
       label = "Preparing download";
     });
     await _handler.network(source.source, progressCallback: (value) {
       label = "Downloading ${value.ceil()}%";
       if (mounted) setState(() {});
     }, onFinished: () {
-      _isLoading = false;
+      isLoading = false;
       if (mounted) setState(() {});
     }).then((value) async {
       if (value == null) return;

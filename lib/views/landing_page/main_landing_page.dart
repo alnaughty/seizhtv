@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart' as cup;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,11 +12,10 @@ import 'package:seizhtv/views/landing_page/firestore_listener.dart';
 import 'package:seizhtv/views/landing_page/children/favorites.dart';
 import 'package:seizhtv/views/landing_page/children/home.dart';
 import 'package:seizhtv/views/landing_page/children/live.dart';
-import 'package:seizhtv/views/landing_page/children/movie.dart';
 import 'package:seizhtv/views/landing_page/children/series.dart';
+import 'package:seizhtv/views/landing_page/movie.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
 import 'package:znavbar/znavbar.dart';
-
 import '../../services/tv_series_api.dart';
 import '../../services/movie_api.dart';
 
@@ -38,29 +37,29 @@ class _MainLandingPageState extends State<MainLandingPage>
   final GlobalKey<ZNavbarState> _kNavState = GlobalKey<ZNavbarState>();
   final List<ZTab> _tabs = [
     ZTabImage(
-      text: "Home",
+      text: "Home".tr(),
       path: "assets/icons/home.svg",
       imgType: ZImageType.svgAsset,
     ),
     ZTabIcon(
-      text: "Live",
+      text: "Live_Tv".tr(),
       icon: const Icon(
         cup.CupertinoIcons.tv,
       ),
     ),
     ZTabImage(
-      text: "Movies",
+      text: "Movies".tr(),
       path: "assets/icons/movies.svg",
       imgType: ZImageType.svgAsset,
     ),
     ZTabIcon(
-      text: "Series",
+      text: "Series".tr(),
       icon: const Icon(
         cup.CupertinoIcons.film,
       ),
     ),
     ZTabImage(
-      text: "Favorites",
+      text: "favorites".tr(),
       path: "assets/icons/favourites.svg",
       imgType: ZImageType.svgAsset,
     ),
@@ -81,7 +80,10 @@ class _MainLandingPageState extends State<MainLandingPage>
     const SeriesPage(),
     const FavoritesPage(),
   ];
+  // const Movie1Page(),
+
   Future<void> initPlatform() async {
+    print("RFID IN INIT PLATFORM LANDING PAGE: $refId");
     String? file = _cacher.filePath;
     refId = _cacher.refId;
     if (mounted) setState(() {});
@@ -92,6 +94,7 @@ class _MainLandingPageState extends State<MainLandingPage>
     }
     try {
       final CategorizedM3UData? value = await runExpensiveOperation(File(file));
+
       if (value == null) {
         // ignore: use_build_context_synchronously
         await Navigator.pushReplacementNamed(context, "/auth");
@@ -116,14 +119,12 @@ class _MainLandingPageState extends State<MainLandingPage>
     init();
     _controller = PageController();
     refId = _cacher.refId;
-    expDate = _cacher.expDate;
-    print("EXP DATE: $expDate ");
-    print("REF ID : $refId");
+    print("RFID IN INIT STATE LANDING PAGE: $refId");
     super.initState();
-    _firestoreListener.listen();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await initPlatform();
     });
+    _firestoreListener.listen();
   }
 
   @override

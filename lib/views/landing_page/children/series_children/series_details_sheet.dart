@@ -1,7 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:seizhtv/data_containers/favorites.dart';
 import 'package:seizhtv/extensions/classified_data.dart';
-import 'package:seizhtv/extensions/color.dart';
 import 'package:seizhtv/extensions/m3u_entry.dart';
 import 'package:seizhtv/globals/data.dart';
 import 'package:seizhtv/globals/favorite_button.dart';
@@ -79,13 +79,26 @@ class _SeriesDetailsSheetState extends State<SeriesDetailsSheet>
               children: [
                 Column(
                   children: [
-                    Text(
-                      "${widget.data.data.length} Episode${widget.data.data.length > 1 ? "s" : ""}",
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white.withOpacity(.5),
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          "${widget.data.data.length} ",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.white.withOpacity(.5),
+                          ),
+                        ),
+                        Text(
+                          "Episode${widget.data.data.length > 1 ? "s" : " "}"
+                              .tr(),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.white.withOpacity(.5),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(
                       height: 5,
@@ -143,9 +156,9 @@ class _SeriesDetailsSheetState extends State<SeriesDetailsSheet>
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          const Text(
-                                            "Added to Favorites",
-                                            style: TextStyle(
+                                          Text(
+                                            "Added_to_Favorites".tr(),
+                                            style: const TextStyle(
                                               fontSize: 16,
                                             ),
                                           ),
@@ -182,8 +195,8 @@ class _SeriesDetailsSheetState extends State<SeriesDetailsSheet>
                           child: Center(
                             child: Text(
                               isFavorite
-                                  ? "Remove from\nfavorites"
-                                  : "Add to favorites",
+                                  ? "Remove_from_favorites".tr()
+                                  : "Add_to_favorites".tr(),
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 10,

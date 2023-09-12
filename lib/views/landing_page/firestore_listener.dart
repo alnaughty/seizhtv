@@ -14,6 +14,7 @@ class FirestoreListener {
   static final M3uFirestoreServices _firestoreServices = M3uFirestoreServices();
 
   void listen() {
+    print("RFID SA FIRESTORE LISTENER: $refId");
     _firestoreServices
         .getListener(collection: "user-favorites", docId: refId!)
         .listen((DocumentSnapshot event) {

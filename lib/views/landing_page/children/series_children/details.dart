@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:seizhtv/extensions/classified_data.dart';
 import 'package:seizhtv/extensions/state.dart';
 import 'package:seizhtv/globals/palette.dart';
@@ -9,8 +9,8 @@ import 'package:seizhtv/services/tv_series_api.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
 import '../../../../data_containers/favorites.dart';
 import '../../../../globals/data.dart';
-import '../../../../globals/favorite_button.dart';
 import '../../../../globals/network.dart';
+import '../../../../globals/network_image_viewer.dart';
 import '../../../../globals/ui_additional.dart';
 import '../../../../globals/video_loader.dart';
 import '../../../../models/tvseries_details.dart';
@@ -38,8 +38,7 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
       SeriesDetailsViewModel.instance;
   static final Favorites _vm = Favorites.instance;
   static final ZM3UHandler _handler = ZM3UHandler.instance;
-  late bool isFavorite = widget.data.isInFavorite("series");
-  late final BehaviorSubject<bool> _status;
+  // late bool isFavorite = widget.data.isInFavorite("series");
   late TabController _tabController;
   late int? chosenIndex = widget.data.data.length == 1 ? 0 : null;
   // late bool value = widget.data.data[chosenIndex!].existsInFavorites("movie");
@@ -102,8 +101,9 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                         width: double.infinity,
                       ),
                       errorWidget: (context, url, error) => Image.asset(
-                        "assets/images/app-icon.png",
-                        fit: BoxFit.cover,
+                        "${widget.data.data[0].attributes['tvg-logo']}",
+                        // "assets/images/logo.png",
+                        fit: BoxFit.fitHeight,
                       ),
                     ),
                   ),
@@ -142,8 +142,21 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                               ),
                             ),
                             const SizedBox(width: 15),
-                            Text(
-                                "${result.numOfSeason} Season${result.numOfSeason == 1 ? "" : "s"}"),
+                            RichText(
+                              text: TextSpan(
+                                text: "${result.numOfSeason} ",
+                                style: const TextStyle(
+                                  fontFamily: "Poppins",
+                                ),
+                                children: [
+                                  TextSpan(
+                                    text:
+                                        "Season${result.numOfSeason == 1 ? "" : "s"}"
+                                            .tr(),
+                                  ),
+                                ],
+                              ),
+                            ),
                             const SizedBox(width: 15),
                             SizedBox(
                               height: 25,
@@ -161,9 +174,9 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                           ],
                         ),
                         const SizedBox(height: 30),
-                        const Text(
-                          "Storyline",
-                          style: TextStyle(
+                        Text(
+                          "Storyline".tr(),
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w500,
                           ),
@@ -189,7 +202,7 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                                     indicatorWeight: 2,
                                     tabs: [
                                       Text(
-                                        "Episodes",
+                                        "Episodes".tr(),
                                         style: TextStyle(
                                           color: white,
                                           fontSize: 16,
@@ -197,7 +210,7 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                                         ),
                                       ),
                                       Text(
-                                        "Info",
+                                        "Info".tr(),
                                         style: TextStyle(
                                           color: white,
                                           fontSize: 16,
@@ -232,8 +245,175 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                 ],
               );
             }
-            return const Center(
-              child: CircularProgressIndicator(color: Colors.grey),
+            return Column(
+              children: [
+                SizedBox(
+                  height: 200,
+                  width: double.infinity,
+                  child: NetworkImageViewer(
+                    url: "${widget.data.data[0].attributes['tvg-logo']}",
+                    width: 85,
+                    height: 60,
+                    fit: BoxFit.cover,
+                    color: highlight,
+                  ),
+                ),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 22,
+                          height: 1.1,
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      Text(
+                        "Storyline".tr(),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text("No_data_available".tr()),
+                      const SizedBox(height: 30),
+                      SizedBox(
+                        height: 550,
+                        child: Column(
+                          children: [
+                            Container(
+                              decoration: const BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(color: Colors.grey),
+                                ),
+                              ),
+                              child: DefaultTabController(
+                                length: 2,
+                                child: TabBar(
+                                  controller: _tabController,
+                                  indicatorColor: orange,
+                                  indicatorWeight: 2,
+                                  tabs: [
+                                    Text(
+                                      "Episodes".tr(),
+                                      style: TextStyle(
+                                        color: white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    Text(
+                                      "Info".tr(),
+                                      style: TextStyle(
+                                        color: white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: TabBarView(
+                                controller: _tabController,
+                                children: [
+                                  EpisodePage(
+                                    data: widget.data,
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(height: 20),
+                                      RichText(
+                                        text: TextSpan(
+                                          text: "Directors".tr(),
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500,
+                                            fontFamily: "Poppins",
+                                          ),
+                                          children: const [
+                                            TextSpan(
+                                              text: " :",
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      RichText(
+                                        text: TextSpan(
+                                          text: "Release_Date".tr(),
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500,
+                                            fontFamily: "Poppins",
+                                          ),
+                                          children: const [
+                                            TextSpan(
+                                              text: " :",
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      RichText(
+                                        text: TextSpan(
+                                          text: "Genre".tr(),
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500,
+                                            fontFamily: "Poppins",
+                                          ),
+                                          children: const [
+                                            TextSpan(
+                                              text: " :",
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      Text(
+                                        "Cast".tr(),
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      SizedBox(
+                                        height: 70,
+                                        child: Center(
+                                          child: Text(
+                                            "No_data_available".tr(),
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ],
             );
           },
         ),

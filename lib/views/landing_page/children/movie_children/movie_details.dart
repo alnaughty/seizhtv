@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:seizhtv/data_containers/favorites.dart';
@@ -51,16 +52,13 @@ class _MovieDetailsState extends State<MovieDetails> with ColorPalette {
         top: false,
         child: Column(
           children: [
-            // Text(widget.data.data.length.toString()),
             Expanded(
               child: LayoutBuilder(builder: (context, c) {
                 final double h = c.maxHeight;
                 return Row(
                   children: [
-                    // Text(widget.data.data.length.toString()),
                     Expanded(
                       child: ListView.separated(
-                        // scrollDirection: Axis.horizontal,
                         itemBuilder: (_, i) {
                           final M3uEntry _data = widget.data.data[i];
                           return ListTile(
@@ -139,9 +137,8 @@ class _MovieDetailsState extends State<MovieDetails> with ColorPalette {
                                         child: Center(
                                           child: Text(
                                             _data.existsInFavorites("movie")
-                                                ? "Remove from\nfavorites"
-                                                : "Add to favorites",
-                                            // "Remove from\nfavorites",
+                                                ? "Remove_from_favorites".tr()
+                                                : "Add_to_favorites".tr(),
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
                                               fontSize: 10,
@@ -322,7 +319,7 @@ class _MovieDetailsState extends State<MovieDetails> with ColorPalette {
                       width: 10,
                     ),
                     Text(
-                      "PLAY NOW",
+                      "Play_now".tr().toUpperCase(),
                       style: TextStyle(
                         color: cardColor,
                       ),

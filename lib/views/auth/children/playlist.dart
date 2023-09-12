@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -40,7 +41,6 @@ class _LoadPlaylistState extends State<LoadPlaylist>
     _name.text = widget.data?.name ?? "";
     _url.text = widget.data?.source ?? "";
     date = DateTime(date.year, date.month + 1, date.day);
-    print("DATEEE: $date");
     super.initState();
   }
 
@@ -79,8 +79,8 @@ class _LoadPlaylistState extends State<LoadPlaylist>
             key: _kFormName,
             child: LabeledTextField(
               controller: _name,
-              label: "Source Name",
-              hinttext: "Type your source name",
+              label: "Source_Name".tr(),
+              hinttext: "Type_your_source_name".tr(),
               validator: (text) {
                 if (text == null) {
                   return "Initiation error";
@@ -93,9 +93,9 @@ class _LoadPlaylistState extends State<LoadPlaylist>
           const SizedBox(
             height: 5,
           ),
-          const Text(
-            "Playlist Type",
-            style: TextStyle(
+          Text(
+            "Playlist_Type".tr(),
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 16,
             ),
@@ -123,7 +123,7 @@ class _LoadPlaylistState extends State<LoadPlaylist>
                           }
                         },
                       ),
-                      const Text("File")
+                      Text("File".tr())
                     ],
                   ),
                 ),
@@ -144,14 +144,14 @@ class _LoadPlaylistState extends State<LoadPlaylist>
                         }
                       },
                     ),
-                    const Text("M3U URL")
+                    Text("M3U_URL".tr())
                   ],
                 ),
               )
             ],
           ),
           Text(
-            type == 1 ? "URL" : "File",
+            type == 1 ? "URL" : "File".tr(),
             style: const TextStyle(fontSize: 16),
           ),
           const SizedBox(
@@ -212,6 +212,7 @@ class _LoadPlaylistState extends State<LoadPlaylist>
                                   file = File(
                                     value.files.single.path!,
                                   );
+                                  print("FILE SELECTED: $file");
                                 });
                               });
                             } catch (e) {
@@ -236,19 +237,21 @@ class _LoadPlaylistState extends State<LoadPlaylist>
                                   const SizedBox(
                                     width: 5,
                                   ),
-                                  const Text("Browse")
+                                  Text("Browse".tr())
                                 ],
                               ),
                             ),
                           ),
                         ),
                       ),
-                      if (file != null) ...{
+                      if (file != null || widget.data?.isFile == true) ...{
                         const SizedBox(
                           height: 5,
                         ),
                         Text(
-                          file!.path.split("/").last,
+                          widget.data?.isFile == true
+                              ? widget.data!.source.split("/").last
+                              : file!.path.split("/").last,
                           style: TextStyle(
                             color: Colors.white.withOpacity(.5),
                             fontStyle: FontStyle.italic,
@@ -286,10 +289,10 @@ class _LoadPlaylistState extends State<LoadPlaylist>
                             source: _url.text,
                             isFile: false,
                             name: _name.text,
-                            expDate: date,
                           ).toJson()
                         ])
                       }, SetOptions(merge: true));
+                      Navigator.of(context).pop();
                       _name.clear();
                       _url.clear();
                     } catch (e, s) {
@@ -298,6 +301,8 @@ class _LoadPlaylistState extends State<LoadPlaylist>
                     }
                   } else {
                     if (file != null && _kFormName.currentState!.validate()) {
+                      await _service.addUser(refId.toString(), file!.path);
+                      await _service.createFavoriteXHistory(refId.toString());
                       await _service.firestore
                           .collection("user-source")
                           .doc(refId)
@@ -307,13 +312,13 @@ class _LoadPlaylistState extends State<LoadPlaylist>
                             source: file!.path,
                             isFile: true,
                             name: _name.text,
-                            expDate: date,
                           ).toJson()
                         ])
                       }, SetOptions(merge: true));
                       file = null;
                       _name.clear();
                       if (mounted) setState(() {});
+                      Navigator.of(context).pop();
                     }
                   }
                 } else {
@@ -330,11 +335,11 @@ class _LoadPlaylistState extends State<LoadPlaylist>
                             source: _url.text,
                             isFile: false,
                             name: _name.text,
-                            expDate: date,
                           ).toJson()
                         ],
                       },
                     );
+                    Navigator.of(context).pop();
                     _name.clear();
                     _url.clear();
                   } else {
@@ -349,7 +354,6 @@ class _LoadPlaylistState extends State<LoadPlaylist>
                               source: file!.path,
                               isFile: true,
                               name: _name.text,
-                              expDate: date,
                             ).toJson()
                           ]
                         },
@@ -357,6 +361,7 @@ class _LoadPlaylistState extends State<LoadPlaylist>
                       file = null;
                       _name.clear();
                       if (mounted) setState(() {});
+                      Navigator.of(context).pop();
                     }
                   }
                 }
@@ -368,7 +373,9 @@ class _LoadPlaylistState extends State<LoadPlaylist>
                       ? const Icon(Icons.add)
                       : Container(),
                   Text(
-                    widget.isUpdate == false ? "Add Source" : "Update Source",
+                    widget.isUpdate == false
+                        ? "Add_Source".tr()
+                        : "Update_source".tr(),
                     style: TextStyle(color: ColorPalette().white),
                   ),
                 ],

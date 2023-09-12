@@ -1,14 +1,13 @@
 // ignore_for_file: deprecated_member_use, avoid_print
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:seizhtv/extensions/color.dart';
-import 'package:seizhtv/globals/data.dart';
 import 'package:seizhtv/globals/network_image_viewer.dart';
 import 'package:seizhtv/globals/palette.dart';
 import 'package:seizhtv/globals/video_loader.dart';
-import 'package:seizhtv/views/landing_page/children/series_children/series_details_sheet.dart';
 import 'package:z_m3u_handler/extension.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
 import '../../../../services/tv_series_api.dart';
@@ -51,12 +50,6 @@ class _ClassifiedSeriesDataState extends State<ClassifiedSeriesData>
         appBar: AppBar(
           elevation: 0,
           backgroundColor: Colors.transparent,
-          // actions: [
-          //   IconButton(
-          //     onPressed: () {},
-          //     icon: Icon(Icons.search),
-          //   ),
-          // ],
           title: Row(
             children: [
               SvgPicture.asset(
@@ -93,14 +86,27 @@ class _ClassifiedSeriesDataState extends State<ClassifiedSeriesData>
                         ),
                       ),
                     ),
-                    Text(
-                      "${_data.length} Entries",
-                      style: TextStyle(
-                        color: white.withOpacity(.5),
-                        fontSize: 11,
-                        height: 1,
-                        fontWeight: FontWeight.w300,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          "${_data.length} ",
+                          style: TextStyle(
+                            color: white.withOpacity(.5),
+                            fontSize: 11,
+                            height: 1,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ),
+                        Text(
+                          "Entries".tr(),
+                          style: TextStyle(
+                            color: white.withOpacity(.5),
+                            fontSize: 11,
+                            height: 1,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ),
+                      ],
                     )
                   ],
                 ),
@@ -156,8 +162,8 @@ class _ClassifiedSeriesDataState extends State<ClassifiedSeriesData>
                         },
                         cursorColor: orange,
                         controller: _search,
-                        decoration: const InputDecoration(
-                          hintText: "Search",
+                        decoration: InputDecoration(
+                          hintText: "Search".tr(),
                         ),
                       ),
                     ),
@@ -176,6 +182,7 @@ class _ClassifiedSeriesDataState extends State<ClassifiedSeriesData>
                   : Scrollbar(
                       controller: _scrollController,
                       child: ListView.separated(
+                        itemCount: _displayData.length,
                         itemBuilder: (_, i) {
                           final ClassifiedData _d = _displayData[i];
                           return ListTile(
@@ -183,43 +190,25 @@ class _ClassifiedSeriesDataState extends State<ClassifiedSeriesData>
                             onTap: () async {
                               String str1 = _d.name;
                               String result1 = str1.replaceAll(
-                                  RegExp(
-                                      r"[(]+[a-zA-Z]+[)]|[|]\s+[0-9]+\s[|]|([HD]|[FHD])"),
+                                  RegExp(r"[(]+[a-zA-Z]+[)]|[|]\s+[0-9]+\s[|]"),
                                   '');
                               String result2 = result1.replaceAll(
                                   RegExp(r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|] "),
                                   '');
 
-                              await searchTV(title: result2).then((value) {
-                                if (value == null) {
-                                  return showModalBottomSheet(
-                                    context: context,
-                                    isDismissible: true,
-                                    backgroundColor: Colors.transparent,
-                                    isScrollControlled: true,
-                                    builder: (_) => SeriesDetailsSheet(
-                                      data: _d,
-                                      onLoadVideo: (M3uEntry entry) async {
-                                        Navigator.of(context).pop(null);
-                                        await loadVideo(context, entry);
-                                        await entry.addToHistory(refId!);
-                                      },
-                                    ),
-                                  );
-                                } else {
-                                  print("VALUEEE: $value");
-                                  return Navigator.push(
-                                    context,
-                                    PageTransition(
-                                      child: SeriesDetailsPage(
-                                        data: _d,
-                                        title: result2,
-                                      ),
-                                      type: PageTransitionType.leftToRight,
-                                    ),
-                                  );
-                                }
-                              });
+                              Navigator.push(
+                                context,
+                                PageTransition(
+                                  child: SeriesDetailsPage(
+                                    data: _d,
+                                    title: result2,
+                                  ),
+                                  type: PageTransitionType.rightToLeft,
+                                ),
+                              );
+                              // }
+                              // }
+                              // );
                               // await showModalBottomSheet(
                               //   context: context,
                               //   isDismissible: true,
@@ -256,7 +245,12 @@ class _ClassifiedSeriesDataState extends State<ClassifiedSeriesData>
                               //       // );
                               //     });
                             },
-                            subtitle: Text("${_d.data.length} Episodes"),
+                            subtitle: Row(
+                              children: [
+                                Text("${_d.data.length} "),
+                                Text("Episodes".tr()),
+                              ],
+                            ),
                             leading: ClipRRect(
                               borderRadius: BorderRadius.circular(5),
                               child: SizedBox(
@@ -275,7 +269,6 @@ class _ClassifiedSeriesDataState extends State<ClassifiedSeriesData>
                         separatorBuilder: (_, i) => Divider(
                           color: Colors.white.withOpacity(.3),
                         ),
-                        itemCount: _displayData.length,
                       ),
                       // child: ListTile(
                       //   // subtitle: entry.attributes['description'] == null

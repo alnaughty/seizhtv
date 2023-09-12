@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../globals/palette.dart';
@@ -18,7 +19,7 @@ class _ParentalControlPageState extends State<ParentalControlPage>
       appBar: AppBar(
         backgroundColor: card,
         elevation: 0,
-        title: const Text("Parental Control"),
+        title: Text("Parental_Control".tr()),
         centerTitle: false,
       ),
       body: Column(

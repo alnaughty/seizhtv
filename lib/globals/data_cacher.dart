@@ -39,6 +39,7 @@ class DataCacher {
       await sharedPreferences.setString("file", file.path);
   String? get filePath => sharedPreferences.getString("file");
   Future<void> removeFile() async => await sharedPreferences.remove('file');
+
   Future<void> clearData() async {
     _favVm.dispose();
     _hisVm.dispose();
@@ -52,6 +53,7 @@ class DataCacher {
       removeUrl(),
       removeFile(),
       removeLoginType(),
+      removeSource(),
       removeM3uUser()
     ]);
   }
@@ -90,6 +92,15 @@ class DataCacher {
 
   Future<bool> removeRefID() async => await sharedPreferences.remove("ref_id");
 
+  /// REFERENCE ID FUNCTIONS
+  Future<bool> saveLanguage(String language) async =>
+      await sharedPreferences.setString("language", language);
+
+  String? get language => sharedPreferences.getString("language");
+
+  Future<bool> removeLanguage() async =>
+      await sharedPreferences.remove("language");
+
   /// Playlist functions
   Future<bool> savePlaylistName(String n) async =>
       await sharedPreferences.setString("playlist_name", n);
@@ -99,12 +110,19 @@ class DataCacher {
   Future<bool> removePlaylistName() async =>
       await sharedPreferences.remove("playlist_name");
 
-  /// Exp. Date functions
-  Future<bool> saveExpDate(String date) async =>
-      await sharedPreferences.setString("exp_date", date);
+  // /// Exp. Date functions
+  // Future<bool> saveExpDate(String date) async =>
+  //     await sharedPreferences.setString("exp_date", date);
 
-  String? get expDate => sharedPreferences.getString("exp_date");
+  // String? get expDate => sharedPreferences.getString("exp_date");
 
-  Future<bool> removeExpDate() async =>
-      await sharedPreferences.remove("exp_date");
+  // Future<bool> removeExpDate() async =>
+  //     await sharedPreferences.remove("exp_date");
+
+  Future<bool> saveSource(String source) async =>
+      await sharedPreferences.setString("source", source);
+
+  String? get source => sharedPreferences.getString("source");
+
+  Future<bool> removeSource() async => await sharedPreferences.remove("source");
 }

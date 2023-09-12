@@ -98,7 +98,6 @@ class TVSeriesAPI {
         if (response.statusCode == 200) {
           final Map<String, dynamic> data = response.data;
           final seriesDetails = TVSeriesDetails.fromJson(data);
-          print("DETAILSSS: $seriesDetails");
           _detailsviewModel.populate(seriesDetails);
           return seriesDetails;
         }

@@ -1,5 +1,6 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, unnecessary_string_interpolations
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:seizhtv/extensions/color.dart';
@@ -41,6 +42,37 @@ class UIAdditional {
           ),
         ),
       );
+
+  Widget filterChip({
+    required List<String> chipsLabel,
+    required Function(int index) onPressed,
+    required int si,
+  }) =>
+      ListView.separated(
+        shrinkWrap: true,
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+              onTap: () {
+                onPressed(index);
+              },
+              child: ChoiceChip(
+                padding: const EdgeInsets.all(10),
+                label: Text(
+                  chipsLabel[index],
+                  style: const TextStyle(color: Colors.white),
+                ),
+                selected: si == index,
+                selectedColor: ColorPalette().topColor,
+                disabledColor: ColorPalette().highlight,
+              ));
+        },
+        itemCount: chipsLabel.length,
+        separatorBuilder: (BuildContext context, int index) {
+          return const SizedBox(width: 10);
+        },
+      );
+
   Widget button2(
           {required Function()? onPressed,
           required String assetPath,
@@ -48,11 +80,10 @@ class UIAdditional {
           required Color foregroundColor}) =>
       MaterialButton(
         onPressed: onPressed,
-        height: 50,
         color: ColorPalette().card,
-        child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(10),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SvgPicture.asset(
                 assetPath,
@@ -63,39 +94,19 @@ class UIAdditional {
               const SizedBox(
                 width: 14,
               ),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 15,
-                  color: Colors.white,
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    color: Colors.white,
+                  ),
+                  maxLines: 2,
+                  textAlign: TextAlign.center,
                 ),
               ),
             ],
           ),
-        ),
-      );
-  Widget filterChip(List<String> labels) => SizedBox(
-        height: 66,
-        child: Row(
-          children: [
-            Expanded(
-              flex: 6,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (context, index) => Chip(
-                    backgroundColor: ColorPalette().highlight,
-                    padding: const EdgeInsets.all(10),
-                    label: Text(labels[index])),
-                itemCount: labels.length,
-                separatorBuilder: (BuildContext context, int index) {
-                  return const SizedBox(
-                    width: 10,
-                  );
-                },
-              ),
-            ),
-            Expanded(child: SvgPicture.asset("assets/icons/vector.svg")),
-          ],
         ),
       );
 
@@ -144,8 +155,7 @@ class UIAdditional {
   }
 
   Widget options({required List<Option> childrenData}) {
-    return Expanded(
-        child: Padding(
+    return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,33 +210,31 @@ class UIAdditional {
           )
         ],
       ),
-    ));
+    );
   }
 
   loader() {
-    return Expanded(
-      child: Container(
-        color: Colors.black.withOpacity(0.7),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              "assets/images/update.gif",
-              fit: BoxFit.fitWidth,
-              height: 95,
-              width: double.maxFinite,
-              alignment: AlignmentDirectional.centerEnd,
-              isAntiAlias: true,
+    return Container(
+      color: Colors.black.withOpacity(0.7),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            "assets/images/update.gif",
+            fit: BoxFit.fitWidth,
+            height: 95,
+            width: double.maxFinite,
+            alignment: AlignmentDirectional.centerEnd,
+            isAntiAlias: true,
+          ),
+          Text(
+            "Updating_please_wait".tr(),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
             ),
-            const Text(
-              "Updating please wait ...",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -8,7 +8,7 @@ extension ENTRY on M3uEntry {
     try {
       final CategorizedM3UData _f = _vm.current.clone();
       // _vm.current.;
-      print(_vm.current);
+
       switch (src) {
         case "series":
           return _f.series

@@ -36,9 +36,9 @@ class NetworkImageViewer extends StatelessWidget
                   //   width: width,
                   // ),
                   SvgPicture.asset(
-                    "assets/icons/logo-ico.svg",
+                    "assets/icons/logo.svg",
                     width: width * .7,
-                    color: Colors.red.withOpacity(.5),
+                    // color: Colors.red.withOpacity(.5),
                     fit: BoxFit.contain,
                   ),
                 ],
