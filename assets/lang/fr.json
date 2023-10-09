@@ -73,5 +73,6 @@
     "Register_with_us": "S’enregistrer",
     "Forget_Password": "Mot de passe oublié ?",
     "Reset": "",
-    "Username": "Nom d’utilisateur"
+    "Username": "Nom d’utilisateur",
+    "Account_Deletion": ""
 }

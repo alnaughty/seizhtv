@@ -14,8 +14,10 @@ import '../../../../globals/palette.dart';
 import '../../../../globals/video_loader.dart';
 
 class EpisodePage extends StatefulWidget {
-  const EpisodePage({super.key, required this.data});
+  const EpisodePage(
+      {super.key, required this.data, required this.seasonLength});
   final ClassifiedData data;
+  final int seasonLength;
 
   @override
   State<EpisodePage> createState() => _EpisodePageState();
@@ -27,6 +29,9 @@ class _EpisodePageState extends State<EpisodePage>
   static final Favorites _vm = Favorites.instance;
   static final ZM3UHandler _handler = ZM3UHandler.instance;
   late int? chosenIndex = widget.data.data.length == 1 ? 0 : null;
+  String dropdownvalue = "";
+  List<String> seasonsNum = [];
+  List<M3uEntry> data = [];
 
   fetchFav() async {
     await _handler
@@ -39,9 +44,29 @@ class _EpisodePageState extends State<EpisodePage>
   }
 
   @override
-  Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
+  void initState() {
+    for (int i = 1; i <= widget.seasonLength; i++) {
+      seasonsNum.add("$i");
+    }
 
+    if (dropdownvalue == "") {
+      for (final M3uEntry datas in widget.data.data) {
+        if (datas.attributes['tvg-name']
+            .toString()
+            .contains('S0${seasonsNum[0]}')) {
+          data.add(datas);
+        }
+      }
+    }
+
+    print("SEASONNUM: ${seasonsNum.length}");
+    print("DROPDOWN: $dropdownvalue");
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Stack(
       children: [
         Material(
@@ -54,142 +79,188 @@ class _EpisodePageState extends State<EpisodePage>
                 const SizedBox(height: 20),
                 Row(
                   children: [
-                    Column(
-                      children: [
-                        RichText(
-                          text: TextSpan(
-                            text: "${widget.data.data.length} ",
-                            style: TextStyle(
-                              fontFamily: "Poppins",
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.white.withOpacity(.5),
-                            ),
-                            children: [
-                              TextSpan(
-                                text:
-                                    "Episode${widget.data.data.length > 1 ? "s" : ""}"
-                                        .tr(),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Container(
-                          height: 3,
-                          width: size.width * .25,
-                          color: orange,
-                        ),
-                      ],
-                    ),
                     Expanded(
-                      child: LayoutBuilder(
-                        builder: (_, c) {
-                          final double w = c.maxWidth;
-                          return Align(
-                            alignment: Alignment.centerRight,
-                            child: Container(
-                              width: w * .7,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(.7),
-                                ),
-                                borderRadius: BorderRadius.circular(5),
+                      child: Column(
+                        children: [
+                          RichText(
+                            text: TextSpan(
+                              text:
+                                  "${widget.seasonLength} Season${widget.seasonLength > 1 ? "s" : ""} - ${widget.data.data.length} ",
+                              style: TextStyle(
+                                fontFamily: "Poppins",
+                                fontWeight: FontWeight.w400,
+                                color: Colors.white.withOpacity(.5),
                               ),
-                              child: MaterialButton(
-                                padding: EdgeInsets.zero,
-                                onPressed: () async {
-                                  Navigator.of(context).pop(null);
-                                  if (!isFavorite) {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        Future.delayed(
-                                          const Duration(seconds: 5),
-                                          () {
-                                            Navigator.of(context).pop(true);
-                                          },
-                                        );
-                                        return Dialog(
-                                          alignment: Alignment.topCenter,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              10.0,
-                                            ),
-                                          ),
-                                          child: Container(
-                                            height: 50,
-                                            padding: const EdgeInsets.symmetric(
-                                              vertical: 15,
-                                              horizontal: 20,
-                                            ),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  "Added_to_Favorites".tr(),
-                                                  style: const TextStyle(
-                                                    fontSize: 16,
-                                                  ),
-                                                ),
-                                                IconButton(
-                                                  padding:
-                                                      const EdgeInsets.all(0),
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                  icon: const Icon(
-                                                    Icons.close_rounded,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                    for (M3uEntry m3u in widget.data.data) {
-                                      await m3u.addToFavorites(refId!);
-                                    }
-                                  } else {
-                                    for (M3uEntry m3u in widget.data.data) {
-                                      await m3u.removeFromFavorites(refId!);
+                              children: [
+                                TextSpan(
+                                  text:
+                                      "Episode${widget.data.data.length > 1 ? "s" : ""}"
+                                          .tr(),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Container(height: 3, color: orange),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    widget.seasonLength == 1
+                        ? Container(width: 150)
+                        : Container(
+                            height: 50,
+                            width: 130,
+                            margin: const EdgeInsets.only(left: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            decoration: BoxDecoration(
+                              color: highlight,
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                            child: DropdownButton(
+                              elevation: 0,
+                              isExpanded: true,
+                              items: seasonsNum.map((value) {
+                                return DropdownMenuItem(
+                                  value: value,
+                                  child: Text("Season $value"),
+                                );
+                              }).toList(),
+                              value: dropdownvalue == ""
+                                  ? seasonsNum[0]
+                                  : dropdownvalue,
+                              style: const TextStyle(
+                                  fontSize: 14, fontFamily: "Poppins"),
+                              icon: const Icon(Icons.keyboard_arrow_down),
+                              onChanged: (value) {
+                                setState(() {
+                                  dropdownvalue = value!;
+                                  print("DROPDOWN VALUE: $dropdownvalue");
+                                  data.clear();
+                                  for (final M3uEntry datas
+                                      in widget.data.data) {
+                                    if (datas.attributes['tvg-name']
+                                        .toString()
+                                        .contains('S0$dropdownvalue')) {
+                                      data.add(datas);
                                     }
                                   }
-                                  await fetchFav();
-                                },
-                                color: Colors.transparent,
-                                elevation: 0,
-                                height: 40,
-                                child: Center(
-                                  child: Text(
-                                    isFavorite
-                                        ? "Remove_from_favorites".tr()
-                                        : "Add_to_favorites".tr(),
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: Colors.white.withOpacity(.7),
-                                    ),
-                                  ),
-                                ),
-                              ),
+                                });
+                              },
                             ),
-                          );
-                        },
-                      ),
-                    )
+                          )
+                    // Expanded(
+                    //   child: LayoutBuilder(
+                    //     builder: (_, c) {
+                    //       final double w = c.maxWidth;
+                    //       return Align(
+                    //         alignment: Alignment.centerRight,
+                    //         child: Container(
+                    //           width: w * .7,
+                    //           height: 40,
+                    //           decoration: BoxDecoration(
+                    //             border: Border.all(
+                    //               color: Colors.white.withOpacity(.7),
+                    //             ),
+                    //             borderRadius: BorderRadius.circular(5),
+                    //           ),
+                    //           child: MaterialButton(
+                    //             padding: EdgeInsets.zero,
+                    //             onPressed: () async {
+                    //               Navigator.of(context).pop(null);
+                    //               if (!isFavorite) {
+                    //                 showDialog(
+                    //                   context: context,
+                    //                   builder: (BuildContext context) {
+                    //                     Future.delayed(
+                    //                       const Duration(seconds: 5),
+                    //                       () {
+                    //                         Navigator.of(context).pop(true);
+                    //                       },
+                    //                     );
+                    //                     return Dialog(
+                    //                       alignment: Alignment.topCenter,
+                    //                       shape: RoundedRectangleBorder(
+                    //                         borderRadius: BorderRadius.circular(
+                    //                           10.0,
+                    //                         ),
+                    //                       ),
+                    //                       child: Container(
+                    //                         height: 50,
+                    //                         padding: const EdgeInsets.symmetric(
+                    //                           vertical: 15,
+                    //                           horizontal: 20,
+                    //                         ),
+                    //                         child: Row(
+                    //                           mainAxisAlignment:
+                    //                               MainAxisAlignment
+                    //                                   .spaceBetween,
+                    //                           children: [
+                    //                             Text(
+                    //                               "Added_to_Favorites".tr(),
+                    //                               style: const TextStyle(
+                    //                                 fontSize: 16,
+                    //                               ),
+                    //                             ),
+                    //                             IconButton(
+                    //                               padding:
+                    //                                   const EdgeInsets.all(0),
+                    //                               onPressed: () {
+                    //                                 Navigator.of(context).pop();
+                    //                               },
+                    //                               icon: const Icon(
+                    //                                 Icons.close_rounded,
+                    //                               ),
+                    //                             ),
+                    //                           ],
+                    //                         ),
+                    //                       ),
+                    //                     );
+                    //                   },
+                    //                 );
+                    //                 for (M3uEntry m3u in widget.data.data) {
+                    //                   await m3u.addToFavorites(refId!);
+                    //                 }
+                    //               } else {
+                    //                 for (M3uEntry m3u in widget.data.data) {
+                    //                   await m3u.removeFromFavorites(refId!);
+                    //                 }
+                    //               }
+                    //               await fetchFav();
+                    //             },
+                    //             color: Colors.transparent,
+                    //             elevation: 0,
+                    //             height: 40,
+                    //             child: Center(
+                    //               child: Text(
+                    //                 isFavorite
+                    //                     ? "Remove_from_favorites".tr()
+                    //                     : "Add_to_favorites".tr(),
+                    //                 textAlign: TextAlign.center,
+                    //                 style: TextStyle(
+                    //                   fontSize: 10,
+                    //                   color: Colors.white.withOpacity(.7),
+                    //                 ),
+                    //               ),
+                    //             ),
+                    //           ),
+                    //         ),
+                    //       );
+                    //     },
+                    //   ),
+                    // )
                   ],
                 ),
                 const SizedBox(height: 30),
                 ListView.separated(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
+                  itemCount: data.length,
                   itemBuilder: (_, i) {
-                    final M3uEntry e = widget.data.data[i];
+                    final M3uEntry e = data[i];
+                    print("S0$dropdownvalue");
+                    print(
+                        "${e.attributes['tvg-name']} - ${e.attributes['tvg-name'].toString().contains("S0$dropdownvalue ")}");
 
                     return ListTile(
                       onTap: () async {
@@ -222,13 +293,12 @@ class _EpisodePageState extends State<EpisodePage>
                           ),
                         ),
                       ),
-                      title: Text(e.title),
+                      title: Text(e.attributes['tvg-name']),
                     );
                   },
                   separatorBuilder: (_, i) => Divider(
                     color: Colors.white.withOpacity(.3),
                   ),
-                  itemCount: widget.data.data.length,
                 )
               ],
             ),

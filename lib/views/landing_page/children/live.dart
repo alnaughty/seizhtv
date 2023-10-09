@@ -1,7 +1,6 @@
 // ignore_for_file: deprecated_member_use, avoid_print
 
 import 'dart:async';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +14,8 @@ import 'package:seizhtv/globals/palette.dart';
 import 'package:seizhtv/globals/ui_additional.dart';
 import 'package:seizhtv/views/landing_page/children/live_children/live_list.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
+import '../../../data_containers/favorites.dart';
+import '../../../data_containers/history.dart';
 import '../../../globals/data.dart';
 import '../../../globals/video_loader.dart';
 import 'live_children/fav_live_tv.dart';
@@ -32,26 +33,70 @@ class _LivePageState extends State<LivePage>
   // final int _itemsPerPage = 20; // number of items to show per page
   // int _currentPage = 0; // current page index
   final LoadedM3uData _vm = LoadedM3uData.instance;
+  final Favorites _favvm = Favorites.instance;
+  final History _hisvm = History.instance;
+  static final ZM3UHandler _handler = ZM3UHandler.instance;
   late final TextEditingController _search;
   late final ScrollController _scrollController;
   late final List<M3uEntry> _data;
   List<M3uEntry>? displayData;
   late final StreamSubscription<CategorizedM3UData> _streamer;
-  int loadLength = 100;
+  late List<ClassifiedData> _favdata;
+  late List<ClassifiedData> _hisdata;
+  late List<M3uEntry> favData = [];
+  late List<M3uEntry> hisData = [];
   bool update = false;
   bool subpage = false;
-  int ind = 0;
   bool searchClose = true;
   bool selectedIndex = false;
+  late List<String>? name = [];
+  int ind = 0;
+  String label = "";
 
   initStream() {
     _streamer = _vm.stream.listen((event) {
+      name = List.from(event.live.map((e) => e.name))
+        ..sort((a, b) => a.compareTo(b));
+
       _data = List.from(
           event.live.expand((element) => element.data).toList().unique());
-      // _data.sort((a, b) => a.name.compareTo(b.name));
       displayData = List.from(_data.unique());
       displayData!.sort((a, b) => a.title.compareTo(b.title));
       if (mounted) setState(() {});
+    });
+  }
+
+  fetchFav() async {
+    await _handler
+        .getDataFrom(type: CollectionType.favorites, refId: refId!)
+        .then((value) {
+      if (value != null) {
+        _favvm.populate(value);
+      }
+    });
+  }
+
+  fetchHis() async {
+    await _handler
+        .getDataFrom(type: CollectionType.history, refId: refId!)
+        .then((value) {
+      if (value != null) {
+        _hisvm.populate(value);
+      }
+    });
+  }
+
+  initFavStream() {
+    _favvm.stream.listen((event) {
+      _favdata = List.from(event.live);
+      favData = _favdata.expand((element) => element.data).toList();
+    });
+  }
+
+  initHisStream() {
+    _hisvm.stream.listen((event) {
+      _hisdata = List.from(event.live);
+      hisData = _hisdata.expand((element) => element.data).toList();
     });
   }
 
@@ -61,6 +106,10 @@ class _LivePageState extends State<LivePage>
     _search = TextEditingController();
     showSearchField = false;
     initStream();
+    fetchFav();
+    fetchHis();
+    initFavStream();
+    initHisStream();
     super.initState();
   }
 
@@ -78,6 +127,8 @@ class _LivePageState extends State<LivePage>
       GlobalKey<FavLiveTvPageState>();
   final GlobalKey<HistoryLiveTvPageState> _hisPage =
       GlobalKey<HistoryLiveTvPageState>();
+  // final GlobalKey<LiveCategoryPageState> _catPage =
+  //     GlobalKey<LiveCategoryPageState>();
   bool showSearchField = false;
 
   @override
@@ -120,39 +171,25 @@ class _LivePageState extends State<LivePage>
                   child: UIAdditional().filterChip(
                     chipsLabel: [
                       "All (${displayData == null ? "" : displayData!.length})",
-                      "favorites".tr(),
-                      "Channels_History".tr(),
+                      "${"favorites".tr()} (${favData.length})",
+                      // "Categories",
+                      // for (int i = 1; i < name!.length; i++) ...{(name![i])},
+                      "${"Channels_History".tr()} (${hisData.length})",
                     ],
-                    onPressed: (index) {
+                    categoryName: [
+                      for (int i = 0; i < name!.length; i++) ...{(name![i])},
+                    ],
+                    onPressed: (index, name) {
                       setState(() {
                         print("$index");
                         ind = index;
+                        label = name!;
                       });
                     },
                     si: ind,
+                    filterButton: (name) {},
                   ),
                 ),
-                // ListView.separated(
-                //   scrollDirection: Axis.horizontal,
-                //   itemBuilder: (context, index) => GestureDetector(
-                //     onTap: () {
-                //       setState(() {
-                //         ind = index;
-                //         print("$ind");
-                //       });
-                //     },
-                //     child: Chip(
-                //       backgroundColor: ColorPalette().highlight,
-                //       padding: const EdgeInsets.all(10),
-                //       label: Text("${category[index]}"
-                //           "${index == 0 ? displayData == null ? "" : displayData!.length : ""}"),
-                //     ),
-                //   ),
-                //   itemCount: category.length,
-                //   separatorBuilder: (BuildContext context, int index) {
-                //     return const SizedBox(width: 10);
-                //   },
-                // ),
                 const SizedBox(height: 15),
                 AnimatedPadding(
                   duration: const Duration(milliseconds: 400),
@@ -255,10 +292,8 @@ class _LivePageState extends State<LivePage>
                               ? LiveList(
                                   key: _kList,
                                   data: displayData!,
-                                  controller: _scrollController,
                                   searchClose: searchClose,
                                   onPressed: (M3uEntry entry) async {
-                                    print("DATA CLICK: $entry");
                                     entry.addToHistory(refId!);
                                     await loadVideo(context, entry);
                                     // return showModalBottomSheet(
@@ -280,25 +315,25 @@ class _LivePageState extends State<LivePage>
                               : ind == 1
                                   ? FavLiveTvPage(
                                       key: _favPage,
-                                      data: displayData!,
-                                      controller: _scrollController,
+                                      data: favData,
                                       onPressed: (M3uEntry entry) async {
-                                        print("DATA CLICK: $entry");
                                         entry.addToHistory(refId!);
                                         await loadVideo(context, entry);
                                       },
                                     )
                                   : HistoryLiveTvPage(
                                       key: _hisPage,
-                                      data: displayData!,
-                                      controller: _scrollController,
+                                      data: hisData,
                                       onPressed: (M3uEntry entry) async {
-                                        print("DATA CLICK: $entry");
                                         entry.addToHistory(refId!);
                                         await loadVideo(context, entry);
                                       },
-                                    ),
-                        ),
+                                    )
+                          // : LiveCategoryPage(
+                          //     key: _catPage,
+                          //     category: label,
+                          //   ),
+                          ),
                 ),
               ],
             ),

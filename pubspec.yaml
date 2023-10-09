@@ -66,7 +66,9 @@ dependencies:
   platform_device_id: ^1.0.1
   shimmer: ^2.0.0
   video_player: ^2.6.0
-  chewie: ^1.4.0
+  chewie: 
+    git: https://github.com/alnaughty/chewie_custom
+  #  ^1.4.0
   # flutter_cast_framework:
   #   path: /Users/qonvexmacmini/Desktop/flutter_cast_framework
   cached_network_image: ^3.2.3
@@ -80,7 +82,8 @@ dependencies:
   localization: ^2.1.0
   easy_localization: ^3.0.2
   restart_app: ^1.2.1
-  flick_video_player: ^0.5.0
+  infinite_scroll_pagination: ^4.0.0
+  cool_dropdown: ^2.1.0
 
 dev_dependencies:
   flutter_test:

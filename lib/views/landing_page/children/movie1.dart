@@ -528,9 +528,10 @@ class _Movie1PageState extends State<Movie1Page>
                                       ),
                                     ],
                                   )
-                            : ind == 1
-                                ? const FaveMoviePage()
-                                : const HistoryMoviePage(),
+                            : Container()
+                    // : ind == 1
+                    //     ? const FaveMoviePage()
+                    //     : const HistoryMoviePage(),
                   ],
                 )
               ],

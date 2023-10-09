@@ -15,11 +15,9 @@ class LiveList extends StatefulWidget {
   const LiveList(
       {super.key,
       required this.data,
-      required this.controller,
       required this.onPressed,
       required this.searchClose});
   final List<M3uEntry> data;
-  final ScrollController controller;
   final ValueChanged<M3uEntry> onPressed;
   final bool searchClose;
   @override
@@ -101,7 +99,7 @@ class LiveListState extends State<LiveList> with ColorPalette, UIAdditional {
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: calculateCrossAxisCount(context),
                 childAspectRatio: .8, // optional, adjust as needed
-                mainAxisSpacing: 10,
+                // mainAxisSpacing: 10,
                 crossAxisSpacing: 10),
             itemCount: _displayData.length, // add 1 for the loading indicator
             itemBuilder: (context, index) {
@@ -134,7 +132,6 @@ class LiveListState extends State<LiveList> with ColorPalette, UIAdditional {
                             ),
                             const SizedBox(height: 7),
                             Text(
-                              // "",
                               item.title,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -234,28 +231,28 @@ class LiveListState extends State<LiveList> with ColorPalette, UIAdditional {
           );
   }
 
-  void _scrollListener() {
-    if (widget.controller.offset >=
-        widget.controller.position.maxScrollExtent) {
-      print("DUGANG!");
+  // void _scrollListener() {
+  //   if (widget.controller.offset >=
+  //       widget.controller.position.maxScrollExtent) {
+  //     print("DUGANG!");
 
-      if (searchText == "") {
-        setState(() {
-          if (endIndex < widget.data.length) {
-            endIndex += 5;
-            if (endIndex > widget.data.length) {
-              endIndex = widget.data.length;
-            }
-          }
-          _displayData = List.from(widget.data.sublist(startIndex,
-              endIndex > widget.data.length ? widget.data.length : endIndex));
-          print(_displayData.length);
-        });
-        return;
-      }
-      return;
-    }
-  }
+  //     if (searchText == "") {
+  //       setState(() {
+  //         if (endIndex < widget.data.length) {
+  //           endIndex += 5;
+  //           if (endIndex > widget.data.length) {
+  //             endIndex = widget.data.length;
+  //           }
+  //         }
+  //         _displayData = List.from(widget.data.sublist(startIndex,
+  //             endIndex > widget.data.length ? widget.data.length : endIndex));
+  //         print(_displayData.length);
+  //       });
+  //       return;
+  //     }
+  //     return;
+  //   }
+  // }
 
   int calculateCrossAxisCount(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;

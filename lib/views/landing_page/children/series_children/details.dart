@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:seizhtv/extensions/classified_data.dart';
 import 'package:seizhtv/extensions/state.dart';
 import 'package:seizhtv/globals/palette.dart';
@@ -38,9 +37,11 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
       SeriesDetailsViewModel.instance;
   static final Favorites _vm = Favorites.instance;
   static final ZM3UHandler _handler = ZM3UHandler.instance;
-  // late bool isFavorite = widget.data.isInFavorite("series");
+  late bool isFavorite = widget.data.isInFavorite("series");
   late TabController _tabController;
   late int? chosenIndex = widget.data.data.length == 1 ? 0 : null;
+  late ClassifiedData data;
+  List<M3uEntry> seasons = [];
   // late bool value = widget.data.data[chosenIndex!].existsInFavorites("movie");
 
   @override
@@ -51,7 +52,24 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
         seriesDetails(value);
       }
     });
+
+    data = widget.data;
+
+    for (final M3uEntry datas in widget.data.data) {
+      if (datas.title.length >= 5) {
+        datas.title = datas.title.substring(0, datas.title.length - 3);
+      }
+    }
+    final titles = widget.data.data.map((e) => e.title).toSet();
+
+    for (final title in titles) {
+      final item =
+          widget.data.data.firstWhere((element) => element.title == title);
+      seasons.add(item);
+    }
+
     _tabController = TabController(vsync: this, length: 2);
+    print("DATAAAA: ${seasons.length}");
     super.initState();
   }
 
@@ -74,6 +92,7 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
 
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: card,
       appBar: PreferredSize(
@@ -86,6 +105,8 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
           builder: (context, snapshot) {
             if (snapshot.hasData && !snapshot.hasError) {
               final TVSeriesDetails result = snapshot.data!;
+
+              print("RESULT: $result");
 
               return Column(
                 children: [
@@ -113,17 +134,114 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          result.title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 22,
-                            height: 1.1,
-                          ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                widget.data.name,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 22,
+                                  height: 1.1,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Container(
+                              width: size.width * .30,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(.7),
+                                ),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: MaterialButton(
+                                padding: EdgeInsets.zero,
+                                onPressed: () async {
+                                  Navigator.of(context).pop(null);
+                                  if (!isFavorite) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        Future.delayed(
+                                          const Duration(seconds: 5),
+                                          () {
+                                            Navigator.of(context).pop(true);
+                                          },
+                                        );
+                                        return Dialog(
+                                          alignment: Alignment.topCenter,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              10.0,
+                                            ),
+                                          ),
+                                          child: Container(
+                                            height: 50,
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 15,
+                                              horizontal: 20,
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "Added_to_Favorites".tr(),
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                  padding:
+                                                      const EdgeInsets.all(0),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  icon: const Icon(
+                                                    Icons.close_rounded,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                    for (M3uEntry m3u in widget.data.data) {
+                                      await m3u.addToFavorites(refId!);
+                                    }
+                                  } else {
+                                    for (M3uEntry m3u in widget.data.data) {
+                                      await m3u.removeFromFavorites(refId!);
+                                    }
+                                  }
+                                  await fetchFav();
+                                },
+                                color: Colors.transparent,
+                                elevation: 0,
+                                height: 40,
+                                child: Center(
+                                  child: Text(
+                                    isFavorite
+                                        ? "Remove_from_favorites".tr()
+                                        : "Add_to_favorites".tr(),
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.white.withOpacity(.7),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 10),
                         Row(
                           children: [
                             Text(DateFormat('yyyy').format(result.date!)),
@@ -141,22 +259,22 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                                 result.voteAverage.toStringAsFixed(1),
                               ),
                             ),
-                            const SizedBox(width: 15),
-                            RichText(
-                              text: TextSpan(
-                                text: "${result.numOfSeason} ",
-                                style: const TextStyle(
-                                  fontFamily: "Poppins",
-                                ),
-                                children: [
-                                  TextSpan(
-                                    text:
-                                        "Season${result.numOfSeason == 1 ? "" : "s"}"
-                                            .tr(),
-                                  ),
-                                ],
-                              ),
-                            ),
+                            // const SizedBox(width: 15),
+                            // RichText(
+                            //   text: TextSpan(
+                            //     text: "${seasons.length} ",
+                            //     style: const TextStyle(
+                            //       fontFamily: "Poppins",
+                            //     ),
+                            //     children: [
+                            //       TextSpan(
+                            //         text:
+                            //             "Season${seasons.length == 1 ? "" : "s"}"
+                            //                 .tr(),
+                            //       ),
+                            //     ],
+                            //   ),
+                            // ),
                             const SizedBox(width: 15),
                             SizedBox(
                               height: 25,
@@ -182,7 +300,13 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                           ),
                         ),
                         const SizedBox(height: 10),
-                        Text("${result.overview}"),
+                        Text(
+                          "${result.overview}",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
                         const SizedBox(height: 20),
                         SizedBox(
                           height: 550,
@@ -226,7 +350,8 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                                   controller: _tabController,
                                   children: [
                                     EpisodePage(
-                                      data: widget.data,
+                                      data: data, seasonLength: seasons.length,
+                                      // widget.data,
                                     ),
                                     DetailsPage(
                                       id: result.id,
@@ -264,27 +389,136 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        widget.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 22,
-                          height: 1.1,
-                        ),
+                      // Text(
+                      //   widget.data.name,
+                      //   maxLines: 2,
+                      //   overflow: TextOverflow.ellipsis,
+                      //   style: const TextStyle(
+                      //     fontWeight: FontWeight.w500,
+                      //     fontSize: 22,
+                      //     height: 1.1,
+                      //   ),
+                      // ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            // width: size.width * .5,
+                            child: Text(
+                              widget.data.name,
+                              // result.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 22,
+                                height: 1.1,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Container(
+                            width: size.width * .30,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.white.withOpacity(.7),
+                              ),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: MaterialButton(
+                              padding: EdgeInsets.zero,
+                              onPressed: () async {
+                                Navigator.of(context).pop(null);
+                                if (!isFavorite) {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      Future.delayed(
+                                        const Duration(seconds: 5),
+                                        () {
+                                          Navigator.of(context).pop(true);
+                                        },
+                                      );
+                                      return Dialog(
+                                        alignment: Alignment.topCenter,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            10.0,
+                                          ),
+                                        ),
+                                        child: Container(
+                                          height: 50,
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 15,
+                                            horizontal: 20,
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                "Added_to_Favorites".tr(),
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                              IconButton(
+                                                padding:
+                                                    const EdgeInsets.all(0),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                                icon: const Icon(
+                                                  Icons.close_rounded,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                  for (M3uEntry m3u in widget.data.data) {
+                                    await m3u.addToFavorites(refId!);
+                                  }
+                                } else {
+                                  for (M3uEntry m3u in widget.data.data) {
+                                    await m3u.removeFromFavorites(refId!);
+                                  }
+                                }
+                                await fetchFav();
+                              },
+                              color: Colors.transparent,
+                              elevation: 0,
+                              height: 40,
+                              child: Center(
+                                child: Text(
+                                  isFavorite
+                                      ? "Remove_from_favorites".tr()
+                                      : "Add_to_favorites".tr(),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.white.withOpacity(.7),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
                       ),
                       const SizedBox(height: 30),
-                      Text(
-                        "Storyline".tr(),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text("No_data_available".tr()),
-                      const SizedBox(height: 30),
+                      // Text(
+                      //   "Storyline".tr(),
+                      //   style: const TextStyle(
+                      //     fontSize: 18,
+                      //     fontWeight: FontWeight.w500,
+                      //   ),
+                      // ),
+                      // const SizedBox(height: 10),
+                      // Text("No_data_available".tr()),
+                      // const SizedBox(height: 30),
                       SizedBox(
                         height: 550,
                         child: Column(
@@ -328,82 +562,92 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                                 children: [
                                   EpisodePage(
                                     data: widget.data,
+                                    seasonLength: seasons.length,
                                   ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const SizedBox(height: 20),
-                                      RichText(
-                                        text: TextSpan(
-                                          text: "Directors".tr(),
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w500,
-                                            fontFamily: "Poppins",
-                                          ),
-                                          children: const [
-                                            TextSpan(
-                                              text: " :",
-                                            ),
-                                          ],
-                                        ),
+                                  Center(
+                                    child: Text(
+                                      "No_data_available".tr(),
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
                                       ),
-                                      const SizedBox(height: 20),
-                                      RichText(
-                                        text: TextSpan(
-                                          text: "Release_Date".tr(),
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w500,
-                                            fontFamily: "Poppins",
-                                          ),
-                                          children: const [
-                                            TextSpan(
-                                              text: " :",
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 20),
-                                      RichText(
-                                        text: TextSpan(
-                                          text: "Genre".tr(),
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w500,
-                                            fontFamily: "Poppins",
-                                          ),
-                                          children: const [
-                                            TextSpan(
-                                              text: " :",
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 20),
-                                      Text(
-                                        "Cast".tr(),
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      SizedBox(
-                                        height: 70,
-                                        child: Center(
-                                          child: Text(
-                                            "No_data_available".tr(),
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                    ],
+                                    ),
                                   )
+                                  // Column(
+                                  //   crossAxisAlignment:
+                                  //       CrossAxisAlignment.center,
+                                  //   children: [
+                                  //     const SizedBox(height: 20),
+                                  //     RichText(
+                                  //       text: TextSpan(
+                                  //         text: "Directors".tr(),
+                                  //         style: const TextStyle(
+                                  //           fontSize: 18,
+                                  //           fontWeight: FontWeight.w500,
+                                  //           fontFamily: "Poppins",
+                                  //         ),
+                                  //         children: const [
+                                  //           TextSpan(
+                                  //             text: " :",
+                                  //           ),
+                                  //         ],
+                                  //       ),
+                                  //     ),
+                                  //     const SizedBox(height: 20),
+                                  //     RichText(
+                                  //       text: TextSpan(
+                                  //         text: "Release_Date".tr(),
+                                  //         style: const TextStyle(
+                                  //           fontSize: 18,
+                                  //           fontWeight: FontWeight.w500,
+                                  //           fontFamily: "Poppins",
+                                  //         ),
+                                  //         children: const [
+                                  //           TextSpan(
+                                  //             text: " :",
+                                  //           ),
+                                  //         ],
+                                  //       ),
+                                  //     ),
+                                  //     const SizedBox(height: 20),
+                                  //     RichText(
+                                  //       text: TextSpan(
+                                  //         text: "Genre".tr(),
+                                  //         style: const TextStyle(
+                                  //           fontSize: 18,
+                                  //           fontWeight: FontWeight.w500,
+                                  //           fontFamily: "Poppins",
+                                  //         ),
+                                  //         children: const [
+                                  //           TextSpan(
+                                  //             text: " :",
+                                  //           ),
+                                  //         ],
+                                  //       ),
+                                  //     ),
+                                  //     const SizedBox(height: 20),
+                                  //     Text(
+                                  //       "Cast".tr(),
+                                  //       style: const TextStyle(
+                                  //         fontSize: 18,
+                                  //         fontWeight: FontWeight.w500,
+                                  //       ),
+                                  //     ),
+                                  //     const SizedBox(height: 10),
+                                  //     SizedBox(
+                                  //       height: 70,
+                                  //       child: Center(
+                                  //         child: Text(
+                                  //           "No_data_available".tr(),
+                                  //           style: const TextStyle(
+                                  //             fontSize: 16,
+                                  //             fontWeight: FontWeight.w500,
+                                  //           ),
+                                  //         ),
+                                  //       ),
+                                  //     )
+                                  //   ],
+                                  // )
                                 ],
                               ),
                             ),

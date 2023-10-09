@@ -3,7 +3,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart' as cup;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:seizhtv/data_containers/loaded_m3u_data.dart';
 import 'package:seizhtv/globals/data.dart';
 import 'package:seizhtv/globals/data_cacher.dart';
@@ -13,7 +12,7 @@ import 'package:seizhtv/views/landing_page/children/favorites.dart';
 import 'package:seizhtv/views/landing_page/children/home.dart';
 import 'package:seizhtv/views/landing_page/children/live.dart';
 import 'package:seizhtv/views/landing_page/children/series.dart';
-import 'package:seizhtv/views/landing_page/movie.dart';
+import 'package:seizhtv/views/landing_page/children/movie.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
 import 'package:znavbar/znavbar.dart';
 import '../../services/tv_series_api.dart';
@@ -140,7 +139,7 @@ class _MainLandingPageState extends State<MainLandingPage>
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     return Scaffold(
       backgroundColor: card,
       // body: ZTab,
@@ -149,21 +148,28 @@ class _MainLandingPageState extends State<MainLandingPage>
         physics: const NeverScrollableScrollPhysics(),
         itemBuilder: (_, i) => _content[i],
       ),
-      bottomNavigationBar: ZNavbar(
-        key: _kNavState,
-        indicatorColor: orange,
-        backgroundColor: highlight,
-        activeColor: white,
-        indicatorSize: 3,
-        indexCallback: (int i) {
-          _controller.animateToPage(
-            i,
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-          );
-        },
-        inactiveColor: white.withOpacity(0.5),
-        tabs: _tabs,
+      bottomNavigationBar: cup.Container(
+        color: highlight,
+        child: SafeArea(
+          top: false,
+          minimum: const EdgeInsets.only(bottom: 5),
+          child: ZNavbar(
+            key: _kNavState,
+            indicatorColor: orange,
+            backgroundColor: highlight,
+            activeColor: white,
+            indicatorSize: 3,
+            indexCallback: (int i) {
+              _controller.animateToPage(
+                i,
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeInOut,
+              );
+            },
+            inactiveColor: white.withOpacity(0.5),
+            tabs: _tabs,
+          ),
+        ),
       ),
     );
   }

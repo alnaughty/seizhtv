@@ -10,6 +10,9 @@ import 'package:seizhtv/globals/palette.dart';
 import 'package:seizhtv/globals/video_loader.dart';
 import 'package:z_m3u_handler/extension.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
+import '../../../../data_containers/favorites.dart';
+import '../../../../globals/data.dart';
+import '../../../../globals/favorite_button.dart';
 import '../../../../services/tv_series_api.dart';
 import 'details.dart';
 
@@ -27,6 +30,36 @@ class _ClassifiedSeriesDataState extends State<ClassifiedSeriesData>
   late List<ClassifiedData> _displayData = List.from(_data);
   late final ScrollController _scrollController;
   late final TextEditingController _search;
+  static final ZM3UHandler _handler = ZM3UHandler.instance;
+  final Favorites _favvm = Favorites.instance;
+  late List<ClassifiedData> seriesData = [];
+  List<ClassifiedData> favData = [];
+  late List<ClassifiedData> _favdata;
+
+  fetchFav() async {
+    await _handler
+        .getDataFrom(type: CollectionType.favorites, refId: refId!)
+        .then((value) {
+      if (value != null) {
+        _favvm.populate(value);
+      }
+    });
+  }
+
+  initFavStream() {
+    _favvm.stream.listen((event) {
+      _favdata = List.from(event.series);
+
+      for (final ClassifiedData item in _favdata) {
+        late final List<ClassifiedData> data = item.data.classify()
+          ..sort((a, b) => a.name.compareTo(b.name));
+
+        favData.addAll(List.from(data));
+      }
+      print("SERIES FAV: ${favData.length}");
+    });
+  }
+
   @override
   void initState() {
     _search = TextEditingController();
@@ -52,11 +85,7 @@ class _ClassifiedSeriesDataState extends State<ClassifiedSeriesData>
           backgroundColor: Colors.transparent,
           title: Row(
             children: [
-              SvgPicture.asset(
-                "assets/images/logo-full.svg",
-                height: 25,
-                color: orange,
-              ),
+              SvgPicture.asset("assets/images/logo.svg", height: 25),
               Container(
                 margin: const EdgeInsets.symmetric(
                   horizontal: 10,
@@ -181,95 +210,282 @@ class _ClassifiedSeriesDataState extends State<ClassifiedSeriesData>
                     )
                   : Scrollbar(
                       controller: _scrollController,
-                      child: ListView.separated(
-                        itemCount: _displayData.length,
-                        itemBuilder: (_, i) {
-                          final ClassifiedData _d = _displayData[i];
-                          return ListTile(
-                            title: Text(_d.name),
-                            onTap: () async {
-                              String str1 = _d.name;
-                              String result1 = str1.replaceAll(
-                                  RegExp(r"[(]+[a-zA-Z]+[)]|[|]\s+[0-9]+\s[|]"),
-                                  '');
-                              String result2 = result1.replaceAll(
-                                  RegExp(r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|] "),
-                                  '');
+                      child: GridView.builder(
+                          shrinkWrap: true,
+                          controller: _scrollController,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  childAspectRatio: .8,
+                                  mainAxisSpacing: 5,
+                                  crossAxisSpacing: 10),
+                          itemCount: _displayData.length,
+                          itemBuilder: (context, i) {
+                            bool isFavorite = false;
+                            for (final ClassifiedData fav in favData) {
+                              if (_displayData[i].name == fav.name) {
+                                if (fav.data.length ==
+                                    _displayData[i].data.length) {
+                                  isFavorite = true;
+                                }
+                              }
+                            }
 
-                              Navigator.push(
-                                context,
-                                PageTransition(
-                                  child: SeriesDetailsPage(
-                                    data: _d,
-                                    title: result2,
+                            return GestureDetector(
+                              onTap: () async {
+                                String result1 = _displayData[i].name.replaceAll(
+                                    RegExp(
+                                        r"[(]+[a-zA-Z]+[)]|[|]\s+[0-9]+\s[|]"),
+                                    '');
+                                String result2 = result1.replaceAll(
+                                    RegExp(r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|] "),
+                                    '');
+
+                                Navigator.push(
+                                  context,
+                                  PageTransition(
+                                    child: SeriesDetailsPage(
+                                      data: _displayData[i],
+                                      title: result2,
+                                    ),
+                                    type: PageTransitionType.rightToLeft,
                                   ),
-                                  type: PageTransitionType.rightToLeft,
-                                ),
-                              );
-                              // }
-                              // }
-                              // );
-                              // await showModalBottomSheet(
-                              //   context: context,
-                              //   isDismissible: true,
-                              //   backgroundColor: Colors.transparent,
-                              //   isScrollControlled: true,
-                              //   builder: (_) => SeriesDetailsSheet(
-                              //     data: _d,
-                              //     onLoadVideo: (M3uEntry entry) async {
-                              //       Navigator.of(context).pop(null);
-                              //       await loadVideo(context, entry);
-                              //       await entry.addToHistory(refId!);
-                              //     },
-                              //   ),
-                              // );
-                              // await showModalBottomSheet(
-                              //     context: context,
-                              //     isDismissible: true,
-                              //     backgroundColor: Colors.transparent,
-                              //     constraints: const BoxConstraints(
-                              //       maxHeight: 230,
-                              //     ),
-                              //     builder: (_) {
-                              //       return SeriesDetailsSheet(
-                              //         data: _d,
-                              //         onLoadVideo: (entry) {},
-                              //       );
-                              //       // return MovieDetails(
-                              //       //   data: _entry,
-                              //       //   onLoadVideo: () async {
-                              //       //     Navigator.of(context).pop(null);
-                              //       //     _entry.addToHistory(refId!);
-                              //       //     await loadVideo(context, _entry);
-                              //       //   },
-                              //       // );
-                              //     });
-                            },
-                            subtitle: Row(
-                              children: [
-                                Text("${_d.data.length} "),
-                                Text("Episodes".tr()),
-                              ],
-                            ),
-                            leading: ClipRRect(
-                              borderRadius: BorderRadius.circular(5),
-                              child: SizedBox(
-                                width: 85,
-                                child: NetworkImageViewer(
-                                  url: _d.data[0].attributes['tvg-logo']!,
-                                  width: 85,
-                                  height: 60,
-                                  fit: BoxFit.cover,
-                                  color: highlight,
-                                ),
+                                );
+                              },
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.only(
+                                        top: 10, right: 10),
+                                    child: LayoutBuilder(
+                                      builder: (context, c) {
+                                        final double w = c.maxWidth;
+                                        return Tooltip(
+                                          message: _displayData[i].name,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                                child: NetworkImageViewer(
+                                                  url: _displayData[i]
+                                                      .data[0]
+                                                      .attributes['tvg-logo'],
+                                                  width: w,
+                                                  height: 53,
+                                                  fit: BoxFit.cover,
+                                                  color: highlight,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 2),
+                                              Tooltip(
+                                                message: _displayData[i].name,
+                                                child: Text(
+                                                  _displayData[i].name,
+                                                  style: const TextStyle(
+                                                      fontSize: 12),
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                      "${_displayData[i].data.length} ",
+                                                      style: const TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors.grey)),
+                                                  Text("Episodes".tr(),
+                                                      style: const TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors.grey)),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 0,
+                                    right: 0,
+                                    child: SizedBox(
+                                      height: 25,
+                                      width: 25,
+                                      child: FavoriteIconButton(
+                                        onPressedCallback:
+                                            (bool isFavorite) async {
+                                          if (isFavorite) {
+                                            showDialog(
+                                              barrierDismissible: false,
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                Future.delayed(
+                                                  const Duration(seconds: 3),
+                                                  () {
+                                                    Navigator.of(context)
+                                                        .pop(true);
+                                                  },
+                                                );
+                                                return Dialog(
+                                                  alignment:
+                                                      Alignment.topCenter,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10.0),
+                                                  ),
+                                                  child: Container(
+                                                    padding: const EdgeInsets
+                                                            .symmetric(
+                                                        horizontal: 20),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          "Added_to_Favorites"
+                                                              .tr(),
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 16,
+                                                          ),
+                                                        ),
+                                                        IconButton(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(0),
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                          },
+                                                          icon: const Icon(
+                                                            Icons.close_rounded,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            );
+                                            for (M3uEntry m3u
+                                                in _displayData[i].data) {
+                                              await m3u.addToFavorites(refId!);
+                                            }
+                                          } else {
+                                            for (M3uEntry m3u
+                                                in _displayData[i].data) {
+                                              await m3u
+                                                  .removeFromFavorites(refId!);
+                                            }
+                                          }
+                                          await fetchFav();
+                                        },
+                                        initValue: isFavorite,
+                                        iconSize: 20,
+                                      ),
+                                    ),
+                                  )
+                                ],
                               ),
-                            ),
-                          );
-                        },
-                        separatorBuilder: (_, i) => Divider(
-                          color: Colors.white.withOpacity(.3),
-                        ),
-                      ),
+                            );
+                          })
+                      //  ListView.separated(
+                      //   itemCount: _displayData.length,
+                      //   itemBuilder: (_, i) {
+                      //     final ClassifiedData _d = _displayData[i];
+                      //     return ListTile(
+                      //       title: Text(_d.name),
+                      //       onTap: () async {
+                      //         String result1 = _d.name.replaceAll(
+                      //             RegExp(r"[(]+[a-zA-Z]+[)]|[|]\s+[0-9]+\s[|]"),
+                      //             '');
+                      //         String result2 = result1.replaceAll(
+                      //             RegExp(r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|] "),
+                      //             '');
+
+                      //         Navigator.push(
+                      //           context,
+                      //           PageTransition(
+                      //             child: SeriesDetailsPage(
+                      //               data: _d,
+                      //               title: result2,
+                      //             ),
+                      //             type: PageTransitionType.rightToLeft,
+                      //           ),
+                      //         );
+                      //         // }
+                      //         // }
+                      //         // );
+                      //         // await showModalBottomSheet(
+                      //         //   context: context,
+                      //         //   isDismissible: true,
+                      //         //   backgroundColor: Colors.transparent,
+                      //         //   isScrollControlled: true,
+                      //         //   builder: (_) => SeriesDetailsSheet(
+                      //         //     data: _d,
+                      //         //     onLoadVideo: (M3uEntry entry) async {
+                      //         //       Navigator.of(context).pop(null);
+                      //         //       await loadVideo(context, entry);
+                      //         //       await entry.addToHistory(refId!);
+                      //         //     },
+                      //         //   ),
+                      //         // );
+                      //         // await showModalBottomSheet(
+                      //         //     context: context,
+                      //         //     isDismissible: true,
+                      //         //     backgroundColor: Colors.transparent,
+                      //         //     constraints: const BoxConstraints(
+                      //         //       maxHeight: 230,
+                      //         //     ),
+                      //         //     builder: (_) {
+                      //         //       return SeriesDetailsSheet(
+                      //         //         data: _d,
+                      //         //         onLoadVideo: (entry) {},
+                      //         //       );
+                      //         //       // return MovieDetails(
+                      //         //       //   data: _entry,
+                      //         //       //   onLoadVideo: () async {
+                      //         //       //     Navigator.of(context).pop(null);
+                      //         //       //     _entry.addToHistory(refId!);
+                      //         //       //     await loadVideo(context, _entry);
+                      //         //       //   },
+                      //         //       // );
+                      //         //     });
+                      //       },
+                      //       subtitle: Row(
+                      //         children: [
+                      //           Text("${_d.data.length} "),
+                      //           Text("Episodes".tr()),
+                      //         ],
+                      //       ),
+                      //       leading: ClipRRect(
+                      //         borderRadius: BorderRadius.circular(5),
+                      //         child: SizedBox(
+                      //           width: 85,
+                      //           child: NetworkImageViewer(
+                      //             url: _d.data[0].attributes['tvg-logo']!,
+                      //             width: 85,
+                      //             height: 60,
+                      //             fit: BoxFit.cover,
+                      //             color: highlight,
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     );
+                      //   },
+                      //   separatorBuilder: (_, i) => Divider(
+                      //     color: Colors.white.withOpacity(.3),
+                      //   ),
+                      // ),
                       // child: ListTile(
                       //   // subtitle: entry.attributes['description'] == null
                       //   //     ? null
@@ -340,7 +556,7 @@ class _ClassifiedSeriesDataState extends State<ClassifiedSeriesData>
                       //     });
                       //   }),
                       // ),
-                    ),
+                      ),
             )
           ],
         ),

@@ -32,4 +32,6 @@ class TopMovieModel extends Details {
       voteCount: json['vote_count'].toInt(),
     );
   }
+
+  void add(TopMovieModel result) {}
 }

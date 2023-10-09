@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:seizhtv/globals/data.dart';
 import 'package:seizhtv/globals/data_cacher.dart';
@@ -52,6 +53,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   void initState() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await check();
     });

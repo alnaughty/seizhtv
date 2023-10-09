@@ -10,13 +10,10 @@ import 'package:seizhtv/globals/loader.dart';
 import 'package:seizhtv/globals/network_image_viewer.dart';
 import 'package:seizhtv/globals/palette.dart';
 import 'package:seizhtv/globals/video_loader.dart';
-import 'package:seizhtv/views/landing_page/children/live_children/live_details.dart';
 import 'package:z_m3u_handler/extension.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
-
 import '../movie_children/details.dart';
 import '../series_children/details.dart';
-// import 'package:z_m3u_handler/src/helpers/db_regx.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});

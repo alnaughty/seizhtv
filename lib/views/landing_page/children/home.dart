@@ -704,57 +704,57 @@ class _HomePageState extends State<HomePage>
                             ),
                           ),
                           SizedBox(height: space),
-                          MaterialButton(
-                            onPressed: () async {
-                              // await Navigator.push(
-                              //   context,
-                              //   PageTransition(
-                              //       child: SamplePage(
-                              //           lenght: _data.length,
-                              //           data: _data
-                              //               .expand((element) => element.data)
-                              //               .toList()),
-                              //       type: PageTransitionType.leftToRight),
-                              // );
-                            },
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18)),
-                            color: highlight,
-                            height: 65,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                      color: ColorPalette().cardButton,
-                                      borderRadius: BorderRadius.circular(12)),
-                                  height: 50,
-                                  width: 50,
-                                  padding: const EdgeInsets.all(8),
-                                  child: SvgPicture.asset(
-                                    "assets/icons/epg.svg",
-                                    color: ColorPalette().white,
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    liveContainer(
-                                        fontSize: 15, height: 30, width: 50),
-                                    const SizedBox(
-                                      width: 8,
-                                    ),
-                                    const Text(
-                                      "with EPG",
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: space),
+                          // MaterialButton(
+                          //   onPressed: () async {
+                          //     // await Navigator.push(
+                          //     //   context,
+                          //     //   PageTransition(
+                          //     //       child: SamplePage(
+                          //     //           lenght: _data.length,
+                          //     //           data: _data
+                          //     //               .expand((element) => element.data)
+                          //     //               .toList()),
+                          //     //       type: PageTransitionType.leftToRight),
+                          //     // );
+                          //   },
+                          //   shape: RoundedRectangleBorder(
+                          //       borderRadius: BorderRadius.circular(18)),
+                          //   color: highlight,
+                          //   height: 65,
+                          //   child: Row(
+                          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          //     children: [
+                          //       Container(
+                          //         decoration: BoxDecoration(
+                          //             color: ColorPalette().cardButton,
+                          //             borderRadius: BorderRadius.circular(12)),
+                          //         height: 50,
+                          //         width: 50,
+                          //         padding: const EdgeInsets.all(8),
+                          //         child: SvgPicture.asset(
+                          //           "assets/icons/epg.svg",
+                          //           color: ColorPalette().white,
+                          //         ),
+                          //       ),
+                          //       Row(
+                          //         children: [
+                          //           liveContainer(
+                          //               fontSize: 15, height: 30, width: 50),
+                          //           const SizedBox(
+                          //             width: 8,
+                          //           ),
+                          //           const Text(
+                          //             "with EPG",
+                          //             style: TextStyle(
+                          //                 fontSize: 15,
+                          //                 fontWeight: FontWeight.w600),
+                          //           ),
+                          //         ],
+                          //       )
+                          //     ],
+                          //   ),
+                          // ),
+                          // SizedBox(height: space),
                           SizedBox(
                             height: 65,
                             width: double.infinity,
@@ -802,42 +802,42 @@ class _HomePageState extends State<HomePage>
                                   ),
                                 ),
                                 SizedBox(width: space),
-                                Expanded(
-                                  child: MaterialButton(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(18),
-                                    ),
-                                    height: 65,
-                                    disabledColor: highlight.darken(),
-                                    color: highlight,
-                                    onPressed: null,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                              color: cardButton,
-                                              borderRadius:
-                                                  BorderRadius.circular(12)),
-                                          height: 40,
-                                          width: 40,
-                                          padding: const EdgeInsets.all(5),
-                                          child: SvgPicture.asset(
-                                            "assets/icons/radio.svg",
-                                            color: ColorPalette().white,
-                                          ),
-                                        ),
-                                        Text(
-                                          "Radio".tr(),
-                                          style: const TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w600),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
+                                // Expanded(
+                                //   child: MaterialButton(
+                                //     shape: RoundedRectangleBorder(
+                                //       borderRadius: BorderRadius.circular(18),
+                                //     ),
+                                //     height: 65,
+                                //     disabledColor: highlight.darken(),
+                                //     color: highlight,
+                                //     onPressed: null,
+                                //     child: Row(
+                                //       mainAxisAlignment:
+                                //           MainAxisAlignment.spaceBetween,
+                                //       children: [
+                                //         Container(
+                                //           decoration: BoxDecoration(
+                                //               color: cardButton,
+                                //               borderRadius:
+                                //                   BorderRadius.circular(12)),
+                                //           height: 40,
+                                //           width: 40,
+                                //           padding: const EdgeInsets.all(5),
+                                //           child: SvgPicture.asset(
+                                //             "assets/icons/radio.svg",
+                                //             color: ColorPalette().white,
+                                //           ),
+                                //         ),
+                                //         Text(
+                                //           "Radio".tr(),
+                                //           style: const TextStyle(
+                                //               fontSize: 15,
+                                //               fontWeight: FontWeight.w600),
+                                //         )
+                                //       ],
+                                //     ),
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),

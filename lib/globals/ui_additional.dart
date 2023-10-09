@@ -9,6 +9,8 @@ import 'package:seizhtv/models/option.dart';
 import 'package:shimmer/shimmer.dart';
 
 class UIAdditional {
+  String dropdownvalue = "";
+
   Widget button({
     required String title,
     required String assetPath,
@@ -45,32 +47,101 @@ class UIAdditional {
 
   Widget filterChip({
     required List<String> chipsLabel,
-    required Function(int index) onPressed,
+    required List<String> categoryName,
+    required Function(int index, String? name) onPressed,
     required int si,
+    required Function(String? name) filterButton,
   }) =>
-      ListView.separated(
-        shrinkWrap: true,
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (context, index) {
-          return GestureDetector(
-              onTap: () {
-                onPressed(index);
+      Row(
+        children: [
+          // PopupMenuButton(
+          //   elevation: 3.2,
+          //   initialValue: categoryName,
+          //   onCanceled: () {
+          //     print('You have not chossed anything');
+          //   },
+          //   tooltip: 'This is tooltip',
+          //   // onSelected: dropdownvalue,
+          //   itemBuilder: (BuildContext context) {
+          //     return categoryName.map((choice) {
+          //       return PopupMenuItem(
+          //         value: choice,
+          //         child: Text(choice),
+          //       );
+          //     }).toList();
+          //   },
+          // ),
+          // Container(
+          //   width: 35,
+          //   child: IconButton(
+          //     alignment: Alignment.centerLeft,
+          //     onPressed: () {
+          //       Container(
+          //         height: 50,
+          //         width: 00,
+          //         decoration: BoxDecoration(
+          //             borderRadius: BorderRadius.circular(20),
+          //             color: ColorPalette().highlight),
+          //         child: DropdownButton(
+          //           elevation: 0,
+          //           items: categoryName.map((value) {
+          //             return DropdownMenuItem(
+          //               value: value,
+          //               child: Text(value),
+          //             );
+          //           }).toList(),
+          //           // value:
+          //           //     dropdownvalue == "" ? categoryName[0] : dropdownvalue,
+          //           style: const TextStyle(fontSize: 14, fontFamily: "Poppins"),
+          //           icon: const Icon(Icons.list_rounded),
+          //           onChanged: (value) {
+          //             // setState(() {
+          //             dropdownvalue = value!;
+          //             // });
+          //           },
+          //         ),
+          //       );
+          //     },
+          //     icon: Icon(Icons.list_rounded),
+          //     padding: const EdgeInsets.all(0),
+          //   ),
+          // ),
+          Expanded(
+            flex: 6,
+            child: ListView.separated(
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                    onTap: () {
+                      onPressed(index, chipsLabel[index]);
+                    },
+                    child: ChoiceChip(
+                      padding: const EdgeInsets.all(10),
+                      label: Text(
+                        chipsLabel[index],
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      selected: index == si,
+                      selectedColor: ColorPalette().topColor,
+                      disabledColor: ColorPalette().highlight,
+                    ));
               },
-              child: ChoiceChip(
-                padding: const EdgeInsets.all(10),
-                label: Text(
-                  chipsLabel[index],
-                  style: const TextStyle(color: Colors.white),
-                ),
-                selected: si == index,
-                selectedColor: ColorPalette().topColor,
-                disabledColor: ColorPalette().highlight,
-              ));
-        },
-        itemCount: chipsLabel.length,
-        separatorBuilder: (BuildContext context, int index) {
-          return const SizedBox(width: 10);
-        },
+              itemCount: chipsLabel.length,
+              separatorBuilder: (BuildContext context, int index) {
+                return const SizedBox(width: 10);
+              },
+            ),
+          ),
+          // Expanded(
+          //   child: GestureDetector(
+          //     onTap: () {
+          //       filterButton();
+          //     },
+          //     child: SvgPicture.asset("assets/icons/vector.svg"),
+          //   ),
+          // ),
+        ],
       );
 
   Widget button2(

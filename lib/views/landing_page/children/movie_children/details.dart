@@ -162,12 +162,9 @@ class _MovieDetailsPageState extends State<MovieDetailsPage>
                             title: "Watch_Now".tr(),
                             icon: "assets/icons/watchNow.svg",
                             onpress: () async {
-                              Navigator.of(context).pop(null);
+                              // Navigator.of(context).pop(null);
                               widget.data.addToHistory(refId!);
-                              await loadVideo(
-                                context,
-                                widget.data,
-                              );
+                              await loadVideo(context, widget.data);
                             },
                           ),
                           Column(

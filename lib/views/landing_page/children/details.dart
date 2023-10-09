@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:seizhtv/globals/ui_additional.dart';
 import 'package:seizhtv/models/createdby.dart';
 import 'package:seizhtv/models/movie_details.dart';
@@ -9,7 +8,6 @@ import 'package:seizhtv/viewmodel/cast_vm.dart';
 import '../../../globals/network.dart';
 import '../../../globals/palette.dart';
 import '../../../models/cast.dart';
-import '../../../models/genre.dart';
 import '../../../models/tvseries_details.dart';
 import '../../../services/movie_api.dart';
 import '../../../services/tv_series_api.dart';
@@ -158,27 +156,39 @@ class _DetailsPageState extends State<DetailsPage>
                 Expanded(
                   child: SizedBox(
                     width: double.infinity,
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (_, x) {
-                        final List<Genre> genre = widget.movie == null
-                            ? widget.series!.genres!
-                            : widget.movie!.genres!;
-
-                        return Text(
-                          genre[x].name,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        );
-                      },
-                      separatorBuilder: (context, index) => const SizedBox(),
-                      itemCount: widget.movie == null
-                          ? widget.series!.genres!.length
-                          : widget.movie!.genres!.length,
+                    child: Text(
+                      widget.movie == null
+                          ? widget.series!.genres!
+                              .map((it) => it.name)
+                              .join(' / ')
+                          : widget.movie!.genres!
+                              .map((it) => it.name)
+                              .join(' / '),
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.w500),
                     ),
+
+                    //  ListView.separated(
+                    //   shrinkWrap: true,
+                    //   physics: const NeverScrollableScrollPhysics(),
+                    //   itemBuilder: (_, x) {
+                    //     final List<Genre> genre = widget.movie == null
+                    //         ? widget.series!.genres!
+                    //         : widget.movie!.genres!;
+
+                    //     return Text(
+                    //       genre[x].name,
+                    // style: const TextStyle(
+                    //   fontSize: 18,
+                    //   fontWeight: FontWeight.w500,
+                    // ),
+                    //     );
+                    //   },
+                    //   separatorBuilder: (context, index) => const SizedBox(),
+                    //   itemCount: widget.movie == null
+                    //       ? widget.series!.genres!.length
+                    //       : widget.movie!.genres!.length,
+                    // ),
                   ),
                 ),
               ],
@@ -203,7 +213,7 @@ class _DetailsPageState extends State<DetailsPage>
                         child: Text(
                           "No_data_available".tr(),
                           style: const TextStyle(
-                            fontSize: 16,
+                            fontSize: 18,
                             fontWeight: FontWeight.w500,
                           ),
                         ),

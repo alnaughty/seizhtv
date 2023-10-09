@@ -31,6 +31,7 @@ class _VideoplayerState extends State<Videoplayer> {
         isLive: false,
         forceHD: false,
         enableCaption: true,
+        showLiveFullscreenButton: false,
       ),
     )..addListener(_videoPlayerListner);
     super.initState();
@@ -77,7 +78,7 @@ class _VideoplayerState extends State<Videoplayer> {
       bottomActions: [
         CurrentPosition(),
         ProgressBar(isExpanded: true),
-        FullScreenButton(),
+        // FullScreenButton(),
       ],
       onReady: () {
         _isPlayerReady = true;

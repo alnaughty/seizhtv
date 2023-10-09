@@ -2,6 +2,7 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:page_transition/page_transition.dart';
@@ -11,8 +12,9 @@ import 'package:seizhtv/globals/loader.dart';
 import 'package:seizhtv/globals/palette.dart';
 import 'package:seizhtv/globals/ui_additional.dart';
 import 'package:seizhtv/models/option.dart';
+import 'package:seizhtv/views/landing_page/children/profile_children/account_deletion.dart';
+import 'package:z_m3u_handler/z_m3u_handler.dart';
 import 'profile_children/general_setting.dart';
-import 'profile_children/parental_control.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -24,7 +26,9 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage>
     with ColorPalette, UIAdditional {
   static final DataCacher _cacher = DataCacher.instance;
+  final M3uFirebaseAuthService _auth = M3uFirebaseAuthService.instance;
   bool _isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -92,7 +96,7 @@ class _ProfilePageState extends State<ProfilePage>
                           //     ),
                           //   ),
                           // ),
-                          const Text("Exp. Date :  "),
+                          // const Text("Exp. Date :  "),
                           // $expDate
                         ],
                       ),
@@ -116,6 +120,54 @@ class _ProfilePageState extends State<ProfilePage>
                       );
                     },
                   ),
+
+                  Option(
+                    icon: "assets/icons/delete.svg",
+                    title: "Account_Deletion".tr(),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text("Account deletion"),
+                            content: const Text(
+                                "Are you sure you want to delete your account?"),
+                            actions: [
+                              TextButton(
+                                child: Text(
+                                  "Cancel",
+                                  style: TextStyle(color: orange),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              TextButton(
+                                child: Text(
+                                  "Yes",
+                                  style: TextStyle(color: orange),
+                                ),
+                                onPressed: () async {
+                                  // await _auth.deleteUserAccount();
+                                  // print(
+                                  //     "CURRENT USER: ${FirebaseAuth.instance.currentUser}");
+                                  // FirebaseAuth.instance.currentUser?.delete();
+                                  // await FirebaseAuth.instance.signOut();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                      // Navigator.push(
+                      //   context,
+                      //   PageTransition(
+                      //     child: const AccountDeletionPage(),
+                      //     type: PageTransitionType.rightToLeft,
+                      //   ),
+                      // );
+                    },
+                  ),
                   // Option(
                   //   icon: "assets/icons/records.svg",
                   //   title: "Records",
@@ -129,45 +181,45 @@ class _ProfilePageState extends State<ProfilePage>
                   // );
                   //   },
                   // ),
-                  Option(
-                    icon: "assets/icons/epg.svg",
-                    title: "EPG",
-                    onPressed: () async {
-                      // Navigator.push(
-                      //   context,
-                      //   PageTransition(
-                      //     child: const GeneralSettingPage(),
-                      //     type: PageTransitionType.rightToLeft,
-                      //   ),
-                      // );
-                    },
-                  ),
-                  Option(
-                    icon: "assets/icons/parental-control.svg",
-                    title: "Parental_Control".tr(),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        PageTransition(
-                          child: const ParentalControlPage(),
-                          type: PageTransitionType.rightToLeft,
-                        ),
-                      );
-                    },
-                  ),
-                  Option(
-                    icon: "assets/icons/player.svg",
-                    title: "Player".tr(),
-                    onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   PageTransition(
-                      //     child: const GeneralSettingPage(),
-                      //     type: PageTransitionType.rightToLeft,
-                      //   ),
-                      // );
-                    },
-                  ),
+                  // Option(
+                  //   icon: "assets/icons/epg.svg",
+                  //   title: "EPG",
+                  //   onPressed: () async {
+                  //     // Navigator.push(
+                  //     //   context,
+                  //     //   PageTransition(
+                  //     //     child: const GeneralSettingPage(),
+                  //     //     type: PageTransitionType.rightToLeft,
+                  //     //   ),
+                  //     // );
+                  //   },
+                  // ),
+                  // Option(
+                  //   icon: "assets/icons/parental-control.svg",
+                  //   title: "Parental_Control".tr(),
+                  //   onPressed: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       PageTransition(
+                  //         child: const ParentalControlPage(),
+                  //         type: PageTransitionType.rightToLeft,
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
+                  // Option(
+                  //   icon: "assets/icons/player.svg",
+                  //   title: "Player".tr(),
+                  //   onPressed: () {
+                  //     // Navigator.push(
+                  //     //   context,
+                  //     //   PageTransition(
+                  //     //     child: const GeneralSettingPage(),
+                  //     //     type: PageTransitionType.rightToLeft,
+                  //     //   ),
+                  //     // );
+                  //   },
+                  // ),
                   // Option(
                   //   icon: "assets/icons/speedtest.svg",
                   //   title: "Speed Test",
@@ -194,19 +246,19 @@ class _ProfilePageState extends State<ProfilePage>
                   // );
                   //   },
                   // ),
-                  Option(
-                    icon: "assets/icons/termcondition.svg",
-                    title: "Terms_&_Conditions".tr(),
-                    onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   PageTransition(
-                      //     child: const GeneralSettingPage(),
-                      //     type: PageTransitionType.rightToLeft,
-                      //   ),
-                      // );
-                    },
-                  ),
+                  // Option(
+                  //   icon: "assets/icons/termcondition.svg",
+                  //   title: "Terms_&_Conditions".tr(),
+                  //   onPressed: () {
+                  //     // Navigator.push(
+                  //     //   context,
+                  //     //   PageTransition(
+                  //     //     child: const GeneralSettingPage(),
+                  //     //     type: PageTransitionType.rightToLeft,
+                  //     //   ),
+                  //     // );
+                  //   },
+                  // ),
                 ],
               ),
               SafeArea(

@@ -14,7 +14,6 @@ class TopRatedTVShowViewModel {
 
   void populate(List<TopSeriesModel> data) {
     _subject.add(data);
-    print("TOP RATED: $data");
   }
 
   void dispose() {
