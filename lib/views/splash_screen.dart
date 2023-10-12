@@ -25,6 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
     playlistName = _cacher.playlistName;
     language = _cacher.language;
     file = _cacher.filePath;
+    password = _cacher.password;
 
     print("REF ID: $refId");
     print("USER: $user");
@@ -32,6 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
     print("PLAYLIST NAME: $playlistName");
     print("LANGUAGE: $language");
     print("FILE: $file");
+    print("PASSWORD: $password");
 
     if (file != null) {
       await Navigator.pushReplacementNamed(context, "/landing-page");

@@ -80,29 +80,23 @@ class _EpisodePageState extends State<EpisodePage>
                 Row(
                   children: [
                     Expanded(
-                      child: Column(
-                        children: [
-                          RichText(
-                            text: TextSpan(
-                              text:
-                                  "${widget.seasonLength} Season${widget.seasonLength > 1 ? "s" : ""} - ${widget.data.data.length} ",
-                              style: TextStyle(
-                                fontFamily: "Poppins",
-                                fontWeight: FontWeight.w400,
-                                color: Colors.white.withOpacity(.5),
-                              ),
-                              children: [
-                                TextSpan(
-                                  text:
-                                      "Episode${widget.data.data.length > 1 ? "s" : ""}"
-                                          .tr(),
-                                ),
-                              ],
-                            ),
+                      child: RichText(
+                        text: TextSpan(
+                          text:
+                              "${widget.seasonLength} Season${widget.seasonLength > 1 ? "s" : ""} - ${widget.data.data.length} ",
+                          style: TextStyle(
+                            fontFamily: "Poppins",
+                            fontWeight: FontWeight.w400,
+                            color: Colors.white.withOpacity(.5),
                           ),
-                          const SizedBox(height: 5),
-                          Container(height: 3, color: orange),
-                        ],
+                          children: [
+                            TextSpan(
+                              text:
+                                  "Episode${widget.data.data.length > 1 ? "s" : ""}"
+                                      .tr(),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -120,6 +114,7 @@ class _EpisodePageState extends State<EpisodePage>
                             child: DropdownButton(
                               elevation: 0,
                               isExpanded: true,
+                              underline: Container(),
                               items: seasonsNum.map((value) {
                                 return DropdownMenuItem(
                                   value: value,

@@ -144,6 +144,7 @@ class _MainAuthPageState extends State<MainAuthPage>
                           if (u != null) {
                             refId = u.user.uid;
                             user = M3uUser.fromProvider(u);
+                            _cacher.savePassword(_password.text);
                             _cacher.saveRefID(refId!);
                             _cacher.saveM3uUser(user!);
                             _cacher.saveLoginType(0);
@@ -246,6 +247,7 @@ class _MainAuthPageState extends State<MainAuthPage>
                         if (u == null) return;
                         refId = u.user.uid;
                         user = M3uUser.fromProvider(u);
+                        _cacher.savePassword(_password.text);
                         _cacher.saveRefID(refId!);
                         _cacher.saveM3uUser(user!);
                         _cacher.saveLoginType(0);

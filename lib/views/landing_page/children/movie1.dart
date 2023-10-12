@@ -7,8 +7,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:seizhtv/extensions/color.dart';
 import 'package:seizhtv/extensions/state.dart';
-import 'package:seizhtv/views/landing_page/children/movie_children/fav_movie.dart';
-import 'package:seizhtv/views/landing_page/children/movie_children/his_movie.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
 import '../../../data_containers/loaded_m3u_data.dart';
 import '../../../globals/loader.dart';

@@ -54,7 +54,8 @@ class DataCacher {
       removeFile(),
       removeLoginType(),
       removeSource(),
-      removeM3uUser()
+      removeM3uUser(),
+      removePassword()
     ]);
   }
 
@@ -125,4 +126,12 @@ class DataCacher {
   String? get source => sharedPreferences.getString("source");
 
   Future<bool> removeSource() async => await sharedPreferences.remove("source");
+
+  Future<bool> savePassword(String password) async =>
+      await sharedPreferences.setString("password", password);
+
+  String? get password => sharedPreferences.getString("password");
+
+  Future<bool> removePassword() async =>
+      await sharedPreferences.remove("password");
 }

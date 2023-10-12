@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, unnecessary_null_comparison
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -12,7 +12,6 @@ import 'package:seizhtv/globals/loader.dart';
 import 'package:seizhtv/globals/palette.dart';
 import 'package:seizhtv/globals/ui_additional.dart';
 import 'package:seizhtv/models/option.dart';
-import 'package:seizhtv/views/landing_page/children/profile_children/account_deletion.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
 import 'profile_children/general_setting.dart';
 
@@ -25,9 +24,10 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage>
     with ColorPalette, UIAdditional {
-  static final DataCacher _cacher = DataCacher.instance;
   final M3uFirebaseAuthService _auth = M3uFirebaseAuthService.instance;
+  static final DataCacher _cacher = DataCacher.instance;
   bool _isLoading = false;
+  String label = "";
 
   @override
   Widget build(BuildContext context) {
@@ -49,13 +49,10 @@ class _ProfilePageState extends State<ProfilePage>
                     bottom: BorderSide(color: Colors.grey),
                   ),
                 ),
-                // height: 100,
                 width: double.infinity,
                 child: Row(
                   children: [
-                    const SizedBox(
-                      width: 20,
-                    ),
+                    const SizedBox(width: 20),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(60),
                       child: user?.photoUrl == null
@@ -72,9 +69,7 @@ class _ProfilePageState extends State<ProfilePage>
                               fit: BoxFit.cover,
                             ),
                     ),
-                    const SizedBox(
-                      width: 10,
-                    ),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,24 +143,62 @@ class _ProfilePageState extends State<ProfilePage>
                                   style: TextStyle(color: orange),
                                 ),
                                 onPressed: () async {
-                                  // await _auth.deleteUserAccount();
-                                  // print(
-                                  //     "CURRENT USER: ${FirebaseAuth.instance.currentUser}");
-                                  // FirebaseAuth.instance.currentUser?.delete();
-                                  // await FirebaseAuth.instance.signOut();
+                                  setState(() {
+                                    _isLoading = true;
+                                    label = "Deleting account";
+                                  });
+                                  final User tempUser =
+                                      FirebaseAuth.instance.currentUser!;
+                                  print("CURRENT USER: $tempUser");
+
+                                  await _cacher.clearData();
+                                  await _auth
+                                      .deleteAccount(current: tempUser)
+                                      .then((value) async {
+                                    if (value == true) {
+                                      await Navigator.pushReplacementNamed(
+                                          context, "/auth");
+                                    }
+                                  }).whenComplete(() {
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+                                  });
+
+                                  // if (tempUser == null) {
+                                  //   // check an loginType
+                                  //   final User? u;
+                                  //   // if (_cacher.savedLoginType == 1) {
+                                  //   //   u = await _google.signIn();
+                                  //   // } else {
+                                  //   final credential = await FirebaseAuth
+                                  //       .instance
+                                  //       .signInWithEmailAndPassword(
+                                  //           email: _cacher.m3uUser!.email
+                                  //               .toString(),
+                                  //           password:
+                                  //               _cacher.password.toString());
+                                  //   u = credential.user;
+                                  //   // await loginWithCredentials(
+                                  //   //     email: asdada, password: password);
+                                  //   // }
+                                  //   await _cacher.clearData();
+                                  //   await _auth
+                                  //       .deleteAccount(current: u)
+                                  //       .then((value) async {
+                                  //     if (value == true) {
+                                  //       await Navigator.pushReplacementNamed(
+                                  //           context, "/auth");
+                                  //     }
+                                  //   });
+                                  //   return;
+                                  // }
                                 },
                               ),
                             ],
                           );
                         },
                       );
-                      // Navigator.push(
-                      //   context,
-                      //   PageTransition(
-                      //     child: const AccountDeletionPage(),
-                      //     type: PageTransitionType.rightToLeft,
-                      //   ),
-                      // );
                     },
                   ),
                   // Option(
@@ -266,6 +299,7 @@ class _ProfilePageState extends State<ProfilePage>
                   onPressed: () async {
                     setState(() {
                       _isLoading = true;
+                      label = "Logging out";
                     });
                     await _cacher.clearData();
                     await Navigator.pushReplacementNamed(context, "/auth");
@@ -299,11 +333,11 @@ class _ProfilePageState extends State<ProfilePage>
           ),
         ),
         if (_isLoading) ...{
-          const Positioned.fill(
+          Positioned.fill(
             child: SeizhTvLoader(
               label: Text(
-                "Logging out",
-                style: TextStyle(
+                label,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                 ),

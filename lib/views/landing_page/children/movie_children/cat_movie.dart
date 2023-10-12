@@ -20,10 +20,10 @@ class MovieCategoryPage extends StatefulWidget {
   final String category;
 
   @override
-  State<MovieCategoryPage> createState() => _MovieCategoryPageState();
+  State<MovieCategoryPage> createState() => MovieCategoryPageState();
 }
 
-class _MovieCategoryPageState extends State<MovieCategoryPage>
+class MovieCategoryPageState extends State<MovieCategoryPage>
     with ColorPalette, VideoLoader, UIAdditional {
   final LoadedM3uData _vm = LoadedM3uData.instance;
   final LoadedM3uData _vm1 = LoadedM3uData.instance;

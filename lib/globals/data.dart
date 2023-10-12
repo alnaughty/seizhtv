@@ -8,3 +8,4 @@ String? file;
 String? playlistName;
 String? sourceUrl;
 String? language;
+String? password;

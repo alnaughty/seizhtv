@@ -22,10 +22,10 @@ class SeriesCategoryPage extends StatefulWidget {
   final String category;
 
   @override
-  State<SeriesCategoryPage> createState() => _SeriesCategoryPageState();
+  State<SeriesCategoryPage> createState() => SeriesCategoryPageState();
 }
 
-class _SeriesCategoryPageState extends State<SeriesCategoryPage>
+class SeriesCategoryPageState extends State<SeriesCategoryPage>
     with ColorPalette, VideoLoader, UIAdditional {
   final LoadedM3uData _vm = LoadedM3uData.instance;
   static final Favorites _vm1 = Favorites.instance;
