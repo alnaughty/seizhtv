@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -34,9 +36,9 @@ class NetworkImageViewer extends StatelessWidget
                   //   width: width,
                   // ),
                   SvgPicture.asset(
-                    "assets/icons/logo-ico.svg",
+                    "assets/icons/logo.svg",
                     width: width * .7,
-                    color: Colors.red.withOpacity(.5),
+                    // color: Colors.red.withOpacity(.5),
                     fit: BoxFit.contain,
                   ),
                 ],

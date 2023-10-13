@@ -31,7 +31,6 @@ class _SearchMoviesState extends State<SearchMovies>
       _displayData = List.from(event.movies);
       _displayData!.sort((a, b) => a.name.compareTo(b.name));
       if (mounted) setState(() {});
-      print(_displayData?.length);
     });
   }
 
@@ -39,7 +38,6 @@ class _SearchMoviesState extends State<SearchMovies>
   void initState() {
     _search = TextEditingController();
     _scrollController = ScrollController();
-    // TODO: implement initState
     initPlatform();
     super.initState();
   }
@@ -48,7 +46,6 @@ class _SearchMoviesState extends State<SearchMovies>
   void dispose() {
     _search.dispose();
     _scrollController.dispose();
-    // TODO: implement dispose
     super.dispose();
   }
 

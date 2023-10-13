@@ -4,7 +4,6 @@ import 'package:seizhtv/extensions/color.dart';
 import 'package:seizhtv/extensions/m3u_entry.dart';
 import 'package:seizhtv/extensions/state.dart';
 import 'package:seizhtv/globals/carousel.dart';
-import 'package:seizhtv/globals/component.dart';
 import 'package:seizhtv/globals/data.dart';
 import 'package:seizhtv/globals/favorite_button.dart';
 import 'package:seizhtv/globals/network_image_viewer.dart';
@@ -28,10 +27,23 @@ class _SeriesDetailsState extends State<SeriesDetails>
         .getDataFrom(type: CollectionType.favorites, refId: refId!)
         .then((value) {
       if (value != null) {
-        print("FETCH DATA FROM FAV: $value");
         _vm.populate(value);
       }
     });
+  }
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await fetchFav();
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _vm.dispose();
   }
 
   @override

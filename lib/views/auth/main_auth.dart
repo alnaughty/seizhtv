@@ -1,3 +1,6 @@
+// ignore_for_file: avoid_print
+
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,8 +13,7 @@ import 'package:seizhtv/globals/logo.dart';
 import 'package:seizhtv/globals/palette.dart';
 import 'package:seizhtv/globals/ui_additional.dart';
 import 'package:seizhtv/services/google_sign_in.dart';
-import 'package:seizhtv/views/auth/children/load_mac_address.dart';
-import 'package:seizhtv/views/auth/children/load_playlist.dart';
+import 'package:seizhtv/views/auth/forgotpassword.dart';
 import 'package:seizhtv/views/auth/register.dart';
 import 'package:seizhtv/views/landing_page/source_management.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
@@ -34,7 +36,6 @@ class _MainAuthPageState extends State<MainAuthPage>
   late final TextEditingController _email, _password;
   @override
   void initState() {
-    // TODO: implement initState
     _email = TextEditingController();
     _password = TextEditingController();
     super.initState();
@@ -64,13 +65,11 @@ class _MainAuthPageState extends State<MainAuthPage>
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 children: [
-                  const SizedBox(
-                    height: 80,
-                  ),
-                  const Hero(
+                  const SizedBox(height: 50),
+                  Hero(
                     tag: "auth-logo",
                     child: LogoSVG(
-                      bottomText: "Login with credentials",
+                      bottomText: "Login_your_account".tr(),
                     ),
                   ),
                   Form(
@@ -79,14 +78,15 @@ class _MainAuthPageState extends State<MainAuthPage>
                       children: [
                         LabeledTextField(
                           controller: _email,
-                          label: "Username",
-                          hinttext: "Username",
+                          label: "Email".tr(),
+                          hinttext: "Email".tr(),
                           validator: (text) {
                             if (text == null) {
                               return "Unprocessable";
                             } else if (text.isEmpty) {
                               return "Field is required";
                             }
+                            return null;
                           },
                         ),
                         const SizedBox(
@@ -95,17 +95,37 @@ class _MainAuthPageState extends State<MainAuthPage>
                         LabeledTextField(
                           isPassword: true,
                           controller: _password,
-                          label: "Password",
-                          hinttext: "Password",
+                          label: "Password".tr(),
+                          hinttext: "Password".tr(),
                           validator: (text) {
                             if (text == null) {
                               return "Unprocessable";
                             } else if (text.isEmpty) {
                               return "Field is required";
                             }
+                            return null;
                           },
                         ),
                       ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      Navigator.push(
+                        context,
+                        PageTransition(
+                          child: const ForgotPasswordPage(),
+                          type: PageTransitionType.leftToRight,
+                        ),
+                      );
+                    },
+                    child: Text(
+                      "Forget_Password".tr(),
+                      style: const TextStyle(fontSize: 16),
+                      textAlign: TextAlign.end,
                     ),
                   ),
                   const SizedBox(
@@ -124,10 +144,25 @@ class _MainAuthPageState extends State<MainAuthPage>
                           if (u != null) {
                             refId = u.user.uid;
                             user = M3uUser.fromProvider(u);
+                            _cacher.savePassword(_password.text);
                             _cacher.saveRefID(refId!);
                             _cacher.saveM3uUser(user!);
                             _cacher.saveLoginType(0);
                             print("USER : $user");
+                            print("REFID SA MAIN AUTH : $refId");
+                            // if (sourceUrl != null) {
+                            //   await Navigator.pushReplacementNamed(
+                            //       context, "/landing-page");
+                            //   return;
+                            // } else {
+                            //   await Navigator.push(
+                            //     context,
+                            //     PageTransition(
+                            //       child: const SourceManagementPage(),
+                            //       type: PageTransitionType.leftToRight,
+                            //     ),
+                            //   );
+                            // }
                             await Navigator.pushReplacement(
                               context,
                               PageTransition(
@@ -147,7 +182,7 @@ class _MainAuthPageState extends State<MainAuthPage>
                     color: orange,
                     height: 55,
                     child: Center(
-                      child: Text("Login".toUpperCase()),
+                      child: Text("Login".tr().toUpperCase()),
                     ),
                   ),
                   const SizedBox(
@@ -155,10 +190,10 @@ class _MainAuthPageState extends State<MainAuthPage>
                   ),
                   Text.rich(
                     TextSpan(
-                      text: "Don't have an account yet? ",
+                      text: 'Dont_have_an_account_yet'.tr(),
                       children: [
                         TextSpan(
-                          text: "Register",
+                          text: "Register".tr(),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () async {
                               await Navigator.push(
@@ -212,11 +247,12 @@ class _MainAuthPageState extends State<MainAuthPage>
                         if (u == null) return;
                         refId = u.user.uid;
                         user = M3uUser.fromProvider(u);
+                        _cacher.savePassword(_password.text);
                         _cacher.saveRefID(refId!);
                         _cacher.saveM3uUser(user!);
                         _cacher.saveLoginType(0);
-                        print("USER : $user");
-                        await Navigator.pushReplacement(
+
+                        await Navigator.push(
                           context,
                           PageTransition(
                             child: const SourceManagementPage(),
@@ -240,9 +276,9 @@ class _MainAuthPageState extends State<MainAuthPage>
                         const SizedBox(
                           width: 10,
                         ),
-                        const Text(
-                          "Login with Google",
-                          style: TextStyle(
+                        Text(
+                          "Login_with_Google".tr(),
+                          style: const TextStyle(
                             color: Colors.black,
                             fontSize: 15,
                           ),
@@ -253,37 +289,34 @@ class _MainAuthPageState extends State<MainAuthPage>
                   const SizedBox(
                     height: 10,
                   ),
-                  button2(
-                    title: "Load your playlist (File/URL)",
-                    assetPath: "assets/icons/folder.svg",
-                    onPressed: () async {
-                      await Navigator.push(
-                        context,
-                        PageTransition(
-                          child: const LoadWithPlaylist(),
-                          type: PageTransitionType.leftToRight,
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 30),
+                    child: RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        text: 'By_using_this_application_you_agree_to_the'.tr(),
+                        style: const TextStyle(
+                          fontSize: 14,
                         ),
-                      );
-                    },
-                    foregroundColor: Colors.black,
+                        children: <TextSpan>[
+                          const TextSpan(text: "\n"),
+                          TextSpan(
+                            text: 'Terms_&_Conditions'.tr(),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                print('Terms & Conditions');
+                              },
+                            style: TextStyle(
+                              height: 1.3,
+                              color: ColorPalette().orange,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  // const SizedBox(
-                  //   height: 10,
-                  // ),
-                  // button2(
-                  //   title: "Login with your MAC Address",
-                  //   assetPath: "assets/icons/mac.svg",
-                  //   onPressed: () async {
-                  //     await Navigator.push(
-                  //       context,
-                  //       PageTransition(
-                  //         child: const LoadWithMacAddress(),
-                  //         type: PageTransitionType.leftToRight,
-                  //       ),
-                  //     );
-                  //   },
-                  //   foregroundColor: Colors.black,
-                  // ),
                   const SizedBox(
                     height: 20,
                   ),

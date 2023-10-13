@@ -175,7 +175,7 @@ class _SearchLiveState extends State<SearchLive>
                                   //   flexibleSpace: FlexibleSpaceBar(
                                   //     background: filterChip([
                                   //       "All",
-                                  //       "Favourites",
+                                  //       "favorites",
                                   //       "Channels History",
                                   //       "France FHD | UHD",
                                   //       "France FHD HEVC"

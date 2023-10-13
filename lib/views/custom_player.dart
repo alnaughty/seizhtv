@@ -1,4 +1,6 @@
-// ignore_for_file: must_be_immutable, use_build_context_synchronously
+// ignore_for_file: must_be_immutable, use_build_context_synchronously, deprecated_member_use, avoid_print
+
+import 'dart:ui';
 
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +10,8 @@ import 'package:seizhtv/extensions/color.dart';
 import 'package:seizhtv/globals/loader.dart';
 import 'package:seizhtv/globals/palette.dart';
 import 'package:video_player/video_player.dart';
+
+import 'cast.dart';
 
 class CustomPlayer extends StatefulWidget {
   CustomPlayer({
@@ -31,11 +35,12 @@ class CustomPlayer extends StatefulWidget {
 }
 
 class _CustomPlayerState extends State<CustomPlayer> with ColorPalette {
-  late final VideoPlayerController _videoController;
-  late final ChewieController _chewieController;
+  late VideoPlayerController _videoController;
+  late ChewieController _chewieController;
 
   Widget? _chewieWidget;
   init() async {
+    print("URL : ${widget.link}");
     print("URL : ${widget.link.substring(6).replaceAll("http", "https")}");
     try {
       unableToPlay = false;
@@ -45,23 +50,40 @@ class _CustomPlayerState extends State<CustomPlayer> with ColorPalette {
       );
 
       await _videoController.initialize().whenComplete(() {
+        print("VIDEO LINK: ${widget.link}");
         print("DURATION ${_videoController.value.duration}");
         _chewieController = ChewieController(
           videoPlayerController: _videoController,
           autoPlay: true,
-          looping: false,
-          showControls: true,
+          looping: true,
+          fullScreenByDefault: true,
           isLive: widget.isLive,
-          allowFullScreen: true,
-          allowPlaybackSpeedChanging: true,
-          allowedScreenSleep: false,
-          showOptions: true,
+          autoInitialize: true,
           additionalOptions: (_) => [
             OptionItem(
               onTap: () async {
-                Navigator.of(context).pop(null);
-                await Future.delayed(const Duration(milliseconds: 200));
-                Navigator.of(context).pop(null);
+                showModalBottomSheet(
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  context: context,
+                  builder: (_) => BackdropFilter(
+                    filter: ImageFilter.blur(
+                      sigmaX: 0,
+                      sigmaY: 0,
+                    ),
+                    child: const CastPage(),
+                  ),
+                );
+              },
+              iconData: Icons.cast,
+              title: "Cast",
+            ),
+            OptionItem(
+              onTap: () async {
+                Navigator.of(context).pop();
+                SystemChrome.setPreferredOrientations([
+                  DeviceOrientation.portraitUp,
+                ]);
               },
               iconData: Icons.cancel_presentation_rounded,
               title: "Close",
@@ -71,25 +93,30 @@ class _CustomPlayerState extends State<CustomPlayer> with ColorPalette {
             bufferedColor: orange.darken(),
             playedColor: orange,
           ),
-          cupertinoProgressColors: ChewieProgressColors(
-            bufferedColor: orange.darken(),
-            playedColor: orange,
-          ),
-          placeholder: const SeizhTvLoader(
-            hasBackgroundColor: false,
-          ),
-          deviceOrientationsAfterFullScreen: [
-            DeviceOrientation.portraitUp,
-          ],
         );
+        _chewieController.addListener(() {
+          print("FULL SCREEN: ${_chewieController.isFullScreen}");
+          print("ASPECT RATIO: ${_videoController.value.aspectRatio}");
+          if (_chewieController.isFullScreen) {
+            print('full screen enabled');
+            SystemChrome.setPreferredOrientations([
+              DeviceOrientation.landscapeRight,
+              DeviceOrientation.landscapeLeft
+            ]);
+          } else {
+            print('fullscreen disabled');
+            SystemChrome.setPreferredOrientations([
+              DeviceOrientation.portraitUp,
+            ]);
+          }
+        });
         _chewieWidget = Chewie(
           controller: _chewieController,
         );
-        if (mounted) setState(() {});
+        // if (mounted) setState(() {});
       });
-      // _videoController.
 
-      if (mounted) setState(() {});
+      // if (mounted) setState(() {});
     } catch (e, s) {
       Fluttertoast.showToast(msg: "No video to stream");
       print("NO VIDEO ON STREAM : $e");
@@ -108,93 +135,112 @@ class _CustomPlayerState extends State<CustomPlayer> with ColorPalette {
   }
 
   bool unableToPlay = false;
+
   @override
   void initState() {
-    // TODO: implement initState
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await init();
     });
-
     super.initState();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _videoController.dispose();
     if (_chewieWidget != null) {
-      _chewieController.dispose();
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
     }
+    _chewieController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
     try {
-      return LayoutBuilder(builder: (context, c) {
-        final double w = c.maxWidth;
-        return _chewieWidget != null
-            ? Container(
-                width: w,
-                height: c.maxHeight,
-                color: Colors.black,
-                child: AspectRatio(
-                  aspectRatio: _videoController.value.aspectRatio,
-                  child: _chewieWidget,
-                ),
-              )
-            : unableToPlay
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                      color: Colors.grey.shade900,
-                      height: 160,
-                      width: w,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            onPressed: () async {
-                              await init();
-                            },
-                            padding: const EdgeInsets.all(0),
-                            icon: const Icon(
-                              Icons.refresh,
-                              color: Colors.white,
-                              size: 40,
-                            ),
-                          ),
-                          const Text(
-                            "Refresh",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                            ),
-                          )
-                        ],
-                      ),
+      return _chewieWidget != null
+          ? Stack(
+              children: [
+                Container(
+                  color: card,
+                  child: Center(
+                    child: AspectRatio(
+                      aspectRatio: _videoController.value.aspectRatio,
+                      child: _chewieWidget,
                     ),
-                  )
-                : ClipRRect(
+                  ),
+                ),
+                Positioned(
+                    top: 10,
+                    left: 10,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const SizedBox(
+                        height: 50,
+                        width: 30,
+                        child: Icon(Icons.cancel_presentation_rounded),
+                      ),
+                    ))
+              ],
+            )
+          : unableToPlay
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    color: Colors.grey.shade900,
+                    height: 160,
+                    width: double.infinity,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          onPressed: () async {
+                            await init();
+                          },
+                          padding: const EdgeInsets.all(0),
+                          icon: const Icon(
+                            Icons.refresh,
+                            color: Colors.white,
+                            size: 40,
+                          ),
+                        ),
+                        const Text(
+                          "Refresh",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              : Center(
+                  child: ClipRRect(
                     borderRadius: BorderRadius.circular(10),
-                    child: SizedBox(
+                    child: const SizedBox(
                       height: 160,
-                      width: w,
-                      child: const Center(
+                      width: double.infinity,
+                      child: Center(
                         child: SeizhTvLoader(
                           hasBackgroundColor: false,
-                          label: "Verifying Network",
+                          label: Text(
+                            "Verifying Network",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
                         ),
-                        // child: LoadingAnimationWidget.halfTriangleDot(
-                        //   color: Colors.white,
-                        //   size: 50,
-                        // ),
                       ),
                     ),
-                  );
-      });
+                  ),
+                );
     } catch (e) {
       return Center(
         child: Text(

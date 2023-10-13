@@ -1,3 +1,6 @@
+// ignore_for_file: depend_on_referenced_packages
+
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:seizhtv/globals/palette.dart';
@@ -31,6 +34,9 @@ class SeizhTv extends StatelessWidget with ColorPalette {
           isDense: true,
         ),
       ),
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       navigatorObservers: <NavigatorObserver>[observer],
       home: const SplashScreen(),
       onGenerateRoute: _route.settings,

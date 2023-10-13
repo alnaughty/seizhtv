@@ -32,13 +32,11 @@ class _FavoriteIconButtonState extends State<FavoriteIconButton> {
       ..stream.debounceTime(const Duration(milliseconds: 600)).listen((event) {
         widget.onPressedCallback(event);
       });
-    // TODO: implement initState
     super.initState();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _status.close();
     super.dispose();
   }

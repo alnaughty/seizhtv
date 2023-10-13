@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,7 +31,6 @@ class _MainRegisterPageState extends State<MainRegisterPage>
   late final TextEditingController _email, _password;
   @override
   void initState() {
-    // TODO: implement initState
     _email = TextEditingController();
     _password = TextEditingController();
     super.initState();
@@ -60,13 +60,11 @@ class _MainRegisterPageState extends State<MainRegisterPage>
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 children: [
-                  const SizedBox(
-                    height: 80,
-                  ),
-                  const Hero(
+                  const SizedBox(height: 50),
+                  Hero(
                     tag: "auth-logo",
                     child: LogoSVG(
-                      bottomText: "Register with Us",
+                      bottomText: "Register_with_us".tr(),
                     ),
                   ),
                   Form(
@@ -75,14 +73,15 @@ class _MainRegisterPageState extends State<MainRegisterPage>
                       children: [
                         LabeledTextField(
                           controller: _email,
-                          label: "Username",
-                          hinttext: "Username",
+                          label: "Email".tr(),
+                          hinttext: "Email".tr(),
                           validator: (text) {
                             if (text == null) {
                               return "Unprocessable";
                             } else if (text.isEmpty) {
                               return "Field is required";
                             }
+                            return null;
                           },
                         ),
                         const SizedBox(
@@ -91,14 +90,15 @@ class _MainRegisterPageState extends State<MainRegisterPage>
                         LabeledTextField(
                           isPassword: true,
                           controller: _password,
-                          label: "Password",
-                          hinttext: "Password",
+                          label: "Password".tr(),
+                          hinttext: "Password".tr(),
                           validator: (text) {
                             if (text == null) {
                               return "Unprocessable";
                             } else if (text.isEmpty) {
                               return "Field is required";
                             }
+                            return null;
                           },
                         ),
                       ],
@@ -123,6 +123,8 @@ class _MainRegisterPageState extends State<MainRegisterPage>
                             _cacher.saveRefID(refId!);
                             _cacher.saveM3uUser(user!);
                             _cacher.saveLoginType(0);
+
+                            print("REFID : $refId");
                             print("USER : $user");
                             await Navigator.pushReplacement(
                               context,
@@ -143,7 +145,7 @@ class _MainRegisterPageState extends State<MainRegisterPage>
                     color: orange,
                     height: 55,
                     child: Center(
-                      child: Text("Register".toUpperCase()),
+                      child: Text("Register".tr().toUpperCase()),
                     ),
                   ),
                   const SizedBox(
@@ -151,10 +153,10 @@ class _MainRegisterPageState extends State<MainRegisterPage>
                   ),
                   Text.rich(
                     TextSpan(
-                      text: "Already have an account? ",
+                      text: "Already_have_an_account".tr(),
                       children: [
                         TextSpan(
-                          text: "Login",
+                          text: "Login".tr(),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
                               Navigator.of(context).pop();
@@ -230,15 +232,16 @@ class _MainRegisterPageState extends State<MainRegisterPage>
                         const SizedBox(
                           width: 10,
                         ),
-                        const Text(
-                          "Login with Google",
-                          style: TextStyle(
+                        Text(
+                          "Login_with_Google".tr(),
+                          style: const TextStyle(
                             color: Colors.black,
                           ),
                         )
                       ],
                     ),
-                  )
+                  ),
+                  const SizedBox(height: 30),
                 ],
               ),
             ),

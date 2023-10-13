@@ -12,6 +12,7 @@ class M3uUser {
     required this.uid,
   });
   factory M3uUser.fromProvider(CredentialProvider provider) => M3uUser(
+        // factory M3uUser.fromProvider(UserCredential provider) => M3uUser(
         uid: provider.user.uid,
         displayName: provider.user.displayName,
         email: provider.user.email,

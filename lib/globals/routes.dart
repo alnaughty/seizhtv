@@ -73,11 +73,18 @@ class Routes {
         );
       case "/load-playlist":
         return PageTransition(
-          child: const LoadPlaylist(),
+          child: LoadPlaylist(),
           type: PageTransitionType.rightToLeft,
           duration: _transitionDuration,
           reverseDuration: _transitionDuration,
         );
+      // case "/login":
+      //   return PageTransition(
+      //     child: const LoginPage(),
+      //     type: PageTransitionType.rightToLeft,
+      //     duration: _transitionDuration,
+      //     reverseDuration: _transitionDuration,
+      //   );
 
       case "/auth":
         return PageTransition(

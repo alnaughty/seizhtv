@@ -15,7 +15,7 @@ class SeizhTvLoader extends StatelessWidget {
   final bool hasBackgroundColor;
   final Color backgroundColor;
   final double opacity;
-  final String? label;
+  final Widget? label;
   final Color? labelColor;
 
   @override
@@ -38,13 +38,16 @@ class SeizhTvLoader extends StatelessWidget {
               fit: BoxFit.fitWidth,
             ),
             if (label != null) ...{
-              Text(
-                label!,
-                style: TextStyle(
-                  color: labelColor,
-                  fontSize: 16,
-                ),
+              Container(
+                child: label,
               ),
+              // Text(
+              //   label!,
+              // style: TextStyle(
+              //   color: labelColor,
+              //   fontSize: 16,
+              // ),
+              // ),
             },
           ],
         ),

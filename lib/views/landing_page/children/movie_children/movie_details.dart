@@ -1,7 +1,9 @@
+// ignore_for_file: deprecated_member_use
+
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:seizhtv/data_containers/favorites.dart';
-import 'package:seizhtv/extensions/color.dart';
 import 'package:seizhtv/extensions/m3u_entry.dart';
 import 'package:seizhtv/globals/data.dart';
 import 'package:seizhtv/globals/network_image_viewer.dart';
@@ -26,7 +28,6 @@ class _MovieDetailsState extends State<MovieDetails> with ColorPalette {
         .getDataFrom(type: CollectionType.favorites, refId: refId!)
         .then((value) {
       if (value != null) {
-        print("FETCH DATA FROM FAV: $value");
         _vm.populate(value);
       }
     });
@@ -35,11 +36,11 @@ class _MovieDetailsState extends State<MovieDetails> with ColorPalette {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 230,
+      height: 250,
       width: double.maxFinite,
       padding: const EdgeInsets.symmetric(
         horizontal: 20,
-        vertical: 20,
+        vertical: 10,
       ),
       decoration: BoxDecoration(
         color: cardColor,
@@ -51,16 +52,13 @@ class _MovieDetailsState extends State<MovieDetails> with ColorPalette {
         top: false,
         child: Column(
           children: [
-            // Text(widget.data.data.length.toString()),
             Expanded(
               child: LayoutBuilder(builder: (context, c) {
                 final double h = c.maxHeight;
                 return Row(
                   children: [
-                    // Text(widget.data.data.length.toString()),
                     Expanded(
                       child: ListView.separated(
-                        // scrollDirection: Axis.horizontal,
                         itemBuilder: (_, i) {
                           final M3uEntry _data = widget.data.data[i];
                           return ListTile(
@@ -75,7 +73,6 @@ class _MovieDetailsState extends State<MovieDetails> with ColorPalette {
                               ),
                               width: chosenIndex == i ? c.maxWidth : 0,
                               height: chosenIndex == i ? 40 : 0,
-                              // color: Colors.red,
                               child: AnimatedSwitcher(
                                 duration: const Duration(milliseconds: 300),
                                 child: chosenIndex == null
@@ -83,13 +80,65 @@ class _MovieDetailsState extends State<MovieDetails> with ColorPalette {
                                     : MaterialButton(
                                         padding: EdgeInsets.zero,
                                         elevation: 0,
-                                        onPressed:
-                                            chosenIndex == i ? () {} : null,
+                                        onPressed: () async {
+                                          await showDialog(
+                                            barrierDismissible: false,
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              Future.delayed(
+                                                const Duration(seconds: 3),
+                                                () {
+                                                  Navigator.of(context)
+                                                      .pop(true);
+                                                },
+                                              );
+                                              return Dialog(
+                                                alignment: Alignment.topCenter,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                    10.0,
+                                                  ),
+                                                ),
+                                                child: Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                    vertical: 5,
+                                                    horizontal: 20,
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Expanded(
+                                                        child: Text(
+                                                          "${_data.title} Removed from Favorites",
+                                                        ),
+                                                      ),
+                                                      IconButton(
+                                                        onPressed: () {
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                        },
+                                                        icon: const Icon(Icons
+                                                            .close_rounded),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          );
+                                          await widget.data.data[chosenIndex!]
+                                              .removeFromFavorites(refId!);
+                                          Navigator.of(context).pop();
+                                        },
                                         child: Center(
                                           child: Text(
                                             _data.existsInFavorites("movie")
-                                                ? "Remove from\nfavorites"
-                                                : "Add to favorites",
+                                                ? "Remove_from_favorites".tr()
+                                                : "Add_to_favorites".tr(),
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
                                               fontSize: 10,
@@ -100,7 +149,6 @@ class _MovieDetailsState extends State<MovieDetails> with ColorPalette {
                                         ),
                                       ),
                               ),
-                              // child: ,
                             ),
                             onTap: () {
                               chosenIndex = i;
@@ -271,7 +319,7 @@ class _MovieDetailsState extends State<MovieDetails> with ColorPalette {
                       width: 10,
                     ),
                     Text(
-                      "PLAY NOW",
+                      "Play_now".tr().toUpperCase(),
                       style: TextStyle(
                         color: cardColor,
                       ),

@@ -1,6 +1,7 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:seizhtv/globals/data.dart';
 import 'package:seizhtv/globals/data_cacher.dart';
@@ -18,10 +19,21 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   final DataCacher _cacher = DataCacher.instance;
   Future<void> check() async {
-    // await _cacher.clearData();
-    String? file = _cacher.filePath;
     refId = _cacher.refId;
     user = _cacher.m3uUser;
+    sourceUrl = _cacher.source;
+    playlistName = _cacher.playlistName;
+    language = _cacher.language;
+    file = _cacher.filePath;
+    password = _cacher.password;
+
+    print("REF ID: $refId");
+    print("USER: $user");
+    print("SOURCE URL: $sourceUrl");
+    print("PLAYLIST NAME: $playlistName");
+    print("LANGUAGE: $language");
+    print("FILE: $file");
+    print("PASSWORD: $password");
 
     if (file != null) {
       await Navigator.pushReplacementNamed(context, "/landing-page");
@@ -34,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen> {
         context,
         PageTransition(
           child: const SourceManagementPage(),
-          type: PageTransitionType.leftToRight,
+          type: PageTransitionType.rightToLeft,
         ),
       );
     }
@@ -43,7 +55,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await check();
     });
@@ -52,7 +64,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
   }
 
