@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,10 +23,14 @@ import '../../../../viewmodel/video_vm.dart';
 import 'details.dart';
 
 class SeriesListPage extends StatefulWidget {
-  const SeriesListPage(
-      {required this.controller, required this.data, super.key});
+  SeriesListPage(
+      {required this.controller,
+      required this.data,
+      this.showSearchField = false,
+      super.key});
   final ScrollController controller;
   final List<ClassifiedData> data;
+  bool showSearchField;
 
   @override
   State<SeriesListPage> createState() => SeriesListPageState();
@@ -38,6 +44,8 @@ class SeriesListPageState extends State<SeriesListPage>
   static final ZM3UHandler _handler = ZM3UHandler.instance;
   static final Favorites _fav = Favorites.instance;
   final LoadedM3uData _vm = LoadedM3uData.instance;
+  late final TextEditingController _search = TextEditingController();
+  List<M3uEntry>? searchData;
   late List<ClassifiedData> _favdata;
   List<ClassifiedData> favData = [];
 

@@ -1,6 +1,9 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, must_be_immutable
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:seizhtv/extensions/color.dart';
 import 'package:seizhtv/extensions/m3u_entry.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
 import '../../../../globals/network_image_viewer.dart';
@@ -9,11 +12,15 @@ import '../../../../globals/ui_additional.dart';
 import '../../../../globals/video_loader.dart';
 
 class HistoryLiveTvPage extends StatefulWidget {
-  const HistoryLiveTvPage(
-      {super.key, required this.data, required this.onPressed});
+  HistoryLiveTvPage(
+      {super.key,
+      required this.data,
+      required this.onPressed,
+      this.showSearchField = false});
 
   final List<M3uEntry> data;
   final ValueChanged<M3uEntry> onPressed;
+  bool showSearchField;
 
   @override
   State<HistoryLiveTvPage> createState() => HistoryLiveTvPageState();
@@ -42,8 +49,18 @@ class HistoryLiveTvPageState extends State<HistoryLiveTvPage>
   //   super.initState();
   // }
 
+  late final TextEditingController _search = TextEditingController();
+  List<M3uEntry>? searchData;
+
+  @override
+  void initState() {
+    searchData = widget.data;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
     // return StreamBuilder<CategorizedM3UData>(
     //   stream: _hisvm.stream,
     //   builder: (_, snapshot) {
@@ -67,51 +84,149 @@ class HistoryLiveTvPageState extends State<HistoryLiveTvPage>
         child: Text("No channel history"),
       );
     }
-    return GridView.builder(
-        physics: const ClampingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: calculateCrossAxisCount(context),
-            childAspectRatio: .8, // optional, adjust as needed
-            // mainAxisSpacing: 10,
-            crossAxisSpacing: 10),
-        itemCount: widget.data.length,
-        itemBuilder: (context, index) {
-          final M3uEntry item = widget.data[index];
-
-          return LayoutBuilder(builder: (context, c) {
-            final double w = c.maxWidth;
-            return GestureDetector(
-              onTap: () {
-                widget.onPressed(item);
-                print("${item.existsInFavorites("live")}");
-              },
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
+    return Column(
+      children: [
+        SizedBox(
+          child: AnimatedPadding(
+            duration: const Duration(milliseconds: 10),
+            padding: EdgeInsets.symmetric(
+                horizontal: widget.showSearchField ? 20 : 0),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 10),
+              height: widget.showSearchField ? size.height * .08 : 0,
+              width: double.maxFinite,
+              child: Row(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: NetworkImageViewer(
-                      url: item.attributes['tvg-logo'],
-                      width: w,
-                      height: 70,
-                      color: highlight,
-                      fit: BoxFit.cover,
+                  Expanded(
+                      child: Container(
+                    height: 50,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                        color: highlight,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                              color: highlight.darken().withOpacity(1),
+                              offset: const Offset(2, 2),
+                              blurRadius: 2)
+                        ]),
+                    child: Row(
+                      children: [
+                        SvgPicture.asset("assets/icons/search.svg",
+                            height: 20, width: 20, color: white),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            child: widget.showSearchField
+                                ? TextField(
+                                    onChanged: (text) {
+                                      if (text.isEmpty) {
+                                        searchData = widget.data;
+                                      } else {
+                                        searchData = List.from(widget.data
+                                            .where((element) => element.title
+                                                .toLowerCase()
+                                                .contains(text.toLowerCase())));
+                                      }
+                                      searchData!.sort(
+                                          (a, b) => a.title.compareTo(b.title));
+                                      if (mounted) {
+                                        setState(() {});
+                                      }
+                                    },
+                                    cursorColor: orange,
+                                    controller: _search,
+                                    decoration: InputDecoration(
+                                      hintText: "Search".tr(),
+                                    ),
+                                  )
+                                : Container(),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    item.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(height: 1),
+                  )),
+                  const SizedBox(width: 10),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _search.clear();
+                        searchData = widget.data;
+                        widget.showSearchField = !widget.showSearchField;
+                      });
+                    },
+                    child: Text(
+                      "Cancel".tr(),
+                      style: const TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),
-            );
-          });
-        });
+            ),
+          ),
+        ),
+        if (widget.showSearchField) ...{
+          const SizedBox(height: 15),
+        },
+        Expanded(
+          child: searchData!.isEmpty
+              ? Center(
+                  child: Text(
+                    "No Result Found for `${_search.text}`",
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(.5),
+                    ),
+                  ),
+                )
+              : GridView.builder(
+                  physics: const ClampingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: calculateCrossAxisCount(context),
+                      childAspectRatio: .8, // optional, adjust as needed
+                      // mainAxisSpacing: 10,
+                      crossAxisSpacing: 10),
+                  itemCount: searchData!.length,
+                  itemBuilder: (context, index) {
+                    final M3uEntry item = searchData![index];
+
+                    return LayoutBuilder(builder: (context, c) {
+                      final double w = c.maxWidth;
+                      return GestureDetector(
+                        onTap: () {
+                          widget.onPressed(item);
+                          print("${item.existsInFavorites("live")}");
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: NetworkImageViewer(
+                                url: item.attributes['tvg-logo'],
+                                width: w,
+                                height: 70,
+                                color: highlight,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              item.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(height: 1),
+                            ),
+                          ],
+                        ),
+                      );
+                    });
+                  }),
+        ),
+      ],
+    );
     //   },
     // );
   }
