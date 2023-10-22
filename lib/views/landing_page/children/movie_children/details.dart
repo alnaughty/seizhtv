@@ -112,7 +112,8 @@ class _MovieDetailsPageState extends State<MovieDetailsPage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        result.title,
+                        widget.data.title,
+                        // result.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -320,7 +321,8 @@ class _MovieDetailsPageState extends State<MovieDetailsPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.title,
+                      widget.data.title,
+                      // widget.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(

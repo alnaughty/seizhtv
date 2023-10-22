@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, must_be_immutable
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +36,7 @@ class MovieCategoryPageState extends State<MovieCategoryPage>
   List<ClassifiedData>? displayData;
   List<M3uEntry> movieData = [];
   List<M3uEntry>? searchData;
+  String result1 = "";
 
   fetchFav() async {
     await _handler
@@ -46,16 +47,6 @@ class MovieCategoryPageState extends State<MovieCategoryPage>
       }
     });
   }
-
-  // @override
-  // void initState() {
-  //   print("CATEGORY NAME: ${widget.category}");
-  //   setState(() {
-  //     // searchData = widget.data;
-  //     print("CATEGORY NAME 1: ${widget.category}");
-  //   });
-  //   super.initState();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -75,12 +66,12 @@ class MovieCategoryPageState extends State<MovieCategoryPage>
           final CategorizedM3UData result = snapshot.data!;
           final List<ClassifiedData> movie = result.movies;
           final List<M3uEntry> data = movie
-              .where((element) => element.name.contains(widget.category))
+              .where((element) =>
+                  element.name.contains(widget.category.trimRight()))
               .expand((element) => element.data)
               .toList()
             ..sort((a, b) => a.title.compareTo(b.title));
           List<M3uEntry> searchData = data;
-          print("CATEGORY NAME 1: ${widget.category}");
           print("SEARCH DATA: ${searchData.length}");
 
           return Column(

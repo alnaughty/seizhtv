@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, must_be_immutable
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -15,9 +15,11 @@ import '../../../../globals/ui_additional.dart';
 import '../../../../globals/video_loader.dart';
 
 class LiveCategoryPage extends StatefulWidget {
-  const LiveCategoryPage({super.key, required this.category});
+  LiveCategoryPage(
+      {super.key, required this.category, this.showSearchField = false});
 
   final String category;
+  bool showSearchField;
 
   @override
   State<LiveCategoryPage> createState() => LiveCategoryPageState();
@@ -54,8 +56,9 @@ class LiveCategoryPageState extends State<LiveCategoryPage>
 
         final CategorizedM3UData result = snapshot.data!;
         final List<ClassifiedData> live = result.live;
-        final List<M3uEntry> _data = live
-            .where((element) => element.name.contains(widget.category))
+        final List<M3uEntry> data = live
+            .where(
+                (element) => element.name.contains(widget.category.trimRight()))
             .expand((element) => element.data)
             .toList()
           ..sort((a, b) => a.title.compareTo(b.title));
@@ -68,9 +71,9 @@ class LiveCategoryPageState extends State<LiveCategoryPage>
               childAspectRatio: .8, // optional, adjust as needed
               mainAxisSpacing: 10,
               crossAxisSpacing: 10),
-          itemCount: _data.length, // add 1 for the loading indicator
+          itemCount: data.length, // add 1 for the loading indicator
           itemBuilder: (context, index) {
-            final M3uEntry item = _data[index];
+            final M3uEntry item = data[index];
 
             return LayoutBuilder(builder: (context, c) {
               final double w = c.maxWidth;

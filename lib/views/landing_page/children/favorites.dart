@@ -155,7 +155,7 @@ class _FavoritesPageState extends State<FavoritesPage>
                                         child: NetworkImageViewer(
                                           url: e.attributes['tvg-logo'],
                                           width: 150,
-                                          height: 85,
+                                          height: 90,
                                           color: card,
                                           fit: BoxFit.cover,
                                         ),
@@ -312,7 +312,7 @@ class _FavoritesPageState extends State<FavoritesPage>
                     const SizedBox(height: 5),
                     SizedBox(
                       width: double.maxFinite,
-                      height: 180,
+                      height: 150,
                       child: ListView.separated(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         scrollDirection: Axis.horizontal,
@@ -374,7 +374,7 @@ class _FavoritesPageState extends State<FavoritesPage>
                                             child: NetworkImageViewer(
                                               url: d.attributes['tvg-logo']!,
                                               width: 150,
-                                              height: 120,
+                                              height: 90,
                                               color: card,
                                               fit: BoxFit.cover,
                                             ),
@@ -496,7 +496,7 @@ class _FavoritesPageState extends State<FavoritesPage>
                     const SizedBox(height: 5),
                     SizedBox(
                       width: double.maxFinite,
-                      height: 200,
+                      height: 150,
                       child: ListView.separated(
                         shrinkWrap: true,
                         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -518,56 +518,145 @@ class _FavoritesPageState extends State<FavoritesPage>
                             itemBuilder: (c, x) {
                               final ClassifiedData d = displayData[x];
 
-                              return SizedBox(
-                                width: 120,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(5),
-                                      child: GestureDetector(
-                                        onTap: () async {
-                                          String result1 = d.name.replaceAll(
-                                              RegExp(
-                                                  r"[(]+[a-zA-Z]+[)]|[|]\s+[0-9]+\s[|]"),
-                                              '');
-                                          String result2 = result1.replaceAll(
-                                              RegExp(
-                                                  r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|] "),
-                                              '');
+                              return Stack(
+                                children: [
+                                  Container(
+                                    width: 120,
+                                    margin: const EdgeInsets.only(
+                                        top: 10, right: 10),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          child: GestureDetector(
+                                            onTap: () async {
+                                              String result1 = d.name.replaceAll(
+                                                  RegExp(
+                                                      r"[(]+[a-zA-Z]+[)]|[|]\s+[0-9]+\s[|]"),
+                                                  '');
+                                              String result2 = result1.replaceAll(
+                                                  RegExp(
+                                                      r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|] "),
+                                                  '');
 
-                                          Navigator.push(
-                                            context,
-                                            PageTransition(
-                                              child: SeriesDetailsPage(
-                                                data: d,
-                                                title: result2,
-                                              ),
-                                              type: PageTransitionType
-                                                  .rightToLeft,
+                                              Navigator.push(
+                                                context,
+                                                PageTransition(
+                                                  child: SeriesDetailsPage(
+                                                    data: d,
+                                                    title: result2,
+                                                  ),
+                                                  type: PageTransitionType
+                                                      .rightToLeft,
+                                                ),
+                                              );
+                                            },
+                                            child: NetworkImageViewer(
+                                              url: d.data[0]
+                                                  .attributes['tvg-logo']!,
+                                              width: 150,
+                                              height: 90,
+                                              color: card,
+                                              fit: BoxFit.cover,
                                             ),
-                                          );
-                                        },
-                                        child: NetworkImageViewer(
-                                          url:
-                                              d.data[0].attributes['tvg-logo']!,
-                                          width: 150,
-                                          height: 145,
-                                          color: card,
-                                          fit: BoxFit.cover,
+                                          ),
                                         ),
-                                      ),
+                                        const SizedBox(height: 5),
+                                        Text(
+                                          d.name,
+                                          maxLines: 2,
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(height: 5),
-                                    Text(
-                                      d.name,
-                                      maxLines: 2,
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                  Positioned(
+                                      top: 0,
+                                      right: 0,
+                                      child: SizedBox(
+                                        height: 25,
+                                        width: 25,
+                                        child: FavoriteIconButton(
+                                          onPressedCallback: (bool f) async {
+                                            if (f) {
+                                              showDialog(
+                                                barrierDismissible: false,
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  Future.delayed(
+                                                    const Duration(seconds: 3),
+                                                    () {
+                                                      Navigator.of(context)
+                                                          .pop(true);
+                                                    },
+                                                  );
+                                                  return Dialog(
+                                                    alignment:
+                                                        Alignment.topCenter,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                        10.0,
+                                                      ),
+                                                    ),
+                                                    child: Container(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                        horizontal: 20,
+                                                      ),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                            "Added_to_Favorites"
+                                                                .tr(),
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 16,
+                                                            ),
+                                                          ),
+                                                          IconButton(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(0),
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                            icon: const Icon(
+                                                              Icons
+                                                                  .close_rounded,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                              // await d.addToFavorites(refId!);
+                                            } else {
+                                              // await d
+                                              //     .removeFromFavorites(refId!);
+                                            }
+                                            await fetchFav();
+                                          },
+                                          initValue: true,
+                                          // d. .existsInFavorites("movie"),
+                                          iconSize: 20,
+                                        ),
+                                      ))
+                                ],
                               );
                             },
                             separatorBuilder: (_, __) =>

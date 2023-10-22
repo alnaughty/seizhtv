@@ -46,38 +46,56 @@ class UIAdditional {
   Widget filterChip({
     required List<String> chipsLabel,
     required Function(int index, String? name) onPressed,
-    required int si,
+    int? si,
     required Widget filterButton,
+    required bool selected,
   }) =>
-      ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (context, index) {
-          return GestureDetector(
-              onTap: () {
-                onPressed(index, chipsLabel[index]);
-              },
-              child: ChoiceChip(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                label: SizedBox(
-                  height: 45,
-                  child: chipsLabel[index].contains("All")
-                      ? filterButton
-                      : Center(
+      SizedBox(
+        height: 50,
+        width: double.infinity,
+        child: ListView(
+          shrinkWrap: true,
+          scrollDirection: Axis.horizontal,
+          children: [
+            ChoiceChip(
+              label: filterButton,
+              selected: selected,
+              selectedColor: ColorPalette().topColor,
+              disabledColor: ColorPalette().highlight,
+            ),
+            const SizedBox(width: 10),
+            ListView.separated(
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                    onTap: () {
+                      onPressed(index, chipsLabel[index]);
+                    },
+                    child: ChoiceChip(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      label: SizedBox(
+                        height: 45,
+                        child: Center(
                           child: Text(
                             chipsLabel[index],
                             style: const TextStyle(color: Colors.white),
                           ),
                         ),
-                ),
-                selected: index == si,
-                selectedColor: ColorPalette().topColor,
-                disabledColor: ColorPalette().highlight,
-              ));
-        },
-        itemCount: chipsLabel.length,
-        separatorBuilder: (BuildContext context, int index) {
-          return const SizedBox(width: 10);
-        },
+                      ),
+                      selected: si == null ? false : index == si,
+                      selectedColor: ColorPalette().topColor,
+                      disabledColor: ColorPalette().highlight,
+                    ));
+              },
+              itemCount: chipsLabel.length,
+              separatorBuilder: (BuildContext context, int index) {
+                return const SizedBox(width: 10);
+              },
+            )
+          ],
+        ),
       );
 
   Widget button2(

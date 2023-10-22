@@ -52,20 +52,19 @@ class _LivePageState extends State<LivePage>
 
   initStream() {
     _streamer = _vm.stream.listen((event) {
+      final List<ClassifiedData> sdata = List.from(event.live);
       _data = List.from(
           event.live.expand((element) => element.data).toList().unique());
       displayData = List.from(_data.unique());
       displayData!.sort((a, b) => a.title.compareTo(b.title));
-      List<String> name = List.from(event.live.map((e) => e.name))
-        ..sort((a, b) => a.compareTo(b));
       categoryName = [
-        "All (${displayData == null ? "" : displayData!.length})"
+        "ALL (${displayData == null ? "" : displayData!.length})"
       ];
-      for (final String cname in name) {
-        categoryName!.add(cname);
+      for (final ClassifiedData cdata in sdata) {
+        categoryName!.add("${cdata.name} (${cdata.data.length})");
       }
+      categoryName!.sort((a, b) => a.compareTo(b));
       if (mounted) setState(() {});
-      print("CATEGORY NAME : $categoryName");
     });
   }
 
@@ -189,17 +188,15 @@ class _LivePageState extends State<LivePage>
                             "All (${displayData == null ? "" : displayData!.length})",
                             "${"favorites".tr()} (${favData.length})",
                             "${"Channels_History".tr()} (${hisData.length})",
-                            // "Categories",
-                            // for (int i = 1; i < name!.length; i++) ...{(name![i])},
                           ],
                           onPressed: (index, name) {
                             setState(() {
-                              print("$index");
                               ind = index;
                               label = name!;
                             });
                           },
                           si: ind,
+                          selected: true,
                           filterButton: Container(
                             width: 150,
                             height: 40,
@@ -216,20 +213,21 @@ class _LivePageState extends State<LivePage>
                               },
                               items: categoryName!.map((value) {
                                 return DropdownMenuItem(
-                                  value: value,
-                                  child: Text(value),
-                                );
+                                    value: value, child: Text(value));
                               }).toList(),
                               value: dropdownvalue == ""
                                   ? categoryName == []
                                       ? ""
-                                      : categoryName![0]
+                                      : categoryName![3]
                                   : dropdownvalue,
                               style: const TextStyle(
                                   fontSize: 14, fontFamily: "Poppins"),
                               onChanged: (value) {
                                 setState(() {
                                   dropdownvalue = value!;
+                                  String result1 = dropdownvalue.replaceAll(
+                                      RegExp(r"[(]+[0-9]+[)]"), '');
+                                  label = result1;
                                 });
                               },
                             ),
@@ -237,92 +235,6 @@ class _LivePageState extends State<LivePage>
                         ),
                       ),
                       const SizedBox(height: 15),
-                      // AnimatedPadding(
-                      //   duration: const Duration(milliseconds: 400),
-                      //   padding: EdgeInsets.symmetric(
-                      //       horizontal: showSearchField ? 20 : 0),
-                      //   child: AnimatedContainer(
-                      //     duration: const Duration(
-                      //       milliseconds: 500,
-                      //     ),
-                      //     height: showSearchField ? 50 : 0,
-                      //     width: double.maxFinite,
-                      //     child: Row(
-                      //       children: [
-                      //         Expanded(
-                      //             child: Container(
-                      //           height: 50,
-                      //           padding:
-                      //               const EdgeInsets.symmetric(horizontal: 10),
-                      //           decoration: BoxDecoration(
-                      //               color: highlight,
-                      //               borderRadius: BorderRadius.circular(10),
-                      //               boxShadow: [
-                      //                 BoxShadow(
-                      //                   color:
-                      //                       highlight.darken().withOpacity(1),
-                      //                   offset: const Offset(2, 2),
-                      //                   blurRadius: 2,
-                      //                 )
-                      //               ]),
-                      //           child: Row(
-                      //             children: [
-                      //               SvgPicture.asset(
-                      //                 "assets/icons/search.svg",
-                      //                 height: 20,
-                      //                 width: 20,
-                      //                 color: white,
-                      //               ),
-                      //               const SizedBox(width: 10),
-                      //               Expanded(
-                      //                 child: AnimatedSwitcher(
-                      //                   duration:
-                      //                       const Duration(milliseconds: 300),
-                      //                   child: showSearchField
-                      //                       ? TextField(
-                      //                           onChanged: (text) {
-                      //                             if (_kList.currentState !=
-                      //                                 null) {
-                      //                               _kList.currentState!
-                      //                                   .search(text);
-                      //                             }
-                      //                             if (mounted) setState(() {});
-                      //                           },
-                      //                           cursorColor: orange,
-                      //                           controller: _search,
-                      //                           decoration: InputDecoration(
-                      //                             hintText: "Search".tr(),
-                      //                           ),
-                      //                         )
-                      //                       : Container(),
-                      //                 ),
-                      //               ),
-                      //             ],
-                      //           ),
-                      //         )),
-                      //         const SizedBox(width: 10),
-                      //         GestureDetector(
-                      //           onTap: () {
-                      //             setState(() {
-                      //               _search.clear();
-                      //               print("SEARCH TEXT ${_search.text == ""}");
-                      //               displayData = List.from(_data);
-                      //               showSearchField = !showSearchField;
-                      //               searchClose = !searchClose;
-                      //             });
-                      //           },
-                      //           child: Text(
-                      //             "Cancel".tr(),
-                      //             style: const TextStyle(color: Colors.white),
-                      //           ),
-                      //         ),
-                      //       ],
-                      //     ),
-                      //   ),
-                      // ),
-                      // if (showSearchField) ...{
-                      //   const SizedBox(height: 20),
-                      // },
                       Expanded(
                         child: Scrollbar(
                             controller: _scrollController,
@@ -332,6 +244,8 @@ class _LivePageState extends State<LivePage>
                                         key: _kList,
                                         data: displayData!,
                                         searchClose: searchClose,
+                                        showSearchField:
+                                            searchindex == 0 ? true : false,
                                         onPressed: (M3uEntry entry) async {
                                           entry.addToHistory(refId!);
                                           await loadVideo(context, entry);
@@ -353,7 +267,9 @@ class _LivePageState extends State<LivePage>
                                       )
                                     : LiveCategoryPage(
                                         key: _catPage,
-                                        category: dropdownvalue,
+                                        category: label,
+                                        showSearchField:
+                                            searchindex == 0 ? true : false,
                                       )
                                 : ind == 1
                                     ? FavLiveTvPage(
@@ -447,3 +363,93 @@ class _LivePageState extends State<LivePage>
     );
   }
 }
+
+
+
+/// SEARCH BAR
+// AnimatedPadding(
+                      //   duration: const Duration(milliseconds: 400),
+                      //   padding: EdgeInsets.symmetric(
+                      //       horizontal: showSearchField ? 20 : 0),
+                      //   child: AnimatedContainer(
+                      //     duration: const Duration(
+                      //       milliseconds: 500,
+                      //     ),
+                      //     height: showSearchField ? 50 : 0,
+                      //     width: double.maxFinite,
+                      //     child: Row(
+                      //       children: [
+                      //         Expanded(
+                      //             child: Container(
+                      //           height: 50,
+                      //           padding:
+                      //               const EdgeInsets.symmetric(horizontal: 10),
+                      //           decoration: BoxDecoration(
+                      //               color: highlight,
+                      //               borderRadius: BorderRadius.circular(10),
+                      //               boxShadow: [
+                      //                 BoxShadow(
+                      //                   color:
+                      //                       highlight.darken().withOpacity(1),
+                      //                   offset: const Offset(2, 2),
+                      //                   blurRadius: 2,
+                      //                 )
+                      //               ]),
+                      //           child: Row(
+                      //             children: [
+                      //               SvgPicture.asset(
+                      //                 "assets/icons/search.svg",
+                      //                 height: 20,
+                      //                 width: 20,
+                      //                 color: white,
+                      //               ),
+                      //               const SizedBox(width: 10),
+                      //               Expanded(
+                      //                 child: AnimatedSwitcher(
+                      //                   duration:
+                      //                       const Duration(milliseconds: 300),
+                      //                   child: showSearchField
+                      //                       ? TextField(
+                      //                           onChanged: (text) {
+                      //                             if (_kList.currentState !=
+                      //                                 null) {
+                      //                               _kList.currentState!
+                      //                                   .search(text);
+                      //                             }
+                      //                             if (mounted) setState(() {});
+                      //                           },
+                      //                           cursorColor: orange,
+                      //                           controller: _search,
+                      //                           decoration: InputDecoration(
+                      //                             hintText: "Search".tr(),
+                      //                           ),
+                      //                         )
+                      //                       : Container(),
+                      //                 ),
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         )),
+                      //         const SizedBox(width: 10),
+                      //         GestureDetector(
+                      //           onTap: () {
+                      //             setState(() {
+                      //               _search.clear();
+                      //               print("SEARCH TEXT ${_search.text == ""}");
+                      //               displayData = List.from(_data);
+                      //               showSearchField = !showSearchField;
+                      //               searchClose = !searchClose;
+                      //             });
+                      //           },
+                      //           child: Text(
+                      //             "Cancel".tr(),
+                      //             style: const TextStyle(color: Colors.white),
+                      //           ),
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   ),
+                      // ),
+                      // if (showSearchField) ...{
+                      //   const SizedBox(height: 20),
+                      // },

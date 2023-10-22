@@ -85,6 +85,7 @@ dependencies:
   infinite_scroll_pagination: ^4.0.0
   cool_dropdown: ^2.1.0
   firebase_auth: ^4.10.1
+  flutter_isolate: ^2.0.4
 
 dev_dependencies:
   flutter_test:
