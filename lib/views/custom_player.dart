@@ -113,7 +113,7 @@ class _CustomPlayerState extends State<CustomPlayer> with ColorPalette {
         _chewieWidget = Chewie(
           controller: _chewieController,
         );
-        // if (mounted) setState(() {});
+        if (mounted) setState(() {});
       });
 
       // if (mounted) setState(() {});

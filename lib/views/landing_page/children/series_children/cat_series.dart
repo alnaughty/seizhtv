@@ -83,19 +83,18 @@ class SeriesCategoryPageState extends State<SeriesCategoryPage>
         final List<ClassifiedData> series = result.series
           ..sort((a, b) => a.name.compareTo(b.name));
 
-        final Iterable<ClassifiedData> data =
-            series.where((element) => element.name.contains(widget.category));
-
+        final Iterable<ClassifiedData> data = series.where(
+            (element) => element.name.contains(widget.category.trimRight()));
         print("${data.first.name}  ${data.first.data.classify().length}");
 
         return GridView.builder(
             shrinkWrap: true,
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: calculateCrossAxisCount(context),
                 childAspectRatio: .8,
-                mainAxisSpacing: 5,
-                crossAxisSpacing: 10),
+                crossAxisSpacing: 10,
+                mainAxisExtent: 150),
             itemCount: data.first.data.classify().length,
             itemBuilder: (context, i) {
               final ClassifiedData datas = data.first.data.classify()[i];
@@ -126,126 +125,139 @@ class SeriesCategoryPageState extends State<SeriesCategoryPage>
                     ),
                   );
                 },
-                child: Stack(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(top: 10, right: 10),
-                      child: LayoutBuilder(
-                        builder: (context, c) {
-                          final double w = c.maxWidth;
-                          return Tooltip(
-                            message: datas.name,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(5),
-                                  child: NetworkImageViewer(
-                                    url: datas.data[0].attributes['tvg-logo'],
-                                    width: w,
-                                    height: 53,
-                                    fit: BoxFit.cover,
-                                    color: highlight,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Tooltip(
-                                  message: datas.name,
-                                  child: Text(
-                                    datas.name,
-                                    style: const TextStyle(fontSize: 12),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Text("${datas.data.length} ",
-                                        style: const TextStyle(
-                                            fontSize: 12, color: Colors.grey)),
-                                    Text("Episodes".tr(),
-                                        style: const TextStyle(
-                                            fontSize: 12, color: Colors.grey)),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      child: SizedBox(
-                        height: 25,
-                        width: 25,
-                        child: FavoriteIconButton(
-                          onPressedCallback: (bool isFavorite) async {
-                            if (isFavorite) {
-                              showDialog(
-                                barrierDismissible: false,
-                                context: context,
-                                builder: (BuildContext context) {
-                                  Future.delayed(
-                                    const Duration(seconds: 5),
-                                    () {
-                                      Navigator.of(context).pop(true);
-                                    },
-                                  );
-                                  return Dialog(
-                                    alignment: Alignment.topCenter,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                  child: Stack(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(top: 10, right: 10),
+                        child: LayoutBuilder(
+                          builder: (context, c) {
+                            final double w = c.maxWidth;
+                            return Tooltip(
+                              message: datas.name,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(5),
+                                    child: NetworkImageViewer(
+                                      url: datas.data[0].attributes['tvg-logo'],
+                                      width: w,
+                                      height: 75,
+                                      fit: BoxFit.cover,
+                                      color: highlight,
                                     ),
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            "Added_to_Favorites".tr(),
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                          IconButton(
-                                            padding: const EdgeInsets.all(0),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                            icon: const Icon(
-                                              Icons.close_rounded,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Tooltip(
+                                    message: datas.name,
+                                    child: Text(
+                                      datas.name,
+                                      style: const TextStyle(fontSize: 12),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                  );
-                                },
-                              );
-                              for (M3uEntry m3u in datas.data) {
-                                await m3u.addToFavorites(refId!);
-                              }
-                            } else {
-                              for (M3uEntry m3u in datas.data) {
-                                await m3u.removeFromFavorites(refId!);
-                              }
-                            }
-                            await fetchFav();
+                                  ),
+                                  Row(
+                                    children: [
+                                      Text("${datas.data.length} ",
+                                          style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey)),
+                                      Text("Episodes".tr(),
+                                          style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey)),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            );
                           },
-                          initValue: isFavorite,
-                          iconSize: 20,
                         ),
                       ),
-                    )
-                  ],
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: SizedBox(
+                          height: 25,
+                          width: 25,
+                          child: FavoriteIconButton(
+                            onPressedCallback: (bool isFavorite) async {
+                              if (isFavorite) {
+                                showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    Future.delayed(
+                                      const Duration(seconds: 5),
+                                      () {
+                                        Navigator.of(context).pop(true);
+                                      },
+                                    );
+                                    return Dialog(
+                                      alignment: Alignment.topCenter,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 20),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "Added_to_Favorites".tr(),
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            IconButton(
+                                              padding: const EdgeInsets.all(0),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              icon: const Icon(
+                                                Icons.close_rounded,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                                for (M3uEntry m3u in datas.data) {
+                                  await m3u.addToFavorites(refId!);
+                                }
+                              } else {
+                                for (M3uEntry m3u in datas.data) {
+                                  await m3u.removeFromFavorites(refId!);
+                                }
+                              }
+                              await fetchFav();
+                            },
+                            initValue: isFavorite,
+                            iconSize: 20,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               );
             });
       },
     );
+  }
+
+  int calculateCrossAxisCount(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    int crossAxisCount =
+        (screenWidth / 150).floor(); // Calculate based on item width
+    return crossAxisCount < 3 ? 3 : crossAxisCount;
   }
 }

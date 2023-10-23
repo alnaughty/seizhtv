@@ -42,7 +42,6 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
   late int? chosenIndex = widget.data.data.length == 1 ? 0 : null;
   late ClassifiedData data;
   List<M3uEntry> seasons = [];
-  // late bool value = widget.data.data[chosenIndex!].existsInFavorites("movie");
 
   @override
   void initState() {
@@ -105,8 +104,7 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
           builder: (context, snapshot) {
             if (snapshot.hasData && !snapshot.hasError) {
               final TVSeriesDetails result = snapshot.data!;
-
-              print("RESULT: $result");
+              print("RESULT : $result");
 
               return Column(
                 children: [
@@ -123,7 +121,6 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                       ),
                       errorWidget: (context, url, error) => Image.asset(
                         "${widget.data.data[0].attributes['tvg-logo']}",
-                        // "assets/images/logo.png",
                         fit: BoxFit.fitHeight,
                       ),
                     ),
@@ -142,10 +139,9 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 22,
-                                  height: 1.1,
-                                ),
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 22,
+                                    height: 1.1),
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -154,14 +150,12 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                               height: 40,
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: Colors.white.withOpacity(.7),
-                                ),
+                                    color: Colors.white.withOpacity(.7)),
                                 borderRadius: BorderRadius.circular(5),
                               ),
                               child: MaterialButton(
                                 padding: EdgeInsets.zero,
                                 onPressed: () async {
-                                  Navigator.of(context).pop(null);
                                   if (!isFavorite) {
                                     showDialog(
                                       context: context,
@@ -175,16 +169,12 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                                         return Dialog(
                                           alignment: Alignment.topCenter,
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              10.0,
-                                            ),
-                                          ),
+                                              borderRadius:
+                                                  BorderRadius.circular(10.0)),
                                           child: Container(
                                             height: 50,
                                             padding: const EdgeInsets.symmetric(
-                                              vertical: 15,
-                                              horizontal: 20,
-                                            ),
+                                                vertical: 15, horizontal: 20),
                                             child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment
@@ -193,8 +183,7 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                                                 Text(
                                                   "Added_to_Favorites".tr(),
                                                   style: const TextStyle(
-                                                    fontSize: 16,
-                                                  ),
+                                                      fontSize: 16),
                                                 ),
                                                 IconButton(
                                                   padding:
@@ -203,8 +192,7 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                                                     Navigator.of(context).pop();
                                                   },
                                                   icon: const Icon(
-                                                    Icons.close_rounded,
-                                                  ),
+                                                      Icons.close_rounded),
                                                 ),
                                               ],
                                             ),
@@ -295,17 +283,13 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                         Text(
                           "Storyline".tr(),
                           style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                          ),
+                              fontSize: 18, fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(height: 10),
                         Text(
                           "${result.overview}",
                           style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                          ),
+                              fontSize: 14, fontWeight: FontWeight.w400),
                         ),
                         const SizedBox(height: 20),
                         SizedBox(
@@ -315,8 +299,7 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                               Container(
                                 decoration: const BoxDecoration(
                                   border: Border(
-                                    bottom: BorderSide(color: Colors.grey),
-                                  ),
+                                      bottom: BorderSide(color: Colors.grey)),
                                 ),
                                 child: DefaultTabController(
                                   length: 2,
@@ -350,8 +333,8 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                                   controller: _tabController,
                                   children: [
                                     EpisodePage(
-                                      data: data, seasonLength: seasons.length,
-                                      // widget.data,
+                                      data: data,
+                                      seasonLength: seasons.length,
                                     ),
                                     DetailsPage(
                                       id: result.id,
@@ -389,24 +372,12 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Text(
-                      //   widget.data.name,
-                      //   maxLines: 2,
-                      //   overflow: TextOverflow.ellipsis,
-                      //   style: const TextStyle(
-                      //     fontWeight: FontWeight.w500,
-                      //     fontSize: 22,
-                      //     height: 1.1,
-                      //   ),
-                      // ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
-                            // width: size.width * .5,
                             child: Text(
                               widget.data.name,
-                              // result.title,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -422,14 +393,12 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                             height: 40,
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: Colors.white.withOpacity(.7),
-                              ),
+                                  color: Colors.white.withOpacity(.7)),
                               borderRadius: BorderRadius.circular(5),
                             ),
                             child: MaterialButton(
                               padding: EdgeInsets.zero,
                               onPressed: () async {
-                                Navigator.of(context).pop(null);
                                 if (!isFavorite) {
                                   showDialog(
                                     context: context,
@@ -443,16 +412,13 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                                       return Dialog(
                                         alignment: Alignment.topCenter,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            10.0,
-                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
                                         ),
                                         child: Container(
                                           height: 50,
                                           padding: const EdgeInsets.symmetric(
-                                            vertical: 15,
-                                            horizontal: 20,
-                                          ),
+                                              vertical: 15, horizontal: 20),
                                           child: Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
@@ -460,8 +426,7 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                                               Text(
                                                 "Added_to_Favorites".tr(),
                                                 style: const TextStyle(
-                                                  fontSize: 16,
-                                                ),
+                                                    fontSize: 16),
                                               ),
                                               IconButton(
                                                 padding:
@@ -470,8 +435,7 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                                                   Navigator.of(context).pop();
                                                 },
                                                 icon: const Icon(
-                                                  Icons.close_rounded,
-                                                ),
+                                                    Icons.close_rounded),
                                               ),
                                             ],
                                           ),
@@ -509,16 +473,6 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                         ],
                       ),
                       const SizedBox(height: 30),
-                      // Text(
-                      //   "Storyline".tr(),
-                      //   style: const TextStyle(
-                      //     fontSize: 18,
-                      //     fontWeight: FontWeight.w500,
-                      //   ),
-                      // ),
-                      // const SizedBox(height: 10),
-                      // Text("No_data_available".tr()),
-                      // const SizedBox(height: 30),
                       SizedBox(
                         height: 550,
                         child: Column(
@@ -573,81 +527,6 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                                       ),
                                     ),
                                   )
-                                  // Column(
-                                  //   crossAxisAlignment:
-                                  //       CrossAxisAlignment.center,
-                                  //   children: [
-                                  //     const SizedBox(height: 20),
-                                  //     RichText(
-                                  //       text: TextSpan(
-                                  //         text: "Directors".tr(),
-                                  //         style: const TextStyle(
-                                  //           fontSize: 18,
-                                  //           fontWeight: FontWeight.w500,
-                                  //           fontFamily: "Poppins",
-                                  //         ),
-                                  //         children: const [
-                                  //           TextSpan(
-                                  //             text: " :",
-                                  //           ),
-                                  //         ],
-                                  //       ),
-                                  //     ),
-                                  //     const SizedBox(height: 20),
-                                  //     RichText(
-                                  //       text: TextSpan(
-                                  //         text: "Release_Date".tr(),
-                                  //         style: const TextStyle(
-                                  //           fontSize: 18,
-                                  //           fontWeight: FontWeight.w500,
-                                  //           fontFamily: "Poppins",
-                                  //         ),
-                                  //         children: const [
-                                  //           TextSpan(
-                                  //             text: " :",
-                                  //           ),
-                                  //         ],
-                                  //       ),
-                                  //     ),
-                                  //     const SizedBox(height: 20),
-                                  //     RichText(
-                                  //       text: TextSpan(
-                                  //         text: "Genre".tr(),
-                                  //         style: const TextStyle(
-                                  //           fontSize: 18,
-                                  //           fontWeight: FontWeight.w500,
-                                  //           fontFamily: "Poppins",
-                                  //         ),
-                                  //         children: const [
-                                  //           TextSpan(
-                                  //             text: " :",
-                                  //           ),
-                                  //         ],
-                                  //       ),
-                                  //     ),
-                                  //     const SizedBox(height: 20),
-                                  //     Text(
-                                  //       "Cast".tr(),
-                                  //       style: const TextStyle(
-                                  //         fontSize: 18,
-                                  //         fontWeight: FontWeight.w500,
-                                  //       ),
-                                  //     ),
-                                  //     const SizedBox(height: 10),
-                                  //     SizedBox(
-                                  //       height: 70,
-                                  //       child: Center(
-                                  //         child: Text(
-                                  //           "No_data_available".tr(),
-                                  //           style: const TextStyle(
-                                  //             fontSize: 16,
-                                  //             fontWeight: FontWeight.w500,
-                                  //           ),
-                                  //         ),
-                                  //       ),
-                                  //     )
-                                  //   ],
-                                  // )
                                 ],
                               ),
                             ),

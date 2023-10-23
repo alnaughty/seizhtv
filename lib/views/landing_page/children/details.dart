@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:seizhtv/globals/ui_additional.dart';
-import 'package:seizhtv/models/createdby.dart';
 import 'package:seizhtv/models/movie_details.dart';
 import 'package:seizhtv/viewmodel/cast_vm.dart';
 import '../../../globals/network.dart';
@@ -63,14 +62,12 @@ class _DetailsPageState extends State<DetailsPage>
                   text: TextSpan(
                     text: "Directors".tr(),
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 17,
                       fontWeight: FontWeight.w500,
                       fontFamily: "Poppins",
                     ),
                     children: const [
-                      TextSpan(
-                        text: " :",
-                      ),
+                      TextSpan(text: " :"),
                     ],
                   ),
                 ),
@@ -78,26 +75,15 @@ class _DetailsPageState extends State<DetailsPage>
                 Expanded(
                   child: SizedBox(
                     width: double.infinity,
-                    child: widget.movie != null
-                        ? const Text("")
-                        : ListView.separated(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemBuilder: (_, x) {
-                              final List<CreatedbyModel> creator =
-                                  widget.series!.createdby!;
-
-                              return Text(
-                                creator[x].name,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              );
-                            },
-                            separatorBuilder: (c, i) => const SizedBox(),
-                            itemCount: widget.series!.createdby!.length,
-                          ),
+                    child: Text(
+                      widget.movie != null
+                          ? ""
+                          : widget.series!.createdby!
+                              .map((it) => it.name)
+                              .join(' / '),
+                      style: const TextStyle(
+                          fontSize: 17, fontWeight: FontWeight.w500),
+                    ),
                   ),
                 ),
               ],
@@ -109,14 +95,12 @@ class _DetailsPageState extends State<DetailsPage>
                   text: TextSpan(
                     text: "Release_Date".tr(),
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 17,
                       fontWeight: FontWeight.w500,
                       fontFamily: "Poppins",
                     ),
                     children: const [
-                      TextSpan(
-                        text: " :",
-                      ),
+                      TextSpan(text: " :"),
                     ],
                   ),
                 ),
@@ -127,7 +111,7 @@ class _DetailsPageState extends State<DetailsPage>
                         ? widget.movie!.date!
                         : widget.series!.date!),
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 17,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -141,14 +125,12 @@ class _DetailsPageState extends State<DetailsPage>
                   text: TextSpan(
                     text: "Genre".tr(),
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 17,
                       fontWeight: FontWeight.w500,
                       fontFamily: "Poppins",
                     ),
                     children: const [
-                      TextSpan(
-                        text: " :",
-                      ),
+                      TextSpan(text: " :"),
                     ],
                   ),
                 ),
@@ -165,30 +147,8 @@ class _DetailsPageState extends State<DetailsPage>
                               .map((it) => it.name)
                               .join(' / '),
                       style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.w500),
+                          fontSize: 17, fontWeight: FontWeight.w500),
                     ),
-
-                    //  ListView.separated(
-                    //   shrinkWrap: true,
-                    //   physics: const NeverScrollableScrollPhysics(),
-                    //   itemBuilder: (_, x) {
-                    //     final List<Genre> genre = widget.movie == null
-                    //         ? widget.series!.genres!
-                    //         : widget.movie!.genres!;
-
-                    //     return Text(
-                    //       genre[x].name,
-                    // style: const TextStyle(
-                    //   fontSize: 18,
-                    //   fontWeight: FontWeight.w500,
-                    // ),
-                    //     );
-                    //   },
-                    //   separatorBuilder: (context, index) => const SizedBox(),
-                    //   itemCount: widget.movie == null
-                    //       ? widget.series!.genres!.length
-                    //       : widget.movie!.genres!.length,
-                    // ),
                   ),
                 ),
               ],
@@ -197,7 +157,7 @@ class _DetailsPageState extends State<DetailsPage>
             Text(
               "Cast".tr(),
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 17,
                 fontWeight: FontWeight.w500,
               ),
             ),
