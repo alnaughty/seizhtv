@@ -30,13 +30,10 @@ class MoviePage extends StatefulWidget {
 class _MoviePageState extends State<MoviePage>
     with ColorPalette, UIAdditional, VideoLoader, MovieAPI {
   static final ZM3UHandler _handler = ZM3UHandler.instance;
-  late final StreamSubscription<CategorizedM3UData> _streamer;
   final LoadedM3uData _vm = LoadedM3uData.instance;
-  late final List<M3uEntry> _data;
   late final ScrollController _scrollController;
   final Favorites _vm1 = Favorites.instance;
   final History _hisvm = History.instance;
-  late final TextEditingController _search;
   late List<ClassifiedData> _favdata;
   late List<ClassifiedData> _hisdata;
   late List<M3uEntry> favData = [];
@@ -57,21 +54,17 @@ class _MoviePageState extends State<MoviePage>
   initStream() {
     _vm.stream.listen((event) {
       displayData = List.from(event.movies);
-      for (final ClassifiedData item in displayData!) {
+      for (final ClassifiedData item in event.movies) {
         late final List<M3uEntry> data = item.data;
         movieData.addAll(List.from(data));
       }
-      // List<String> name = List.from(displayData!.map((e) => e.name))
-      //   ..sort((a, b) => a.compareTo(b));
-      // categoryName = ["All (${movieData == null ? "" : movieData.length})"];
-      // for (final String cname in name) {
-      //   categoryName!.add(cname);
-      // }
-      categoryName = ["ALL (${movieData == null ? "" : movieData.length})"];
+
+      categoryName = ["All (${movieData == null ? "" : movieData.length})"];
       for (final ClassifiedData cdata in displayData!) {
         categoryName!.add("${cdata.name} (${cdata.data.length})");
       }
       categoryName!.sort((a, b) => a.compareTo(b));
+      movieData.sort((a, b) => a.title.compareTo(b.title));
       if (mounted) setState(() {});
     });
   }
@@ -112,21 +105,20 @@ class _MoviePageState extends State<MoviePage>
 
   @override
   void initState() {
-    super.initState();
     _scrollController = ScrollController();
-    _search = TextEditingController();
     fetchFav();
     fetchHis();
     initFavStream();
     initHisStream();
     initStream();
-    label = "All (${movieData == null ? "" : movieData.length})";
+    super.initState();
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
-    _search.dispose();
+    favData = [];
+    hisData = [];
     super.dispose();
   }
 
@@ -187,77 +179,64 @@ class _MoviePageState extends State<MoviePage>
                 : Column(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: UIAdditional().filterChip(
-                          chipsLabel: [
-                            "${"favorites".tr()} (${favData.length})",
-                            "Series History (${hisData.length})",
-                          ],
-                          onPressed: (index, name) {
-                            setState(() {
-                              ind = index + 1;
-                              selected = false;
-                              selectedAgain = false;
-                              print("INDEXXXXX $ind");
-                            });
-                          },
-                          si: ind,
-                          selected: selected,
-                          filterButton: Container(
-                            width: 150,
-                            height: 40,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(30)),
-                            child:
-                                // selectedAgain == false
-                                //     ? Row(
-                                //         mainAxisAlignment:
-                                //             MainAxisAlignment.spaceBetween,
-                                //         children: [
-                                //           Text(label,
-                                //               style: const TextStyle(
-                                //                   fontSize: 14,
-                                //                   fontFamily: "Poppins")),
-                                //           const Icon(
-                                //               Icons.arrow_drop_down_outlined),
-                                //         ],
-                                //       )
-                                //     :
-                                DropdownButton(
-                              elevation: 0,
-                              isExpanded: true,
-                              padding: const EdgeInsets.all(0),
-                              underline: Container(),
-                              onTap: () {
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: UIAdditional().filterChip(
+                              chipsLabel: [
+                                // "All (${displayData == null ? "0" : seriesData.length})",
+                                "${"favorites".tr()} (${favData.length})",
+                                "Series History (${hisData.length})",
+                              ],
+                              onPressed: (index, name) {
                                 setState(() {
-                                  selected = true;
-                                  ind = 0;
+                                  ind = index + 1;
+                                  selected = false;
+                                  selectedAgain = false;
+                                  print("INDEXXXXX $ind");
+                                  print("DROPDOWNNNN $dropdownvalue");
                                 });
                               },
-                              items: categoryName!.map((value) {
-                                return DropdownMenuItem(
-                                    value: value, child: Text(value));
-                              }).toList(),
-                              value: dropdownvalue == ""
-                                  ? categoryName == []
-                                      ? ""
-                                      : categoryName![0]
-                                  : dropdownvalue,
-                              style: const TextStyle(
-                                  fontSize: 14, fontFamily: "Poppins"),
-                              icon: const Icon(Icons.arrow_drop_down_outlined),
-                              onChanged: (value) {
-                                setState(() {
-                                  dropdownvalue = value!;
-                                  String result1 = dropdownvalue.replaceAll(
-                                      RegExp(r"[(]+[0-9]+[)]"), '');
-                                  label = result1;
-                                });
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
+                              si: ind,
+                              selected: selected,
+                              filterButton: Container(
+                                width: 150,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: DropdownButton(
+                                  elevation: 0,
+                                  isExpanded: true,
+                                  padding: const EdgeInsets.all(0),
+                                  underline: Container(),
+                                  onTap: () {
+                                    setState(() {
+                                      selected = true;
+                                      ind = 0;
+                                    });
+                                  },
+                                  items: categoryName!.map((value) {
+                                    return DropdownMenuItem(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList(),
+                                  value: dropdownvalue == ""
+                                      ? categoryName == []
+                                          ? ""
+                                          : categoryName![0]
+                                      : dropdownvalue,
+                                  style: const TextStyle(
+                                      fontSize: 14, fontFamily: "Poppins"),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      dropdownvalue = value!;
+                                      String result1 = dropdownvalue.replaceAll(
+                                          RegExp(r"[(]+[0-9]+[)]"), '');
+                                      label = result1;
+                                    });
+                                  },
+                                ),
+                              ))),
                       const SizedBox(height: 10),
                       Expanded(
                         child: Scrollbar(

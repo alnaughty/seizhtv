@@ -57,17 +57,6 @@ class MovieListPageState extends State<MovieListPage>
     });
   }
 
-  // fetchFav() async {
-  //   await _handler
-  //       .getDataFrom(type: CollectionType.favorites, refId: refId!)
-  //       .then((value) {
-  //     if (value != null) {
-  //       _vm.populate(value);
-  //       print("FAVV VALUEEEE: $value");
-  //     }
-  //   });
-  // }
-
   @override
   void initState() {
     searchData = widget.data;
@@ -289,7 +278,7 @@ class MovieListPageState extends State<MovieListPage>
                                                   ),
                                                   child: Container(
                                                     padding: const EdgeInsets
-                                                            .symmetric(
+                                                        .symmetric(
                                                         horizontal: 20),
                                                     child: Row(
                                                       mainAxisAlignment:
@@ -427,7 +416,7 @@ class MovieListPageState extends State<MovieListPage>
                                                       Container(
                                                         padding:
                                                             const EdgeInsets
-                                                                    .symmetric(
+                                                                .symmetric(
                                                                 horizontal: 5),
                                                         decoration:
                                                             BoxDecoration(
@@ -611,7 +600,7 @@ class MovieListPageState extends State<MovieListPage>
                                                     ),
                                                     child: Container(
                                                       padding: const EdgeInsets
-                                                              .symmetric(
+                                                          .symmetric(
                                                           horizontal: 20),
                                                       child: Row(
                                                         mainAxisAlignment:
