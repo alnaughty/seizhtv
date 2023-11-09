@@ -793,3 +793,298 @@ class _Movie1PageState extends State<Movie1Page>
 
 
           
+/////// MEDYO FIX HAHAHHAHHA
+ 
+
+/// SEARCH BAR
+// SizedBox(
+//   child: AnimatedPadding(
+//     duration: const Duration(milliseconds: 10),
+//     padding: EdgeInsets.symmetric(
+//         horizontal: showSearchField ? 20 : 0),
+//     child: AnimatedContainer(
+//       duration: const Duration(milliseconds: 10),
+//       height: showSearchField ? size.height * .08 : 0,
+//       width: double.maxFinite,
+//       child: Row(
+//         children: [
+//           Expanded(
+//               child: Container(
+//             height: 50,
+//             padding: const EdgeInsets.symmetric(
+//                 horizontal: 10),
+//             decoration: BoxDecoration(
+//                 color: highlight,
+//                 borderRadius: BorderRadius.circular(10),
+//                 boxShadow: [
+//                   BoxShadow(
+//                       color: highlight
+//                           .darken()
+//                           .withOpacity(1),
+//                       offset: const Offset(2, 2),
+//                       blurRadius: 2)
+//                 ]),
+//             child: Row(
+//               children: [
+//                 SvgPicture.asset(
+//                   "assets/icons/search.svg",
+//                   height: 20,
+//                   width: 20,
+//                   color: white,
+//                 ),
+//                 const SizedBox(width: 10),
+//                 Expanded(
+//                   child: AnimatedSwitcher(
+//                     duration:
+//                         const Duration(milliseconds: 300),
+//                     child: showSearchField
+//                         ? TextField(
+//                             onChanged: (text) {
+//                               if (text.isEmpty) {
+//                                 searchData = movieData;
+//                               } else {
+//                                 searchData = List.from(
+//                                     movieData.where(
+//                                         (element) => element
+//                                             .title
+//                                             .toLowerCase()
+//                                             .contains(text
+//                                                 .toLowerCase())));
+//                               }
+//                               searchData!.sort((a, b) => a
+//                                   .title
+//                                   .compareTo(b.title));
+//                               if (mounted) {
+//                                 setState(() {});
+//                               }
+//                             },
+//                             cursorColor: orange,
+//                             controller: _search,
+//                             decoration: InputDecoration(
+//                               hintText:
+//                                   "Search $ind".tr(),
+//                             ),
+//                           )
+//                         : Container(),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           )),
+//           const SizedBox(width: 10),
+//           GestureDetector(
+//             onTap: () {
+//               setState(() {
+//                 _search.clear();
+//                 searchData = movieData;
+//                 showSearchField = !showSearchField;
+//               });
+//             },
+//             child: Text(
+//               "Cancel".tr(),
+//               style: const TextStyle(color: Colors.white),
+//             ),
+//           ),
+//         ],
+//       ),
+//     ),
+//   ),
+// ),
+// if (showSearchField) ...{
+//   const SizedBox(height: 15),
+// },
+
+// ? showSearchField
+//           ? searchData!.isEmpty
+//               ? Center(
+//                   child: Text(
+//                     "No Result Found for `${_search.text}`",
+//                     style: TextStyle(
+//                       color: Colors.white
+//                           .withOpacity(.5),
+//                     ),
+//                   ),
+//                 )
+//                   : GridView.builder(
+//                       shrinkWrap: true,
+//                       controller: _scrollController,
+//                       padding: const EdgeInsets.symmetric(
+//                           horizontal: 20),
+//                       gridDelegate:
+//                           const SliverGridDelegateWithFixedCrossAxisCount(
+//                               crossAxisCount: 3,
+//                               mainAxisExtent: 155),
+//                       itemCount: searchData!.length,
+//                       itemBuilder: (context, i) {
+//                         final M3uEntry d = searchData![i];
+
+//                         return GestureDetector(
+//                           onTap: () async {
+//                             String result1 = d.title
+//                                 .replaceAll(
+//                                     RegExp(
+//                                         r"[(]+[a-zA-Z]+[)]|[|]\s+[0-9]+\s[|]"),
+//                                     '');
+//                             String result2 =
+//                                 result1.replaceAll(
+//                                     RegExp(
+//                                         r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|] "),
+//                                     '');
+
+//                             print("$d");
+
+//                             Navigator.push(
+//                               context,
+//                               PageTransition(
+//                                 child: MovieDetailsPage(
+//                                   data: d,
+//                                   title: result2,
+//                                 ),
+//                                 type: PageTransitionType
+//                                     .rightToLeft,
+//                               ),
+//                             );
+//                           },
+//                           child: Container(
+//                             margin: const EdgeInsets
+//                                     .symmetric(
+//                                 horizontal: 1.5),
+//                             child: Stack(
+//                               children: [
+//                                 Container(
+//                                   margin: const EdgeInsets
+//                                           .only(
+//                                       top: 10, right: 10),
+//                                   child: LayoutBuilder(
+//                                     builder:
+//                                         (context, c) {
+//                                       final double w =
+//                                           c.maxWidth;
+//                                       return Tooltip(
+//                                         message: d.title,
+//                                         child: Column(
+//                                           crossAxisAlignment:
+//                                               CrossAxisAlignment
+//                                                   .start,
+//                                           children: [
+//                                             NetworkImageViewer(
+//                                               url: d.attributes[
+//                                                   'tvg-logo'],
+//                                               width: w,
+//                                               height: 90,
+//                                               fit: BoxFit
+//                                                   .cover,
+//                                               color:
+//                                                   highlight,
+//                                             ),
+//                                             const SizedBox(
+//                                                 height:
+//                                                     3),
+//                                             Tooltip(
+//                                               message:
+//                                                   d.title,
+//                                               child: Text(
+//                                                 d.title,
+//                                                 style: const TextStyle(
+//                                                     fontSize:
+//                                                         12),
+//                                                 maxLines:
+//                                                     2,
+//                                                 overflow:
+//                                                     TextOverflow
+//                                                         .ellipsis,
+//                                               ),
+//                                             ),
+//                                           ],
+//                                         ),
+//                                       );
+//                                     },
+//                                   ),
+//                                 ),
+//                                 Positioned(
+//                                   top: 0,
+//                                   right: 0,
+//                                   child: SizedBox(
+//                                     height: 25,
+//                                     width: 25,
+//                                     child:
+//                                         FavoriteIconButton(
+//                                       onPressedCallback:
+//                                           (bool f) async {
+//                                         if (f) {
+//                                           showDialog(
+//                                             barrierDismissible:
+//                                                 false,
+//                                             context:
+//                                                 context,
+//                                             builder:
+//                                                 (BuildContext
+//                                                     context) {
+//                                               Future.delayed(
+//                                                   const Duration(
+//                                                       seconds:
+//                                                           3),
+//                                                   () {
+//                                                 Navigator.of(
+//                                                         context)
+//                                                     .pop(
+//                                                         true);
+//                                               });
+//                                               return Dialog(
+//                                                 alignment:
+//                                                     Alignment
+//                                                         .topCenter,
+//                                                 shape:
+//                                                     RoundedRectangleBorder(
+//                                                   borderRadius:
+//                                                       BorderRadius.circular(10),
+//                                                 ),
+//                                                 child:
+//                                                     Container(
+//                                                   padding:
+//                                                       const EdgeInsets.symmetric(horizontal: 20),
+//                                                   child:
+//                                                       Row(
+//                                                     mainAxisAlignment:
+//                                                         MainAxisAlignment.spaceBetween,
+//                                                     children: [
+//                                                       Text(
+//                                                         "Added_to_Favorites".tr(),
+//                                                         style: const TextStyle(fontSize: 16),
+//                                                       ),
+//                                                       IconButton(
+//                                                         padding: const EdgeInsets.all(0),
+//                                                         onPressed: () {
+//                                                           Navigator.of(context).pop();
+//                                                         },
+//                                                         icon: const Icon(Icons.close_rounded),
+//                                                       ),
+//                                                     ],
+//                                                   ),
+//                                                 ),
+//                                               );
+//                                             },
+//                                           );
+//                                           await d
+//                                               .addToFavorites(
+//                                                   refId!);
+//                                         } else {
+//                                           await d
+//                                               .removeFromFavorites(
+//                                                   refId!);
+//                                         }
+//                                         await fetchFav();
+//                                       },
+//                                       initValue: d
+//                                           .existsInFavorites(
+//                                               "movie"),
+//                                       iconSize: 20,
+//                                     ),
+//                                   ),
+//                                 )
+//                               ],
+//                             ),
+//                           ),
+//                         );
+//                       },
+//                     )  :

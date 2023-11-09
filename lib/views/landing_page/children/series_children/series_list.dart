@@ -1,4 +1,6 @@
 // ignore_for_file: must_be_immutable
+import 'dart:isolate';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -48,6 +50,7 @@ class SeriesListPageState extends State<SeriesListPage>
   List<ClassifiedData> favData = [];
   late final TextEditingController _search = TextEditingController();
   List<ClassifiedData>? searchData;
+  final ReceivePort receivePort = ReceivePort();
 
   fetchFav() async {
     await _handler
@@ -588,8 +591,6 @@ class SeriesListPageState extends State<SeriesListPage>
                                         RegExp(
                                             r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|] "),
                                         '');
-
-                                    debugPrint("DATA: ${_displayData[i]}");
                                     // await showModalBottomSheet(
                                     //   context: context,
                                     //   isDismissible: true,
@@ -811,4 +812,18 @@ class SeriesListPageState extends State<SeriesListPage>
       });
     }
   }
+
+  //  useIsolate() async {
+  //   final ReceivePort receivePort = ReceivePort();
+  //   try {
+  //     await Isolate.spawn(
+  //         runHeavyTaskIWithIsolate, [receivePort.sendPort, 4000000000]);
+  //   } on Object {
+  //     debugPrint('Isolate Failed');
+  //     receivePort.close();
+  //   }
+  //   final response = await receivePort.first;
+
+  //   print('Result: $response');
+  // }
 }

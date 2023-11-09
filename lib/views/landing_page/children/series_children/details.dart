@@ -104,7 +104,6 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
           builder: (context, snapshot) {
             if (snapshot.hasData && !snapshot.hasError) {
               final TVSeriesDetails result = snapshot.data!;
-              print("RESULT : $result");
 
               return Column(
                 children: [
@@ -214,16 +213,24 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                                 elevation: 0,
                                 height: 40,
                                 child: Center(
-                                  child: Text(
-                                    isFavorite
-                                        ? "Remove_from_favorites".tr()
-                                        : "Add_to_favorites".tr(),
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: Colors.white.withOpacity(.7),
-                                    ),
-                                  ),
+                                  child: !isFavorite
+                                      ? Text(
+                                          "Add_to_favorites".tr(),
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: Colors.white.withOpacity(.7),
+                                          ),
+                                        )
+                                      : Text(
+                                          "Favorites".tr(),
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w800,
+                                            color: Colors.white.withOpacity(.7),
+                                          ),
+                                        ),
                                 ),
                               ),
                             )
@@ -457,16 +464,24 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                               elevation: 0,
                               height: 40,
                               child: Center(
-                                child: Text(
-                                  isFavorite
-                                      ? "Remove_from_favorites".tr()
-                                      : "Add_to_favorites".tr(),
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: Colors.white.withOpacity(.7),
-                                  ),
-                                ),
+                                child: !isFavorite
+                                    ? Text(
+                                        "Add_to_favorites".tr(),
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.white.withOpacity(.7),
+                                        ),
+                                      )
+                                    : Text(
+                                        "Favorites".tr(),
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w800,
+                                          color: Colors.white.withOpacity(.7),
+                                        ),
+                                      ),
                               ),
                             ),
                           )
