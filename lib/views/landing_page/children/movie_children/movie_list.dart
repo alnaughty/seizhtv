@@ -7,6 +7,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:seizhtv/extensions/color.dart';
 import 'package:seizhtv/extensions/m3u_entry.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
+import '../../../../data_containers/favorites.dart';
 import '../../../../data_containers/loaded_m3u_data.dart';
 import '../../../../globals/data.dart';
 import '../../../../globals/favorite_button.dart';
@@ -41,7 +42,7 @@ class MovieListPageState extends State<MovieListPage>
       TopRatedMovieViewModel.instance;
   static final MovieVideoViewModel _videoViewModel =
       MovieVideoViewModel.instance;
-  final LoadedM3uData _vm = LoadedM3uData.instance;
+  static final Favorites _vm = Favorites.instance;
   static final ZM3UHandler _handler = ZM3UHandler.instance;
   late final TextEditingController _search = TextEditingController();
   List<M3uEntry>? searchData;
@@ -277,7 +278,7 @@ class MovieListPageState extends State<MovieListPage>
                                                   ),
                                                   child: Container(
                                                     padding: const EdgeInsets
-                                                            .symmetric(
+                                                        .symmetric(
                                                         horizontal: 20),
                                                     child: Row(
                                                       mainAxisAlignment:
@@ -415,7 +416,7 @@ class MovieListPageState extends State<MovieListPage>
                                                       Container(
                                                         padding:
                                                             const EdgeInsets
-                                                                    .symmetric(
+                                                                .symmetric(
                                                                 horizontal: 5),
                                                         decoration:
                                                             BoxDecoration(
@@ -599,7 +600,7 @@ class MovieListPageState extends State<MovieListPage>
                                                     ),
                                                     child: Container(
                                                       padding: const EdgeInsets
-                                                              .symmetric(
+                                                          .symmetric(
                                                           horizontal: 20),
                                                       child: Row(
                                                         mainAxisAlignment:

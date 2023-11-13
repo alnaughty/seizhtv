@@ -84,7 +84,7 @@ class UIAdditional {
                           ),
                         ),
                       ),
-                      selected: si == null ? false : index == si,
+                      selected: si == null ? false : index == si - 1,
                       selectedColor: ColorPalette().topColor,
                       disabledColor: ColorPalette().highlight,
                     ));

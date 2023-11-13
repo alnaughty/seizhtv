@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use, avoid_print
 
 import 'dart:async';
+import 'dart:isolate';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,8 +47,11 @@ class _LivePageState extends State<LivePage>
   bool searchClose = true;
   late List<String>? categoryName = [];
   String dropdownvalue = "";
-  int ind = 0;
+  int? ind = 0;
   String label = "";
+  bool selectedAgain = false;
+  bool selected = true;
+  String categorylabel = "";
   int? searchindex;
 
   initStream() {
@@ -182,21 +186,23 @@ class _LivePageState extends State<LivePage>
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
-                        height: 50,
                         child: UIAdditional().filterChip(
                           chipsLabel: [
-                            "All (${displayData == null ? "" : displayData!.length})",
+                            // "All (${displayData == null ? "" : displayData!.length})",
                             "${"favorites".tr()} (${favData.length})",
                             "${"Channels_History".tr()} (${hisData.length})",
                           ],
                           onPressed: (index, name) {
                             setState(() {
-                              ind = index;
-                              label = name!;
+                              ind = index + 1;
+                              selected = false;
+                              selectedAgain = false;
+                              print("INDEXXXXX $ind");
+                              print("DROPDOWNNNN $dropdownvalue");
                             });
                           },
                           si: ind,
-                          selected: true,
+                          selected: selected,
                           filterButton: Container(
                             width: 150,
                             height: 40,
@@ -209,7 +215,10 @@ class _LivePageState extends State<LivePage>
                               padding: const EdgeInsets.all(0),
                               underline: Container(),
                               onTap: () {
-                                ind = 0;
+                                setState(() {
+                                  selected = true;
+                                  ind = 0;
+                                });
                               },
                               items: categoryName!.map((value) {
                                 return DropdownMenuItem(
@@ -227,7 +236,8 @@ class _LivePageState extends State<LivePage>
                                   dropdownvalue = value!;
                                   String result1 = dropdownvalue.replaceAll(
                                       RegExp(r"[(]+[0-9]+[)]"), '');
-                                  label = result1;
+                                  categorylabel = result1;
+                                  print("DROPDOWNNNN $dropdownvalue");
                                 });
                               },
                             ),
@@ -239,7 +249,8 @@ class _LivePageState extends State<LivePage>
                         child: Scrollbar(
                             controller: _scrollController,
                             child: ind == 0
-                                ? dropdownvalue.contains("All")
+                                ? dropdownvalue.contains("ALL") ||
+                                        dropdownvalue == ""
                                     ? LiveList(
                                         key: _kList,
                                         data: displayData!,
@@ -249,25 +260,11 @@ class _LivePageState extends State<LivePage>
                                         onPressed: (M3uEntry entry) async {
                                           entry.addToHistory(refId!);
                                           await loadVideo(context, entry);
-                                          // return showModalBottomSheet(
-                                          //   context: context,
-                                          //   isDismissible: true,
-                                          //   backgroundColor: Colors.transparent,
-                                          //   isScrollControlled: true,
-                                          //   builder: (_) => LiveDetails(
-                                          //     onLoadVideo: () async {
-                                          //       Navigator.of(context).pop(null);
-                                          //       await loadVideo(context, entry);
-                                          //       await entry.addToHistory(refId!);
-                                          //     },
-                                          //     entry: entry,
-                                          //   ),
-                                          // );
                                         },
                                       )
                                     : LiveCategoryPage(
                                         key: _catPage,
-                                        category: label,
+                                        category: categorylabel,
                                         showSearchField:
                                             searchindex == 0 ? true : false,
                                       )
@@ -298,6 +295,28 @@ class _LivePageState extends State<LivePage>
             update == true ? loader() : Container()
           ],
         ),
+      ),
+    );
+  }
+}
+
+
+                                          // return showModalBottomSheet(
+                                          //   context: context,
+                                          //   isDismissible: true,
+                                          //   backgroundColor: Colors.transparent,
+                                          //   isScrollControlled: true,
+                                          //   builder: (_) => LiveDetails(
+                                          //     onLoadVideo: () async {
+                                          //       Navigator.of(context).pop(null);
+                                          //       await loadVideo(context, entry);
+                                          //       await entry.addToHistory(refId!);
+                                          //     },
+                                          //     entry: entry,
+                                          //   ),
+                                          // );
+
+
         // body: Column(
         //   children: [
 
@@ -359,10 +378,6 @@ class _LivePageState extends State<LivePage>
         //     ),
         //   ],
         // ),
-      ),
-    );
-  }
-}
 
 
 

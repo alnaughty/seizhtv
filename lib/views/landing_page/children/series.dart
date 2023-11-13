@@ -47,6 +47,8 @@ class _SeriesPageState extends State<SeriesPage>
   String label = "";
   int ind = 0;
   int? searchindex;
+  bool selectedAgain = false;
+  bool selected = true;
 
   fetchFav() async {
     await _handler
@@ -178,18 +180,21 @@ class _SeriesPageState extends State<SeriesPage>
                         height: 50,
                         child: UIAdditional().filterChip(
                             chipsLabel: [
-                              "All (${displayData == null ? "0" : seriesData.length})",
+                              // "All (${displayData == null ? "0" : seriesData.length})",
                               "${"favorites".tr()} (${favData.length})",
                               "Series History (${hisData.length})",
                             ],
                             onPressed: (index, name) {
                               setState(() {
-                                print("$index - $name");
-                                ind = index;
+                                ind = index + 1;
+                                selected = false;
+                                selectedAgain = false;
+                                print("INDEXXXXX $ind");
+                                print("DROPDOWNNNN $dropdownvalue");
                               });
                             },
                             si: ind,
-                            selected: true,
+                            selected: selected,
                             filterButton: Container(
                               width: 150,
                               height: 40,
@@ -202,8 +207,10 @@ class _SeriesPageState extends State<SeriesPage>
                                 padding: const EdgeInsets.all(0),
                                 underline: Container(),
                                 onTap: () {
-                                  print("All");
-                                  ind = 0;
+                                  setState(() {
+                                    selected = true;
+                                    ind = 0;
+                                  });
                                 },
                                 items: categoryName!.map((value) {
                                   return DropdownMenuItem(

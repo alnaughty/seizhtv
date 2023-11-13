@@ -53,51 +53,6 @@ class LiveListState extends State<LiveList> with ColorPalette, UIAdditional {
     super.initState();
   }
 
-  // String searchText = "";
-
-  // void search(String text) {
-  //   try {
-  //     print("TEXT SEARCH IN LIVE: $text");
-  //     searchText = text;
-  //     endIndex = widget.data.length < 30 ? widget.data.length : 30;
-  //     if (text.isEmpty) {
-  //       _displayData = List.from(widget.data.unique());
-  //       // .sublist(startIndex,
-  //       //     endIndex < widget.data.length ? endIndex : widget.data.length));
-  //     } else {
-  //       text.isEmpty
-  //           ? _displayData = List.from(widget.data.unique())
-  //           : _displayData = List.from(widget.data
-  //                   .unique()
-  //                   .where(
-  //                     (element) => element.title.toLowerCase().contains(
-  //                           text.toLowerCase(),
-  //                         ),
-  //                   )
-  //                   .toList()
-  //               // .sublist(
-  //               //     startIndex,
-  //               //     endIndex > widget.data.length
-  //               //         ? widget.data.length
-  //               //         : endIndex),
-  //               );
-  //     }
-  //     _displayData.sort((a, b) => a.title.compareTo(b.title));
-
-  //     print("DISPLAY DATA LENGHT: ${_displayData.length}");
-  //     if (mounted) setState(() {});
-  //   } on RangeError {
-  //     _displayData = [];
-  //     if (mounted) setState(() {});
-  //   }
-  // }
-
-  // final int startIndex = 0;
-  // late int endIndex = widget.data.length;
-  // //  < 30 ? widget.data.length : 30;
-  // late List<M3uEntry> _displayData =
-  //     List.from(widget.data.sublist(startIndex, endIndex));
-
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -348,6 +303,13 @@ class LiveListState extends State<LiveList> with ColorPalette, UIAdditional {
     );
   }
 
+  int calculateCrossAxisCount(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    int crossAxisCount =
+        (screenWidth / 150).floor(); // Calculate based on item width
+    return crossAxisCount < 3 ? 3 : crossAxisCount;
+  }
+
   // void _scrollListener() {
   //   if (widget.controller.offset >=
   //       widget.controller.position.maxScrollExtent) {
@@ -370,11 +332,52 @@ class LiveListState extends State<LiveList> with ColorPalette, UIAdditional {
   //     return;
   //   }
   // }
-
-  int calculateCrossAxisCount(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    int crossAxisCount =
-        (screenWidth / 150).floor(); // Calculate based on item width
-    return crossAxisCount < 3 ? 3 : crossAxisCount;
-  }
 }
+
+
+
+  // String searchText = "";
+
+  // void search(String text) {
+  //   try {
+  //     print("TEXT SEARCH IN LIVE: $text");
+  //     searchText = text;
+  //     endIndex = widget.data.length < 30 ? widget.data.length : 30;
+  //     if (text.isEmpty) {
+  //       _displayData = List.from(widget.data.unique());
+  //       // .sublist(startIndex,
+  //       //     endIndex < widget.data.length ? endIndex : widget.data.length));
+  //     } else {
+  //       text.isEmpty
+  //           ? _displayData = List.from(widget.data.unique())
+  //           : _displayData = List.from(widget.data
+  //                   .unique()
+  //                   .where(
+  //                     (element) => element.title.toLowerCase().contains(
+  //                           text.toLowerCase(),
+  //                         ),
+  //                   )
+  //                   .toList()
+  //               // .sublist(
+  //               //     startIndex,
+  //               //     endIndex > widget.data.length
+  //               //         ? widget.data.length
+  //               //         : endIndex),
+  //               );
+  //     }
+  //     _displayData.sort((a, b) => a.title.compareTo(b.title));
+
+  //     print("DISPLAY DATA LENGHT: ${_displayData.length}");
+  //     if (mounted) setState(() {});
+  //   } on RangeError {
+  //     _displayData = [];
+  //     if (mounted) setState(() {});
+  //   }
+  // }
+
+  // final int startIndex = 0;
+  // late int endIndex = widget.data.length;
+  // //  < 30 ? widget.data.length : 30;
+  // late List<M3uEntry> _displayData =
+  //     List.from(widget.data.sublist(startIndex, endIndex));
+
