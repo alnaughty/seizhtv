@@ -52,8 +52,8 @@ class _LivePageState extends State<LivePage>
   bool selectedAgain = false;
   bool selected = true;
   String categorylabel = "";
-  late List<M3uEntry> categoryData = [];
   late List<ClassifiedData> sdata = [];
+  int currentIndex = 0;
 
   initStream() {
     _streamer = _vm.stream.listen((event) {
@@ -69,6 +69,7 @@ class _LivePageState extends State<LivePage>
         categoryName!.add("${cdata.name} (${cdata.data.length})");
       }
       categoryName!.sort((a, b) => a.compareTo(b));
+      dropdownvalue = categoryName![3];
       if (mounted) setState(() {});
     });
   }
@@ -151,7 +152,6 @@ class _LivePageState extends State<LivePage>
             1,
             onSearchPressed: () async {
               showSearchField = !showSearchField;
-              print("showSearchField $showSearchField - $ind");
               if (mounted) setState(() {});
             },
             onUpdateChannel: () {
@@ -175,10 +175,7 @@ class _LivePageState extends State<LivePage>
                 ? SeizhTvLoader(
                     label: Text(
                       "Retrieving_data".tr(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   )
                 : Column(
@@ -186,81 +183,88 @@ class _LivePageState extends State<LivePage>
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: UIAdditional().filterChip(
-                          chipsLabel: [
-                            // "All (${displayData == null ? "" : displayData!.length})",
-                            "${"favorites".tr()} (${favData.length})",
-                            "${"Channels_History".tr()} (${hisData.length})",
-                          ],
-                          onPressed: (index, name) {
-                            setState(() {
-                              ind = index + 1;
-                              selected = false;
-                              selectedAgain = false;
-                              print("INDEXXXXX $ind");
-                              print("DROPDOWNNNN $dropdownvalue");
-                            });
-                          },
-                          si: ind,
-                          selected: selected,
-                          filterButton: Container(
-                            width: 150,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: DropdownButton(
-                              elevation: 0,
-                              isExpanded: true,
-                              padding: const EdgeInsets.all(0),
-                              underline: Container(),
+                            chipsLabel: [
+                              // "All (${displayData == null ? "" : displayData!.length})",
+                              "${"favorites".tr()} (${favData.length})",
+                              "${"Channels_History".tr()} (${hisData.length})",
+                            ],
+                            onPressed: (index, name) {
+                              setState(() {
+                                ind = index + 1;
+                                selected = false;
+                                selectedAgain = false;
+                                currentIndex = ind!;
+                              });
+                            },
+                            si: ind,
+                            selected: selected,
+                            filterButton: GestureDetector(
                               onTap: () {
                                 setState(() {
                                   selected = true;
                                   ind = 0;
+                                  currentIndex = ind!;
+                                  print("presssss $currentIndex");
                                 });
                               },
-                              items: categoryName!.map((value) {
-                                return DropdownMenuItem(
-                                    value: value, child: Text(value));
-                              }).toList(),
-                              value: dropdownvalue == ""
-                                  ? categoryName == []
-                                      ? ""
-                                      : categoryName![3]
-                                  : dropdownvalue,
-                              style: const TextStyle(
-                                  fontSize: 14, fontFamily: "Poppins"),
-                              onChanged: (value) {
-                                setState(() {
-                                  dropdownvalue = value!;
-                                  String result1 = dropdownvalue.replaceAll(
-                                      RegExp(r"[(]+[0-9]+[)]"), '');
-                                  categorylabel = result1;
-                                  print("DROPDOWNNNN $dropdownvalue");
-
-                                  // final CategorizedM3UData result = displayData.;
-                                  // final List<M3uEntry> live = displayData;
-                                  categoryData = sdata
-                                      .where((element) => element.name
-                                          .contains(categorylabel.trimRight()))
-                                      .expand(
-                                          (element) => element.data.unique())
-                                      .toList()
-                                    // data = live
-                                    //     .where((element) => element.name
-                                    //         .contains(categorylabel.trimRight()))
-                                    //     .expand((element) => element.data)
-                                    //     .toList()
-                                    ..sort(
-                                        (a, b) => a.title.compareTo(b.title));
-
-                                  print(
-                                      "CATEGORY DATA LENGHT: ${categoryData.length}");
-                                });
-                              },
-                            ),
-                          ),
-                        ),
+                              child: currentIndex != 0
+                                  ? Container(
+                                      width: 170,
+                                      height: 45,
+                                      alignment: Alignment.centerLeft,
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Expanded(
+                                        child: Text(
+                                          dropdownvalue,
+                                          style: const TextStyle(
+                                              // fontSize: 14,
+                                              fontFamily: "Poppins"),
+                                        ),
+                                      ),
+                                    )
+                                  : Container(
+                                      width: 170,
+                                      height: 45,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                      child: DropdownButton(
+                                        elevation: 0,
+                                        isExpanded: true,
+                                        padding: const EdgeInsets.all(0),
+                                        underline: Container(),
+                                        onTap: () {
+                                          setState(() {
+                                            selected = true;
+                                            ind = 0;
+                                          });
+                                        },
+                                        items: categoryName!.map((value) {
+                                          return DropdownMenuItem(
+                                              value: value, child: Text(value));
+                                        }).toList(),
+                                        value: dropdownvalue == ""
+                                            ? categoryName == []
+                                                ? ""
+                                                : categoryName![3]
+                                            : dropdownvalue,
+                                        style: const TextStyle(
+                                            // fontSize: 14,
+                                            fontFamily: "Poppins"),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            dropdownvalue = value!;
+                                            String result1 =
+                                                dropdownvalue.replaceAll(
+                                                    RegExp(r"[(]+[0-9]+[)]"),
+                                                    '');
+                                            categorylabel = result1;
+                                            print("DROPDOWNNNN $dropdownvalue");
+                                          });
+                                        },
+                                      ),
+                                    ),
+                            )),
                       ),
                       const SizedBox(height: 15),
                       AnimatedPadding(
@@ -382,7 +386,6 @@ class _LivePageState extends State<LivePage>
                                   : LiveCategoryPage(
                                       key: _catPage,
                                       category: categorylabel,
-                                      categoryData: categoryData,
                                     )
                               : ind == 1
                                   ? FavLiveTvPage(
@@ -413,81 +416,79 @@ class _LivePageState extends State<LivePage>
   }
 }
 
+// return showModalBottomSheet(
+//   context: context,
+//   isDismissible: true,
+//   backgroundColor: Colors.transparent,
+//   isScrollControlled: true,
+//   builder: (_) => LiveDetails(
+//     onLoadVideo: () async {
+//       Navigator.of(context).pop(null);
+//       await loadVideo(context, entry);
+//       await entry.addToHistory(refId!);
+//     },
+//     entry: entry,
+//   ),
+// );
 
-                                          // return showModalBottomSheet(
-                                          //   context: context,
-                                          //   isDismissible: true,
-                                          //   backgroundColor: Colors.transparent,
-                                          //   isScrollControlled: true,
-                                          //   builder: (_) => LiveDetails(
-                                          //     onLoadVideo: () async {
-                                          //       Navigator.of(context).pop(null);
-                                          //       await loadVideo(context, entry);
-                                          //       await entry.addToHistory(refId!);
-                                          //     },
-                                          //     entry: entry,
-                                          //   ),
-                                          // );
+// body: Column(
+//   children: [
 
-
-        // body: Column(
-        //   children: [
-
-        //     Expanded(
-        // child: displayData == null
-        //     ? const SeizhTvLoader(
-        //         label: "Retrieving Data",
-        //       )
-        // : displayData!.isEmpty
-        //     ? Center(
-        //         child: Text(
-        //           "No Result Found for `${_search.text}`",
-        //           style: TextStyle(
-        //             color: Colors.white.withOpacity(.5),
-        //           ),
-        //         ),
-        //       )
-        //     : Scrollbar(
-        //                   controller: _scrollController,
-        //   child: ListView.separated(
-        //       controller: _scrollController,
-        //       itemBuilder: (_, i) {
-        //         final ClassifiedData data = displayData![i];
-        //         return ListTile(
-        //           onTap: () async {
-        //             await Navigator.push(
-        //               context,
-        //               PageTransition(
-        //                   child: ClassifiedLiveData(data: data),
-        //                   type: PageTransitionType.leftToRight),
-        //             );
-        //           },
-        //           contentPadding: const EdgeInsets.symmetric(
-        //               horizontal: 15),
-        //           leading: SvgPicture.asset(
-        //             "assets/icons/logo-ico.svg",
-        //             width: 50,
-        //             color: orange,
-        //             fit: BoxFit.contain,
-        //           ),
-        //           trailing: const Icon(Icons.chevron_right),
-        //           title: Hero(
-        //             tag: data.name.toUpperCase(),
-        //             child: Material(
-        //               color: Colors.transparent,
-        //               elevation: 0,
-        //               child: Text(data.name),
-        //             ),
-        //           ),
-        //           subtitle: Text(
-        //               "${data.data.classify().length} Entries"),
-        //         );
-        //       },
-        //       separatorBuilder: (_, i) => Divider(
-        //             color: Colors.white.withOpacity(.3),
-        //           ),
-        //       itemCount: displayData!.length),
-        // ),
-        //     ),
-        //   ],
-        // ),
+//     Expanded(
+// child: displayData == null
+//     ? const SeizhTvLoader(
+//         label: "Retrieving Data",
+//       )
+// : displayData!.isEmpty
+//     ? Center(
+//         child: Text(
+//           "No Result Found for `${_search.text}`",
+//           style: TextStyle(
+//             color: Colors.white.withOpacity(.5),
+//           ),
+//         ),
+//       )
+//     : Scrollbar(
+//                   controller: _scrollController,
+//   child: ListView.separated(
+//       controller: _scrollController,
+//       itemBuilder: (_, i) {
+//         final ClassifiedData data = displayData![i];
+//         return ListTile(
+//           onTap: () async {
+//             await Navigator.push(
+//               context,
+//               PageTransition(
+//                   child: ClassifiedLiveData(data: data),
+//                   type: PageTransitionType.leftToRight),
+//             );
+//           },
+//           contentPadding: const EdgeInsets.symmetric(
+//               horizontal: 15),
+//           leading: SvgPicture.asset(
+//             "assets/icons/logo-ico.svg",
+//             width: 50,
+//             color: orange,
+//             fit: BoxFit.contain,
+//           ),
+//           trailing: const Icon(Icons.chevron_right),
+//           title: Hero(
+//             tag: data.name.toUpperCase(),
+//             child: Material(
+//               color: Colors.transparent,
+//               elevation: 0,
+//               child: Text(data.name),
+//             ),
+//           ),
+//           subtitle: Text(
+//               "${data.data.classify().length} Entries"),
+//         );
+//       },
+//       separatorBuilder: (_, i) => Divider(
+//             color: Colors.white.withOpacity(.3),
+//           ),
+//       itemCount: displayData!.length),
+// ),
+//     ),
+//   ],
+// ),

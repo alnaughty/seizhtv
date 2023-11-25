@@ -52,6 +52,7 @@ class _MoviePageState extends State<MoviePage>
   int? previousIndex;
   bool selected = true;
   bool selectedAgain = false;
+  int currentIndex = 0;
 
   initStream() {
     _vm.stream.listen((event) {
@@ -66,6 +67,7 @@ class _MoviePageState extends State<MoviePage>
       }
       categoryName!.sort((a, b) => a.compareTo(b));
       movieData.sort((a, b) => a.title.compareTo(b.title));
+      dropdownvalue = categoryName![0];
       if (mounted) setState(() {});
     });
   }
@@ -183,63 +185,88 @@ class _MoviePageState extends State<MoviePage>
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: UIAdditional().filterChip(
-                          chipsLabel: [
-                            // "All (${displayData == null ? "0" : seriesData.length})",
-                            "${"favorites".tr()} (${favData.length})",
-                            "Series History (${hisData.length})",
-                          ],
-                          onPressed: (index, name) {
-                            setState(() {
-                              ind = index + 1;
-                              selected = false;
-                              selectedAgain = false;
-                              print("INDEXXXXX $ind");
-                              print("DROPDOWNNNN $dropdownvalue");
-                            });
-                          },
-                          si: ind,
-                          selected: selected,
-                          filterButton: Container(
-                            width: 150,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: DropdownButton(
-                              elevation: 0,
-                              isExpanded: true,
-                              padding: const EdgeInsets.all(0),
-                              underline: Container(),
+                            chipsLabel: [
+                              // "All (${displayData == null ? "" : displayData!.length})",
+                              "${"favorites".tr()} (${favData.length})",
+                              "${"Channels_History".tr()} (${hisData.length})",
+                            ],
+                            onPressed: (index, name) {
+                              setState(() {
+                                ind = index + 1;
+                                selected = false;
+                                selectedAgain = false;
+                                currentIndex = ind!;
+                              });
+                            },
+                            si: ind,
+                            selected: selected,
+                            filterButton: GestureDetector(
                               onTap: () {
                                 setState(() {
                                   selected = true;
                                   ind = 0;
+                                  currentIndex = ind!;
+                                  print("presssss $currentIndex");
                                 });
                               },
-                              items: categoryName!.map((value) {
-                                return DropdownMenuItem(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList(),
-                              value: dropdownvalue == ""
-                                  ? categoryName == []
-                                      ? ""
-                                      : categoryName![0]
-                                  : dropdownvalue,
-                              style: const TextStyle(
-                                  fontSize: 14, fontFamily: "Poppins"),
-                              onChanged: (value) {
-                                setState(() {
-                                  dropdownvalue = value!;
-                                  String result1 = dropdownvalue.replaceAll(
-                                      RegExp(r"[(]+[0-9]+[)]"), '');
-                                  label = result1;
-                                });
-                              },
-                            ),
-                          ),
-                        ),
+                              child: currentIndex != 0
+                                  ? Container(
+                                      width: 170,
+                                      height: 45,
+                                      alignment: Alignment.centerLeft,
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Expanded(
+                                        child: Text(
+                                          dropdownvalue,
+                                          style: const TextStyle(
+                                              // fontSize: 14,
+                                              fontFamily: "Poppins"),
+                                        ),
+                                      ),
+                                    )
+                                  : Container(
+                                      width: 170,
+                                      height: 45,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                      child: DropdownButton(
+                                        elevation: 0,
+                                        isExpanded: true,
+                                        padding: const EdgeInsets.all(0),
+                                        underline: Container(),
+                                        onTap: () {
+                                          setState(() {
+                                            selected = true;
+                                            ind = 0;
+                                          });
+                                        },
+                                        items: categoryName!.map((value) {
+                                          return DropdownMenuItem(
+                                              value: value, child: Text(value));
+                                        }).toList(),
+                                        value: dropdownvalue == ""
+                                            ? categoryName == []
+                                                ? ""
+                                                : categoryName![0]
+                                            : dropdownvalue,
+                                        style: const TextStyle(
+                                            // fontSize: 14,
+                                            fontFamily: "Poppins"),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            dropdownvalue = value!;
+                                            String result1 =
+                                                dropdownvalue.replaceAll(
+                                                    RegExp(r"[(]+[0-9]+[)]"),
+                                                    '');
+                                            label = result1;
+                                            print("DROPDOWNNNN $label");
+                                          });
+                                        },
+                                      ),
+                                    ),
+                            )),
                       ),
                       const SizedBox(height: 15),
                       AnimatedPadding(
@@ -290,14 +317,12 @@ class _MoviePageState extends State<MoviePage>
                                                       null) {
                                                     _kList.currentState!
                                                         .search(text);
-                                                  }
-                                                  // else if (_catPage
-                                                  //         .currentState !=
-                                                  //     null) {
-                                                  //   _catPage.currentState!
-                                                  //       .search(text);
-                                                  // }
-                                                  else if (_favPage
+                                                  } else if (_catPage
+                                                          .currentState !=
+                                                      null) {
+                                                    _catPage.currentState!
+                                                        .search(text);
+                                                  } else if (_favPage
                                                           .currentState !=
                                                       null) {
                                                     _favPage.currentState!
@@ -327,7 +352,7 @@ class _MoviePageState extends State<MoviePage>
                                 onTap: () {
                                   setState(() {
                                     _kList.currentState?.search("");
-                                    // _catPage.currentState?.search("");
+                                    _catPage.currentState?.search("");
                                     _favPage.currentState?.search("");
                                     _hisPage.currentState?.search("");
                                     _search.text = "";
@@ -350,7 +375,7 @@ class _MoviePageState extends State<MoviePage>
                         child: Scrollbar(
                           controller: _scrollController,
                           child: ind == 0
-                              ? dropdownvalue.contains("All") ||
+                              ? dropdownvalue.contains("ALL") ||
                                       dropdownvalue == ""
                                   ? MovieListPage(
                                       key: _kList,

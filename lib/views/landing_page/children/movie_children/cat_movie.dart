@@ -5,34 +5,29 @@ import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:seizhtv/extensions/m3u_entry.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
+import '../../../../data_containers/favorites.dart';
 import '../../../../data_containers/loaded_m3u_data.dart';
 import '../../../../globals/data.dart';
 import '../../../../globals/favorite_button.dart';
 import '../../../../globals/loader.dart';
 import '../../../../globals/network_image_viewer.dart';
 import '../../../../globals/palette.dart';
-import '../../../../globals/ui_additional.dart';
-import '../../../../globals/video_loader.dart';
 import 'details.dart';
 
 class MovieCategoryPage extends StatefulWidget {
-  MovieCategoryPage(
-      {super.key, this.showSearchField = false, required this.category});
+  const MovieCategoryPage({super.key, required this.category});
   final String category;
-  bool showSearchField;
 
   @override
   State<MovieCategoryPage> createState() => MovieCategoryPageState();
 }
 
 class MovieCategoryPageState extends State<MovieCategoryPage>
-    with ColorPalette, VideoLoader, UIAdditional {
+    with ColorPalette {
   final LoadedM3uData _vm = LoadedM3uData.instance;
-  final LoadedM3uData _vm1 = LoadedM3uData.instance;
+  static final Favorites _vm1 = Favorites.instance;
   static final ZM3UHandler _handler = ZM3UHandler.instance;
-  late final TextEditingController _search = TextEditingController();
-  List<ClassifiedData>? displayData;
-  String result1 = "";
+  late List<M3uEntry> data = [];
 
   fetchFav() async {
     await _handler
@@ -43,6 +38,41 @@ class MovieCategoryPageState extends State<MovieCategoryPage>
       }
     });
   }
+
+  String searchText = "";
+
+  void search(String text) {
+    try {
+      print("TEXT SEARCH IN CATEGORY LIVE: $text");
+      searchText = text;
+      endIndex = data.length < 30 ? data.length : 30;
+      if (text.isEmpty) {
+        _displayData = List.from(data);
+      } else {
+        text.isEmpty
+            ? _displayData = List.from(data)
+            : _displayData = List.from(data
+                .where(
+                  (element) => element.title.toLowerCase().contains(
+                        text.toLowerCase(),
+                      ),
+                )
+                .toList());
+      }
+      _displayData.sort((a, b) => a.title.compareTo(b.title));
+
+      print("DISPLAY DATA LENGHT: ${_displayData.length}");
+      if (mounted) setState(() {});
+    } on RangeError {
+      _displayData = [];
+      if (mounted) setState(() {});
+    }
+  }
+
+  final int startIndex = 0;
+  late int endIndex = data.length;
+  late List<M3uEntry> _displayData =
+      List.from(data.sublist(startIndex, endIndex));
 
   @override
   Widget build(BuildContext context) {
@@ -60,22 +90,20 @@ class MovieCategoryPageState extends State<MovieCategoryPage>
 
           final CategorizedM3UData result = snapshot.data!;
           final List<ClassifiedData> movie = result.movies;
-          final List<M3uEntry> data = movie
+          data = movie
               .where((element) =>
                   element.name.contains(widget.category.trimRight()))
               .expand((element) => element.data)
               .toList()
             ..sort((a, b) => a.title.compareTo(b.title));
-          List<M3uEntry> searchData = data;
-          print("SEARCH DATA: ${searchData.length}");
 
           return Column(
             children: [
               Expanded(
-                child: searchData.isEmpty
+                child: _displayData.isEmpty
                     ? Center(
                         child: Text(
-                          "No Result Found for `${_search.text}`",
+                          "No Result Found for `$searchText`",
                           style: TextStyle(
                             color: Colors.white.withOpacity(.5),
                           ),
@@ -88,9 +116,9 @@ class MovieCategoryPageState extends State<MovieCategoryPage>
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 3, mainAxisExtent: 145),
-                        itemCount: searchData.length,
+                        itemCount: _displayData.length,
                         itemBuilder: (context, index) {
-                          final M3uEntry item = searchData[index];
+                          final M3uEntry item = _displayData[index];
 
                           return GestureDetector(
                             onTap: () async {

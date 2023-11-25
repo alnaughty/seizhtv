@@ -97,7 +97,7 @@ class MovieListPageState extends State<MovieListPage>
       children: [
         Expanded(
             child: widget.showSearchField == true
-                ? searchData!.isEmpty
+                ? _displayData.isEmpty
                     ? Center(
                         child: Text(
                           "No Result Found for `$searchText`",
@@ -110,9 +110,9 @@ class MovieListPageState extends State<MovieListPage>
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 3, mainAxisExtent: 155),
-                        itemCount: searchData!.length,
+                        itemCount: _displayData.length,
                         itemBuilder: (context, i) {
-                          final M3uEntry d = searchData![i];
+                          final M3uEntry d = _displayData[i];
 
                           return GestureDetector(
                             onTap: () async {

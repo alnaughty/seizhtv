@@ -49,9 +49,8 @@ class _SeriesPageState extends State<SeriesPage>
   String dropdownvalue = "";
   String label = "";
   int ind = 0;
-  bool selectedAgain = false;
   bool selected = true;
-
+  int currentIndex = 0;
   fetchFav() async {
     await _handler
         .getDataFrom(type: CollectionType.favorites, refId: refId!)
@@ -88,6 +87,7 @@ class _SeriesPageState extends State<SeriesPage>
       }
       categoryName!.sort((a, b) => a.compareTo(b));
       seriesData.sort((a, b) => a.name.compareTo(b.name));
+      dropdownvalue = categoryName![0];
       if (mounted) setState(() {});
     });
   }
@@ -132,7 +132,7 @@ class _SeriesPageState extends State<SeriesPage>
       GlobalKey<FavSeriesPageState>();
   final GlobalKey<HistorySeriesPageState> _hisPage =
       GlobalKey<HistorySeriesPageState>();
-  final GlobalKey<SeriesCategoryPageState> _catList =
+  final GlobalKey<SeriesCategoryPageState> _catPage =
       GlobalKey<SeriesCategoryPageState>();
 
   @override
@@ -189,52 +189,79 @@ class _SeriesPageState extends State<SeriesPage>
                               setState(() {
                                 ind = index + 1;
                                 selected = false;
-                                selectedAgain = false;
+                                currentIndex = ind;
                                 print("INDEXXXXX $ind");
                                 print("DROPDOWNNNN $dropdownvalue");
                               });
                             },
                             si: ind,
                             selected: selected,
-                            filterButton: Container(
-                              width: 150,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: DropdownButton(
-                                elevation: 0,
-                                isExpanded: true,
-                                padding: const EdgeInsets.all(0),
-                                underline: Container(),
-                                onTap: () {
-                                  setState(() {
-                                    selected = true;
-                                    ind = 0;
-                                  });
-                                },
-                                items: categoryName!.map((value) {
-                                  return DropdownMenuItem(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                                value: dropdownvalue == ""
-                                    ? categoryName == []
-                                        ? ""
-                                        : categoryName![0]
-                                    : dropdownvalue,
-                                style: const TextStyle(
-                                    fontSize: 14, fontFamily: "Poppins"),
-                                onChanged: (value) {
-                                  setState(() {
-                                    dropdownvalue = value!;
-                                    String result1 = dropdownvalue.replaceAll(
-                                        RegExp(r"[(]+[0-9]+[)]"), '');
-                                    label = result1;
-                                  });
-                                },
-                              ),
+                            filterButton: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selected = true;
+                                  ind = 0;
+                                  currentIndex = ind;
+                                  print("presssss $currentIndex");
+                                });
+                              },
+                              child: currentIndex != 0
+                                  ? Container(
+                                      width: 170,
+                                      height: 45,
+                                      alignment: Alignment.centerLeft,
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Expanded(
+                                        child: Text(
+                                          dropdownvalue,
+                                          style: const TextStyle(
+                                              // fontSize: 14,
+                                              fontFamily: "Poppins"),
+                                        ),
+                                      ),
+                                    )
+                                  : Container(
+                                      width: 170,
+                                      height: 45,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                      child: DropdownButton(
+                                        elevation: 0,
+                                        isExpanded: true,
+                                        padding: const EdgeInsets.all(0),
+                                        underline: Container(),
+                                        onTap: () {
+                                          setState(() {
+                                            selected = true;
+                                            ind = 0;
+                                          });
+                                        },
+                                        items: categoryName!.map((value) {
+                                          return DropdownMenuItem(
+                                              value: value, child: Text(value));
+                                        }).toList(),
+                                        value: dropdownvalue == ""
+                                            ? categoryName == []
+                                                ? ""
+                                                : categoryName![0]
+                                            : dropdownvalue,
+                                        style: const TextStyle(
+                                            // fontSize: 14,
+                                            fontFamily: "Poppins"),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            dropdownvalue = value!;
+                                            String result1 =
+                                                dropdownvalue.replaceAll(
+                                                    RegExp(r"[(]+[0-9]+[)]"),
+                                                    '');
+                                            label = result1;
+                                            print("DROPDOWNNNN $dropdownvalue");
+                                          });
+                                        },
+                                      ),
+                                    ),
                             )),
                       ),
                       const SizedBox(height: 15),
@@ -286,14 +313,12 @@ class _SeriesPageState extends State<SeriesPage>
                                                       null) {
                                                     _kList.currentState!
                                                         .search(text);
-                                                  }
-                                                  // else if (_catPage
-                                                  //         .currentState !=
-                                                  //     null) {
-                                                  //   _catPage.currentState!
-                                                  //       .search(text);
-                                                  // }
-                                                  else if (_favPage
+                                                  } else if (_catPage
+                                                          .currentState !=
+                                                      null) {
+                                                    _catPage.currentState!
+                                                        .search(text);
+                                                  } else if (_favPage
                                                           .currentState !=
                                                       null) {
                                                     _favPage.currentState!
@@ -323,7 +348,7 @@ class _SeriesPageState extends State<SeriesPage>
                                 onTap: () {
                                   setState(() {
                                     _kList.currentState?.search("");
-                                    // _catPage.currentState?.search("");
+                                    _catPage.currentState?.search("");
                                     _favPage.currentState?.search("");
                                     _hisPage.currentState?.search("");
                                     _search.text = "";
@@ -346,7 +371,7 @@ class _SeriesPageState extends State<SeriesPage>
                         child: Scrollbar(
                             controller: _scrollController,
                             child: ind == 0
-                                ? dropdownvalue.contains("All") ||
+                                ? dropdownvalue.contains("ALL") ||
                                         dropdownvalue == ""
                                     ? SeriesListPage(
                                         key: _kList,
@@ -354,7 +379,7 @@ class _SeriesPageState extends State<SeriesPage>
                                         data: seriesData,
                                       )
                                     : SeriesCategoryPage(
-                                        key: _catList,
+                                        key: _catPage,
                                         category: label,
                                       )
                                 : ind == 1

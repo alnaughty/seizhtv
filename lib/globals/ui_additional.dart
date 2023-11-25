@@ -58,6 +58,8 @@ class UIAdditional {
           scrollDirection: Axis.horizontal,
           children: [
             ChoiceChip(
+              padding: const EdgeInsets.all(0),
+              showCheckmark: false,
               label: filterButton,
               selected: selected,
               selectedColor: ColorPalette().topColor,
@@ -72,8 +74,10 @@ class UIAdditional {
                 return GestureDetector(
                     onTap: () {
                       onPressed(index, chipsLabel[index]);
+                      print("Previous index: $index");
                     },
                     child: ChoiceChip(
+                      showCheckmark: false,
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       label: SizedBox(
                         height: 45,
