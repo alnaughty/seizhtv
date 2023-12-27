@@ -1,10 +1,8 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, avoid_print
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:seizhtv/extensions/color.dart';
 import 'package:seizhtv/extensions/m3u_entry.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
 import '../../../../data_containers/favorites.dart';
@@ -29,7 +27,6 @@ class FaveMoviePageState extends State<FaveMoviePage>
     with ColorPalette, VideoLoader, UIAdditional {
   final Favorites _favvm = Favorites.instance;
   static final ZM3UHandler _handler = ZM3UHandler.instance;
-  late final TextEditingController _search = TextEditingController();
   List<M3uEntry>? searchData;
 
   fetchFav() async {
@@ -42,16 +39,40 @@ class FaveMoviePageState extends State<FaveMoviePage>
     });
   }
 
-  @override
-  void initState() {
-    fetchFav();
-    searchData = widget.data;
-    super.initState();
+  String searchText = "";
+
+  void search(String text) {
+    try {
+      print("TEXT SEARCH IN CATEGORY LIVE: $text");
+      searchText = text;
+      endIndex = widget.data.length < 30 ? widget.data.length : 30;
+      if (text.isEmpty) {
+        _displayData = List.from(widget.data);
+      } else {
+        text.isEmpty
+            ? _displayData = List.from(widget.data)
+            : _displayData = List.from(widget.data
+                .where((element) =>
+                    element.title.toLowerCase().contains(text.toLowerCase()))
+                .toList());
+      }
+      _displayData.sort((a, b) => a.title.compareTo(b.title));
+
+      print("DISPLAY DATA LENGHT: ${_displayData.length}");
+      if (mounted) setState(() {});
+    } on RangeError {
+      _displayData = [];
+      if (mounted) setState(() {});
+    }
   }
+
+  final int startIndex = 0;
+  late int endIndex = widget.data.length;
+  late List<M3uEntry> _displayData =
+      List.from(widget.data.sublist(startIndex, endIndex));
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
     if (widget.data.isEmpty) {
       return const Center(
         child: Text("No data added to favorites"),
@@ -59,94 +80,11 @@ class FaveMoviePageState extends State<FaveMoviePage>
     }
     return Column(
       children: [
-        SizedBox(
-          child: AnimatedPadding(
-            duration: const Duration(milliseconds: 10),
-            padding: EdgeInsets.symmetric(
-                horizontal: widget.showSearchField ? 20 : 0),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 10),
-              height: widget.showSearchField ? size.height * .08 : 0,
-              width: double.maxFinite,
-              child: Row(
-                children: [
-                  Expanded(
-                      child: Container(
-                    height: 50,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                        color: highlight,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                              color: highlight.darken().withOpacity(1),
-                              offset: const Offset(2, 2),
-                              blurRadius: 2)
-                        ]),
-                    child: Row(
-                      children: [
-                        SvgPicture.asset("assets/icons/search.svg",
-                            height: 20, width: 20, color: white),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 300),
-                            child: widget.showSearchField
-                                ? TextField(
-                                    onChanged: (text) {
-                                      if (text.isEmpty) {
-                                        searchData = widget.data;
-                                      } else {
-                                        searchData = List.from(widget.data
-                                            .where((element) => element.title
-                                                .toLowerCase()
-                                                .contains(text.toLowerCase())));
-                                      }
-                                      searchData!.sort(
-                                          (a, b) => a.title.compareTo(b.title));
-                                      if (mounted) {
-                                        setState(() {});
-                                      }
-                                    },
-                                    cursorColor: orange,
-                                    controller: _search,
-                                    decoration: InputDecoration(
-                                      hintText: "Search".tr(),
-                                    ),
-                                  )
-                                : Container(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )),
-                  const SizedBox(width: 10),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _search.clear();
-                        searchData = widget.data;
-                        widget.showSearchField = !widget.showSearchField;
-                      });
-                    },
-                    child: Text(
-                      "Cancel".tr(),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        if (widget.showSearchField) ...{
-          const SizedBox(height: 15),
-        },
         Expanded(
-          child: searchData!.isEmpty
+          child: _displayData.isEmpty
               ? Center(
                   child: Text(
-                    "No Result Found for `${_search.text}`",
+                    "No Result Found for `$searchText`",
                     style: TextStyle(
                       color: Colors.white.withOpacity(.5),
                     ),
@@ -159,9 +97,9 @@ class FaveMoviePageState extends State<FaveMoviePage>
                       crossAxisCount: calculateCrossAxisCount(context),
                       childAspectRatio: .8,
                       crossAxisSpacing: 10),
-                  itemCount: searchData!.length,
+                  itemCount: _displayData.length,
                   itemBuilder: (context, index) {
-                    final M3uEntry item = searchData![index];
+                    final M3uEntry item = _displayData[index];
 
                     return LayoutBuilder(
                       builder: (context, c) {

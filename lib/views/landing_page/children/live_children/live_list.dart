@@ -1,14 +1,12 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, avoid_print
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:seizhtv/extensions/color.dart';
+import 'package:seizhtv/extensions/list.dart';
 import 'package:seizhtv/extensions/m3u_entry.dart';
 import 'package:seizhtv/globals/network_image_viewer.dart';
 import 'package:seizhtv/globals/palette.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
-
 import '../../../../data_containers/favorites.dart';
 import '../../../../globals/data.dart';
 import '../../../../globals/favorite_button.dart';
@@ -16,16 +14,9 @@ import '../../../../globals/loader.dart';
 import '../../../../globals/ui_additional.dart';
 
 class LiveList extends StatefulWidget {
-  LiveList(
-      {super.key,
-      required this.data,
-      required this.onPressed,
-      this.showSearchField = false,
-      required this.searchClose});
+  const LiveList({super.key, required this.data, required this.onPressed});
   final List<M3uEntry> data;
   final ValueChanged<M3uEntry> onPressed;
-  final bool searchClose;
-  bool showSearchField;
 
   @override
   State<LiveList> createState() => LiveListState();
@@ -34,7 +25,6 @@ class LiveList extends StatefulWidget {
 class LiveListState extends State<LiveList> with ColorPalette, UIAdditional {
   static final Favorites _vm = Favorites.instance;
   static final ZM3UHandler _handler = ZM3UHandler.instance;
-  late final TextEditingController _search = TextEditingController();
   List<M3uEntry>? searchData;
 
   fetchFav() async {
@@ -47,15 +37,41 @@ class LiveListState extends State<LiveList> with ColorPalette, UIAdditional {
     });
   }
 
-  @override
-  void initState() {
-    searchData = widget.data;
-    super.initState();
+  String searchText = "";
+
+  void search(String text) {
+    try {
+      print("TEXT SEARCH IN LIVE: $text");
+      searchText = text;
+      endIndex = widget.data.length < 30 ? widget.data.length : 30;
+      if (text.isEmpty) {
+        _displayData = List.from(widget.data.unique());
+      } else {
+        text.isEmpty
+            ? _displayData = List.from(widget.data.unique())
+            : _displayData = List.from(widget.data
+                .unique()
+                .where((element) =>
+                    element.title.toLowerCase().contains(text.toLowerCase()))
+                .toList());
+      }
+      _displayData.sort((a, b) => a.title.compareTo(b.title));
+
+      print("DISPLAY DATA LENGHT: ${_displayData.length}");
+      if (mounted) setState(() {});
+    } on RangeError {
+      _displayData = [];
+      if (mounted) setState(() {});
+    }
   }
+
+  final int startIndex = 0;
+  late int endIndex = widget.data.length;
+  late List<M3uEntry> _displayData =
+      List.from(widget.data.sublist(startIndex, endIndex));
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
     if (widget.data.isEmpty) {
       return SeizhTvLoader(
         label: Text(
@@ -66,99 +82,12 @@ class LiveListState extends State<LiveList> with ColorPalette, UIAdditional {
     }
     return Column(
       children: [
-        AnimatedPadding(
-          duration: const Duration(milliseconds: 10),
-          padding:
-              EdgeInsets.symmetric(horizontal: widget.showSearchField ? 20 : 0),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 10),
-            height: widget.showSearchField ? size.height * .08 : 0,
-            width: double.maxFinite,
-            child: Row(
-              children: [
-                Expanded(
-                    child: Container(
-                  height: 50,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                      color: highlight,
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                            color: highlight.darken().withOpacity(1),
-                            offset: const Offset(2, 2),
-                            blurRadius: 2)
-                      ]),
-                  child: Row(
-                    children: [
-                      SvgPicture.asset(
-                        "assets/icons/search.svg",
-                        height: 20,
-                        width: 20,
-                        color: white,
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          child: widget.showSearchField
-                              ? TextField(
-                                  onChanged: (text) {
-                                    if (text.isEmpty) {
-                                      searchData = widget.data;
-                                    } else {
-                                      searchData = List.from(widget.data.where(
-                                          (element) => element.title
-                                              .toLowerCase()
-                                              .contains(text.toLowerCase())));
-                                    }
-                                    searchData!.sort(
-                                        (a, b) => a.title.compareTo(b.title));
-                                    if (mounted) {
-                                      setState(() {});
-                                    }
-                                  },
-                                  cursorColor: orange,
-                                  controller: _search,
-                                  decoration: InputDecoration(
-                                    hintText: "Search".tr(),
-                                  ),
-                                )
-                              : Container(),
-                        ),
-                      ),
-                    ],
-                  ),
-                )),
-                const SizedBox(width: 10),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _search.clear();
-                      searchData = widget.data;
-                      widget.showSearchField = !widget.showSearchField;
-                    });
-                  },
-                  child: Text(
-                    "Cancel".tr(),
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        if (widget.showSearchField) ...{
-          const SizedBox(height: 15),
-        },
         Expanded(
-          child: searchData!.isEmpty
+          child: _displayData.isEmpty
               ? Center(
                   child: Text(
-                    "No Result Found for `${_search.text}`",
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(.5),
-                    ),
+                    "No Result Found for `$searchText`",
+                    style: TextStyle(color: Colors.white.withOpacity(.5)),
                   ),
                 )
               : GridView.builder(
@@ -168,10 +97,9 @@ class LiveListState extends State<LiveList> with ColorPalette, UIAdditional {
                       crossAxisCount: calculateCrossAxisCount(context),
                       childAspectRatio: .8,
                       crossAxisSpacing: 10),
-                  itemCount:
-                      searchData!.length, // add 1 for the loading indicator
+                  itemCount: _displayData.length,
                   itemBuilder: (context, index) {
-                    final M3uEntry item = searchData![index];
+                    final M3uEntry item = _displayData[index];
 
                     return LayoutBuilder(builder: (context, c) {
                       final double w = c.maxWidth;
@@ -278,25 +206,7 @@ class LiveListState extends State<LiveList> with ColorPalette, UIAdditional {
                         ],
                       );
                     });
-                    // return GridTile(
-                    //   header: Container(
-                    //     color: Colors.blue,
-                    //     width: 100,
-                    //     height: 85,
-                    //   ),
-                    //   footer: Align(
-                    //     alignment: AlignmentDirectional.topStart,
-                    // child: Text(
-                    //   item.title,
-                    //   maxLines: 2,
-                    //   overflow: TextOverflow.ellipsis,
-                    // ),
-                    //   ),
-                    //   child: Container(),
-                    // );
                   },
-                  // listen for when the user scrolls to the end of the list
-                  // controller: widget.controller..addListener(_scrollListener),
                 ),
         ),
       ],
@@ -305,8 +215,7 @@ class LiveListState extends State<LiveList> with ColorPalette, UIAdditional {
 
   int calculateCrossAxisCount(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    int crossAxisCount =
-        (screenWidth / 150).floor(); // Calculate based on item width
+    int crossAxisCount = (screenWidth / 150).floor();
     return crossAxisCount < 3 ? 3 : crossAxisCount;
   }
 
@@ -333,51 +242,3 @@ class LiveListState extends State<LiveList> with ColorPalette, UIAdditional {
   //   }
   // }
 }
-
-
-
-  // String searchText = "";
-
-  // void search(String text) {
-  //   try {
-  //     print("TEXT SEARCH IN LIVE: $text");
-  //     searchText = text;
-  //     endIndex = widget.data.length < 30 ? widget.data.length : 30;
-  //     if (text.isEmpty) {
-  //       _displayData = List.from(widget.data.unique());
-  //       // .sublist(startIndex,
-  //       //     endIndex < widget.data.length ? endIndex : widget.data.length));
-  //     } else {
-  //       text.isEmpty
-  //           ? _displayData = List.from(widget.data.unique())
-  //           : _displayData = List.from(widget.data
-  //                   .unique()
-  //                   .where(
-  //                     (element) => element.title.toLowerCase().contains(
-  //                           text.toLowerCase(),
-  //                         ),
-  //                   )
-  //                   .toList()
-  //               // .sublist(
-  //               //     startIndex,
-  //               //     endIndex > widget.data.length
-  //               //         ? widget.data.length
-  //               //         : endIndex),
-  //               );
-  //     }
-  //     _displayData.sort((a, b) => a.title.compareTo(b.title));
-
-  //     print("DISPLAY DATA LENGHT: ${_displayData.length}");
-  //     if (mounted) setState(() {});
-  //   } on RangeError {
-  //     _displayData = [];
-  //     if (mounted) setState(() {});
-  //   }
-  // }
-
-  // final int startIndex = 0;
-  // late int endIndex = widget.data.length;
-  // //  < 30 ? widget.data.length : 30;
-  // late List<M3uEntry> _displayData =
-  //     List.from(widget.data.sublist(startIndex, endIndex));
-

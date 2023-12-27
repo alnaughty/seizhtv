@@ -4,6 +4,8 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:seizhtv/extensions/color.dart';
 import 'package:seizhtv/extensions/state.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
 import '../../../data_containers/favorites.dart';
@@ -40,16 +42,17 @@ class _MoviePageState extends State<MoviePage>
   late List<M3uEntry> hisData = [];
   bool showSearchField = false;
   bool update = false;
-  int? searchindex;
+  late final TextEditingController _search;
   List<M3uEntry> movieData = [];
   late List<String>? categoryName = [];
   List<ClassifiedData>? displayData;
   String dropdownvalue = "";
   String label = "";
-  int? ind;
+  int? ind = 0;
   int? previousIndex;
   bool selected = true;
   bool selectedAgain = false;
+  int currentIndex = 0;
 
   initStream() {
     _vm.stream.listen((event) {
@@ -58,13 +61,13 @@ class _MoviePageState extends State<MoviePage>
         late final List<M3uEntry> data = item.data;
         movieData.addAll(List.from(data));
       }
-
-      categoryName = ["All (${movieData == null ? "" : movieData.length})"];
+      categoryName = ["ALL (${movieData == null ? "" : movieData.length})"];
       for (final ClassifiedData cdata in displayData!) {
         categoryName!.add("${cdata.name} (${cdata.data.length})");
       }
       categoryName!.sort((a, b) => a.compareTo(b));
       movieData.sort((a, b) => a.title.compareTo(b.title));
+      dropdownvalue = categoryName![0];
       if (mounted) setState(() {});
     });
   }
@@ -92,20 +95,23 @@ class _MoviePageState extends State<MoviePage>
   initFavStream() {
     _vm1.stream.listen((event) {
       _favdata = List.from(event.movies);
-      favData = _favdata.expand((element) => element.data).toList();
+      favData = _favdata.expand((element) => element.data).toList()
+        ..sort((a, b) => a.title.compareTo(b.title));
     });
   }
 
   initHisStream() {
     _hisvm.stream.listen((event) {
       _hisdata = List.from(event.movies);
-      hisData = _hisdata.expand((element) => element.data).toList();
+      hisData = _hisdata.expand((element) => element.data).toList()
+        ..sort((a, b) => a.title.compareTo(b.title));
     });
   }
 
   @override
   void initState() {
     _scrollController = ScrollController();
+    _search = TextEditingController();
     fetchFav();
     fetchHis();
     initFavStream();
@@ -123,11 +129,11 @@ class _MoviePageState extends State<MoviePage>
   }
 
   final GlobalKey<MovieListPageState> _kList = GlobalKey<MovieListPageState>();
-  final GlobalKey<FaveMoviePageState> _favList =
+  final GlobalKey<FaveMoviePageState> _favPage =
       GlobalKey<FaveMoviePageState>();
-  final GlobalKey<HistoryMoviePageState> _hisList =
+  final GlobalKey<HistoryMoviePageState> _hisPage =
       GlobalKey<HistoryMoviePageState>();
-  final GlobalKey<MovieCategoryPageState> _catList =
+  final GlobalKey<MovieCategoryPageState> _catPage =
       GlobalKey<MovieCategoryPageState>();
 
   @override
@@ -144,9 +150,7 @@ class _MoviePageState extends State<MoviePage>
             2,
             onSearchPressed: () async {
               showSearchField = !showSearchField;
-              searchindex = showSearchField == true ? ind : null;
               print("showSearchField $showSearchField - $ind");
-              print("SEARCH INDEX $searchindex - $ind");
               if (mounted) setState(() {});
             },
             onUpdateChannel: () {
@@ -179,93 +183,220 @@ class _MoviePageState extends State<MoviePage>
                 : Column(
                     children: [
                       Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: UIAdditional().filterChip(
-                              chipsLabel: [
-                                // "All (${displayData == null ? "0" : seriesData.length})",
-                                "${"favorites".tr()} (${favData.length})",
-                                "Series History (${hisData.length})",
-                              ],
-                              onPressed: (index, name) {
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: UIAdditional().filterChip(
+                            chipsLabel: [
+                              // "All (${displayData == null ? "" : displayData!.length})",
+                              "${"favorites".tr()} (${favData.length})",
+                              "${"Channels_History".tr()} (${hisData.length})",
+                            ],
+                            onPressed: (index, name) {
+                              setState(() {
+                                ind = index + 1;
+                                selected = false;
+                                selectedAgain = false;
+                                currentIndex = ind!;
+                              });
+                            },
+                            si: ind,
+                            selected: selected,
+                            filterButton: GestureDetector(
+                              onTap: () {
                                 setState(() {
-                                  ind = index + 1;
-                                  selected = false;
-                                  selectedAgain = false;
-                                  print("INDEXXXXX $ind");
-                                  print("DROPDOWNNNN $dropdownvalue");
+                                  selected = true;
+                                  ind = 0;
+                                  currentIndex = ind!;
+                                  print("presssss $currentIndex");
                                 });
                               },
-                              si: ind,
-                              selected: selected,
-                              filterButton: Container(
-                                width: 150,
-                                height: 40,
+                              child: currentIndex != 0
+                                  ? Container(
+                                      width: 170,
+                                      height: 45,
+                                      alignment: Alignment.centerLeft,
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Expanded(
+                                        child: Text(
+                                          dropdownvalue,
+                                          style: const TextStyle(
+                                              // fontSize: 14,
+                                              fontFamily: "Poppins"),
+                                        ),
+                                      ),
+                                    )
+                                  : Container(
+                                      width: 170,
+                                      height: 45,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                      child: DropdownButton(
+                                        elevation: 0,
+                                        isExpanded: true,
+                                        padding: const EdgeInsets.all(0),
+                                        underline: Container(),
+                                        onTap: () {
+                                          setState(() {
+                                            selected = true;
+                                            ind = 0;
+                                          });
+                                        },
+                                        items: categoryName!.map((value) {
+                                          return DropdownMenuItem(
+                                              value: value, child: Text(value));
+                                        }).toList(),
+                                        value: dropdownvalue == ""
+                                            ? categoryName == []
+                                                ? ""
+                                                : categoryName![0]
+                                            : dropdownvalue,
+                                        style: const TextStyle(
+                                            // fontSize: 14,
+                                            fontFamily: "Poppins"),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            dropdownvalue = value!;
+                                            String result1 =
+                                                dropdownvalue.replaceAll(
+                                                    RegExp(r"[(]+[0-9]+[)]"),
+                                                    '');
+                                            label = result1;
+                                            print("DROPDOWNNNN $label");
+                                          });
+                                        },
+                                      ),
+                                    ),
+                            )),
+                      ),
+                      const SizedBox(height: 15),
+                      AnimatedPadding(
+                        duration: const Duration(milliseconds: 400),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: showSearchField ? 20 : 0),
+                        child: AnimatedContainer(
+                          duration: const Duration(
+                            milliseconds: 500,
+                          ),
+                          height: showSearchField ? 50 : 0,
+                          width: double.maxFinite,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                  child: Container(
+                                height: 50,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(30),
+                                    color: highlight,
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color:
+                                            highlight.darken().withOpacity(1),
+                                        offset: const Offset(2, 2),
+                                        blurRadius: 2,
+                                      )
+                                    ]),
+                                child: Row(
+                                  children: [
+                                    SvgPicture.asset(
+                                      "assets/icons/search.svg",
+                                      height: 20,
+                                      width: 20,
+                                      color: white,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: AnimatedSwitcher(
+                                        duration:
+                                            const Duration(milliseconds: 300),
+                                        child: showSearchField
+                                            ? TextField(
+                                                onChanged: (text) {
+                                                  if (_kList.currentState !=
+                                                      null) {
+                                                    _kList.currentState!
+                                                        .search(text);
+                                                  } else if (_catPage
+                                                          .currentState !=
+                                                      null) {
+                                                    _catPage.currentState!
+                                                        .search(text);
+                                                  } else if (_favPage
+                                                          .currentState !=
+                                                      null) {
+                                                    _favPage.currentState!
+                                                        .search(text);
+                                                  } else if (_hisPage
+                                                          .currentState !=
+                                                      null) {
+                                                    _hisPage.currentState!
+                                                        .search(text);
+                                                  }
+                                                  if (mounted) setState(() {});
+                                                },
+                                                cursorColor: orange,
+                                                controller: _search,
+                                                decoration: InputDecoration(
+                                                  hintText: "Search".tr(),
+                                                ),
+                                              )
+                                            : Container(),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                child: DropdownButton(
-                                  elevation: 0,
-                                  isExpanded: true,
-                                  padding: const EdgeInsets.all(0),
-                                  underline: Container(),
-                                  onTap: () {
-                                    setState(() {
-                                      selected = true;
-                                      ind = 0;
-                                    });
-                                  },
-                                  items: categoryName!.map((value) {
-                                    return DropdownMenuItem(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
-                                  value: dropdownvalue == ""
-                                      ? categoryName == []
-                                          ? ""
-                                          : categoryName![0]
-                                      : dropdownvalue,
-                                  style: const TextStyle(
-                                      fontSize: 14, fontFamily: "Poppins"),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      dropdownvalue = value!;
-                                      String result1 = dropdownvalue.replaceAll(
-                                          RegExp(r"[(]+[0-9]+[)]"), '');
-                                      label = result1;
-                                    });
-                                  },
+                              )),
+                              const SizedBox(width: 10),
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _kList.currentState?.search("");
+                                    _catPage.currentState?.search("");
+                                    _favPage.currentState?.search("");
+                                    _hisPage.currentState?.search("");
+                                    _search.text = "";
+                                    showSearchField = !showSearchField;
+                                  });
+                                },
+                                child: Text(
+                                  "Cancel".tr(),
+                                  style: const TextStyle(color: Colors.white),
                                 ),
-                              ))),
-                      const SizedBox(height: 10),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      if (showSearchField) ...{
+                        const SizedBox(height: 20),
+                      },
                       Expanded(
                         child: Scrollbar(
-                            controller: _scrollController,
-                            child: ind == 0
-                                ? dropdownvalue.contains("All") ||
-                                        dropdownvalue == ""
-                                    ? MovieListPage(
-                                        key: _kList,
-                                        controller: _scrollController,
-                                        data: movieData,
-                                        showSearchField:
-                                            searchindex == 0 ? true : false)
-                                    : MovieCategoryPage(
-                                        key: _catList,
-                                        category: label,
-                                        showSearchField:
-                                            searchindex == 0 ? true : false)
-                                : ind == 1
-                                    ? FaveMoviePage(
-                                        key: _favList,
-                                        data: favData,
-                                        showSearchField:
-                                            searchindex == 1 ? true : false)
-                                    : HistoryMoviePage(
-                                        key: _hisList,
-                                        data: hisData,
-                                        showSearchField:
-                                            searchindex == 2 ? true : false)),
+                          controller: _scrollController,
+                          child: ind == 0
+                              ? dropdownvalue.contains("ALL") ||
+                                      dropdownvalue == ""
+                                  ? MovieListPage(
+                                      key: _kList,
+                                      controller: _scrollController,
+                                      data: movieData,
+                                      showSearchField: showSearchField,
+                                    )
+                                  : MovieCategoryPage(
+                                      key: _catPage,
+                                      category: label,
+                                    )
+                              : ind == 1
+                                  ? FaveMoviePage(
+                                      key: _favPage,
+                                      data: favData,
+                                    )
+                                  : HistoryMoviePage(
+                                      key: _hisPage,
+                                      data: hisData,
+                                    ),
+                        ),
                       ),
                     ],
                   ),

@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, avoid_print
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -30,10 +30,10 @@ class SeriesCategoryPageState extends State<SeriesCategoryPage>
   final LoadedM3uData _vm = LoadedM3uData.instance;
   static final Favorites _vm1 = Favorites.instance;
   static final ZM3UHandler _handler = ZM3UHandler.instance;
-  late List<ClassifiedData> seriesData = [];
   List<ClassifiedData> favData = [];
   static final Favorites _fav = Favorites.instance;
   late List<ClassifiedData> _favdata;
+  late List<ClassifiedData> data = [];
 
   fetchFav() async {
     await _handler
@@ -65,6 +65,41 @@ class SeriesCategoryPageState extends State<SeriesCategoryPage>
     super.initState();
   }
 
+  String searchText = "";
+
+  void search(String text) {
+    try {
+      print("TEXT SEARCH IN CATEGORY LIVE: $text");
+      searchText = text;
+      endIndex = data.length < 30 ? data.length : 30;
+      if (text.isEmpty) {
+        _displayData = List.from(data);
+      } else {
+        text.isEmpty
+            ? _displayData = List.from(data)
+            : _displayData = List.from(data
+                .where(
+                  (element) => element.name.toLowerCase().contains(
+                        text.toLowerCase(),
+                      ),
+                )
+                .toList());
+      }
+      _displayData.sort((a, b) => a.name.compareTo(b.name));
+
+      print("DISPLAY DATA LENGHT: ${_displayData.length}");
+      if (mounted) setState(() {});
+    } on RangeError {
+      _displayData = [];
+      if (mounted) setState(() {});
+    }
+  }
+
+  final int startIndex = 0;
+  late int endIndex = data.length;
+  late List<ClassifiedData> _displayData =
+      List.from(data.sublist(startIndex, endIndex));
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -83,173 +118,190 @@ class SeriesCategoryPageState extends State<SeriesCategoryPage>
         final List<ClassifiedData> series = result.series
           ..sort((a, b) => a.name.compareTo(b.name));
 
-        final Iterable<ClassifiedData> data = series.where(
-            (element) => element.name.contains(widget.category.trimRight()));
+        data = series
+            .where(
+                (element) => element.name.contains(widget.category.trimRight()))
+            .expand((element) => element.data.classify())
+            .toList();
         print("${data.first.name}  ${data.first.data.classify().length}");
 
-        return GridView.builder(
-            shrinkWrap: true,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: calculateCrossAxisCount(context),
-                childAspectRatio: .8,
-                crossAxisSpacing: 10,
-                mainAxisExtent: 150),
-            itemCount: data.first.data.classify().length,
-            itemBuilder: (context, i) {
-              final ClassifiedData datas = data.first.data.classify()[i];
-              bool isFavorite = false;
-              for (final ClassifiedData fav in favData) {
-                if (datas.name == fav.name) {
-                  if (fav.data.length == datas.data.length) {
-                    isFavorite = true;
-                  }
-                }
-              }
-
-              return GestureDetector(
-                onTap: () async {
-                  String result1 = datas.name.replaceAll(
-                      RegExp(r"[(]+[a-zA-Z]+[)]|[0-9]|[|]\s+[0-9]+\s[|]"), '');
-                  String result2 = result1.replaceAll(
-                      RegExp(r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|]"), '');
-
-                  Navigator.push(
-                    context,
-                    PageTransition(
-                      child: SeriesDetailsPage(
-                        data: datas,
-                        title: result2,
-                      ),
-                      type: PageTransitionType.rightToLeft,
-                    ),
-                  );
-                },
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 1.5),
-                  child: Stack(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(top: 10, right: 10),
-                        child: LayoutBuilder(
-                          builder: (context, c) {
-                            final double w = c.maxWidth;
-                            return Tooltip(
-                              message: datas.name,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(5),
-                                    child: NetworkImageViewer(
-                                      url: datas.data[0].attributes['tvg-logo'],
-                                      width: w,
-                                      height: 75,
-                                      fit: BoxFit.cover,
-                                      color: highlight,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Tooltip(
-                                    message: datas.name,
-                                    child: Text(
-                                      datas.name,
-                                      style: const TextStyle(fontSize: 12),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text("${datas.data.length} ",
-                                          style: const TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.grey)),
-                                      Text("Episodes".tr(),
-                                          style: const TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.grey)),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      Positioned(
-                        top: 0,
-                        right: 0,
-                        child: SizedBox(
-                          height: 25,
-                          width: 25,
-                          child: FavoriteIconButton(
-                            onPressedCallback: (bool isFavorite) async {
-                              if (isFavorite) {
-                                showDialog(
-                                  barrierDismissible: false,
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    Future.delayed(
-                                      const Duration(seconds: 5),
-                                      () {
-                                        Navigator.of(context).pop(true);
-                                      },
-                                    );
-                                    return Dialog(
-                                      alignment: Alignment.topCenter,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                      ),
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 20),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              "Added_to_Favorites".tr(),
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                            IconButton(
-                                              padding: const EdgeInsets.all(0),
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                              icon: const Icon(
-                                                Icons.close_rounded,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                                for (M3uEntry m3u in datas.data) {
-                                  await m3u.addToFavorites(refId!);
-                                }
-                              } else {
-                                for (M3uEntry m3u in datas.data) {
-                                  await m3u.removeFromFavorites(refId!);
-                                }
-                              }
-                              await fetchFav();
-                            },
-                            initValue: isFavorite,
-                            iconSize: 20,
-                          ),
-                        ),
-                      )
-                    ],
+        return _displayData.isEmpty
+            ? Center(
+                child: Text(
+                  "No Result Found for `$searchText`",
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(.5),
                   ),
                 ),
-              );
-            });
+              )
+            : GridView.builder(
+                shrinkWrap: true,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: calculateCrossAxisCount(context),
+                    childAspectRatio: .8,
+                    crossAxisSpacing: 10,
+                    mainAxisExtent: 150),
+                itemCount: _displayData.length,
+                itemBuilder: (context, i) {
+                  final ClassifiedData datas = _displayData[i];
+                  bool isFavorite = false;
+                  for (final ClassifiedData fav in favData) {
+                    if (datas.name == fav.name) {
+                      if (fav.data.length == datas.data.length) {
+                        isFavorite = true;
+                      }
+                    }
+                  }
+
+                  return GestureDetector(
+                    onTap: () async {
+                      String result1 = datas.name.replaceAll(
+                          RegExp(r"[(]+[a-zA-Z]+[)]|[0-9]|[|]\s+[0-9]+\s[|]"),
+                          '');
+                      String result2 = result1.replaceAll(
+                          RegExp(r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|]"), '');
+
+                      Navigator.push(
+                        context,
+                        PageTransition(
+                          child: SeriesDetailsPage(
+                            data: datas,
+                            title: result2,
+                          ),
+                          type: PageTransitionType.rightToLeft,
+                        ),
+                      );
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                      child: Stack(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(top: 10, right: 10),
+                            child: LayoutBuilder(
+                              builder: (context, c) {
+                                final double w = c.maxWidth;
+                                return Tooltip(
+                                  message: datas.name,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(5),
+                                        child: NetworkImageViewer(
+                                          url: datas
+                                              .data[0].attributes['tvg-logo'],
+                                          width: w,
+                                          height: 75,
+                                          fit: BoxFit.cover,
+                                          color: highlight,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Tooltip(
+                                        message: datas.name,
+                                        child: Text(
+                                          datas.name,
+                                          style: const TextStyle(fontSize: 12),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text("${datas.data.length} ",
+                                              style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.grey)),
+                                          Text("Episodes".tr(),
+                                              style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.grey)),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: SizedBox(
+                              height: 25,
+                              width: 25,
+                              child: FavoriteIconButton(
+                                onPressedCallback: (bool isFavorite) async {
+                                  if (isFavorite) {
+                                    showDialog(
+                                      barrierDismissible: false,
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        Future.delayed(
+                                          const Duration(seconds: 5),
+                                          () {
+                                            Navigator.of(context).pop(true);
+                                          },
+                                        );
+                                        return Dialog(
+                                          alignment: Alignment.topCenter,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                          ),
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 20),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "Added_to_Favorites".tr(),
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                  padding:
+                                                      const EdgeInsets.all(0),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  icon: const Icon(
+                                                    Icons.close_rounded,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                    for (M3uEntry m3u in datas.data) {
+                                      await m3u.addToFavorites(refId!);
+                                    }
+                                  } else {
+                                    for (M3uEntry m3u in datas.data) {
+                                      await m3u.removeFromFavorites(refId!);
+                                    }
+                                  }
+                                  await fetchFav();
+                                },
+                                initValue: isFavorite,
+                                iconSize: 20,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                });
       },
     );
   }
