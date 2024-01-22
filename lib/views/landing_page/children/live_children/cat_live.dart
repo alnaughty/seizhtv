@@ -40,6 +40,7 @@ class LiveCategoryPageState extends State<LiveCategoryPage>
   }
 
   String searchText = "";
+  late int endIndex;
 
   void search(String text) {
     try {
@@ -69,10 +70,10 @@ class LiveCategoryPageState extends State<LiveCategoryPage>
     }
   }
 
-  final int startIndex = 0;
-  late int endIndex = data.length;
-  late List<M3uEntry> _displayData =
-      List.from(data.sublist(startIndex, endIndex));
+  // final int startIndex = 0;
+  // late int endIndex = data.length;
+  late List<M3uEntry> _displayData = [];
+  //     List.from(data.sublist(startIndex, endIndex));
 
   @override
   Widget build(BuildContext context) {
@@ -96,6 +97,7 @@ class LiveCategoryPageState extends State<LiveCategoryPage>
             .expand((element) => element.data)
             .toList()
           ..sort((a, b) => a.title.compareTo(b.title));
+        _displayData = data;
 
         return _displayData.isEmpty
             ? Center(
@@ -116,6 +118,8 @@ class LiveCategoryPageState extends State<LiveCategoryPage>
                     crossAxisSpacing: 10),
                 itemCount: _displayData.length,
                 itemBuilder: (context, index) {
+                  print("DISPLAY DATA LENGHT: ${_displayData.length}");
+                  print("DATA LENGHT: ${data.length}");
                   final M3uEntry item = _displayData[index];
 
                   return LayoutBuilder(
