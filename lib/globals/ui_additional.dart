@@ -74,7 +74,6 @@ class UIAdditional {
                 return GestureDetector(
                     onTap: () {
                       onPressed(index, chipsLabel[index]);
-                      print("Previous index: $index");
                     },
                     child: ChoiceChip(
                       showCheckmark: false,
