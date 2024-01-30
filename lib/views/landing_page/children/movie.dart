@@ -46,13 +46,13 @@ class _MoviePageState extends State<MoviePage>
   List<M3uEntry> movieData = [];
   late List<String>? categoryName = [];
   List<ClassifiedData>? displayData;
+  late List<M3uEntry> data = [];
+  late List<M3uEntry> categorydata = [];
+  bool categorysearch = false;
   String dropdownvalue = "";
-  String label = "";
   int? ind = 0;
-  int? previousIndex;
+  int? prevIndex;
   bool selected = true;
-  bool selectedAgain = false;
-  int currentIndex = 0;
 
   initStream() {
     _vm.stream.listen((event) {
@@ -67,7 +67,12 @@ class _MoviePageState extends State<MoviePage>
       }
       categoryName!.sort((a, b) => a.compareTo(b));
       movieData.sort((a, b) => a.title.compareTo(b.title));
-      dropdownvalue = categoryName![0];
+      for (final String label in categoryName!) {
+        if (label
+            .contains("ALL (${movieData == null ? "" : movieData.length})")) {
+          dropdownvalue = label;
+        }
+      }
       if (mounted) setState(() {});
     });
   }
@@ -150,7 +155,17 @@ class _MoviePageState extends State<MoviePage>
             2,
             onSearchPressed: () async {
               showSearchField = !showSearchField;
-              print("showSearchField $showSearchField - $ind");
+              if (showSearchField == true) {
+                if (ind == 0) {
+                  if (dropdownvalue.contains("ALL") || dropdownvalue == "") {
+                    categorysearch = false;
+                  } else {
+                    categorysearch = true;
+                  }
+                } else {
+                  categorysearch = false;
+                }
+              }
               if (mounted) setState(() {});
             },
             onUpdateChannel: () {
@@ -183,191 +198,272 @@ class _MoviePageState extends State<MoviePage>
                 : Column(
                     children: [
                       Container(
+                        height: 50,
+                        width: double.infinity,
                         padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: UIAdditional().filterChip(
-                            chipsLabel: [
-                              // "All (${displayData == null ? "" : displayData!.length})",
-                              "${"favorites".tr()} (${favData.length})",
-                              "${"Channels_History".tr()} (${hisData.length})",
-                            ],
-                            onPressed: (index, name) {
-                              setState(() {
-                                ind = index + 1;
-                                selected = false;
-                                selectedAgain = false;
-                                currentIndex = ind!;
-                              });
-                            },
-                            si: ind,
-                            selected: selected,
-                            filterButton: GestureDetector(
+                        child: ListView(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          children: [
+                            GestureDetector(
                               onTap: () {
                                 setState(() {
-                                  selected = true;
+                                  prevIndex = ind!;
                                   ind = 0;
-                                  currentIndex = ind!;
-                                  print("presssss $currentIndex");
+                                  showSearchField = false;
                                 });
                               },
-                              child: currentIndex != 0
-                                  ? Container(
-                                      width: 170,
-                                      height: 45,
-                                      alignment: Alignment.centerLeft,
-                                      padding: const EdgeInsets.only(left: 10),
-                                      child: Expanded(
-                                        child: Text(
-                                          dropdownvalue,
+                              child: ind == 0 && prevIndex != 0
+                                  ? ChoiceChip(
+                                      showCheckmark: false,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      label: Container(
+                                        width: 170,
+                                        height: 45,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                        ),
+                                        child: DropdownButton(
+                                          elevation: 0,
+                                          isExpanded: true,
+                                          padding: const EdgeInsets.all(0),
+                                          underline: Container(),
+                                          onTap: () {
+                                            setState(() {
+                                              selected = true;
+                                              ind = 0;
+                                            });
+                                          },
+                                          items: categoryName!.map((value) {
+                                            return DropdownMenuItem(
+                                                value: value,
+                                                child: Text(value));
+                                          }).toList(),
+                                          value: dropdownvalue == ""
+                                              ? categoryName == []
+                                                  ? ""
+                                                  : categoryName![3]
+                                              : dropdownvalue,
                                           style: const TextStyle(
-                                              // fontSize: 14,
                                               fontFamily: "Poppins"),
+                                          onChanged: (value) {
+                                            setState(
+                                              () {
+                                                dropdownvalue = value!;
+                                                String result1 =
+                                                    dropdownvalue.replaceAll(
+                                                        RegExp(
+                                                            r"[(]+[0-9]+[)]"),
+                                                        '');
+
+                                                data = displayData!
+                                                    .where((element) => element
+                                                        .name
+                                                        .contains(result1
+                                                            .trimRight()))
+                                                    .expand((element) =>
+                                                        element.data)
+                                                    .toList()
+                                                  ..sort((a, b) => a.title
+                                                      .compareTo(b.title));
+                                                categorydata = data;
+                                                showSearchField = false;
+                                                categorysearch = false;
+                                              },
+                                            );
+                                          },
                                         ),
                                       ),
+                                      selected: ind == 0 ? true : false,
+                                      selectedColor: ColorPalette().topColor,
+                                      disabledColor: ColorPalette().highlight,
                                     )
-                                  : Container(
-                                      width: 170,
-                                      height: 45,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(30),
+                                  : ChoiceChip(
+                                      showCheckmark: false,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      label: SizedBox(
+                                        height: 45,
+                                        child: Center(
+                                          child: Text(
+                                            dropdownvalue,
+                                            style: const TextStyle(
+                                                fontFamily: "Poppins"),
+                                          ),
+                                        ),
                                       ),
-                                      child: DropdownButton(
-                                        elevation: 0,
-                                        isExpanded: true,
-                                        padding: const EdgeInsets.all(0),
-                                        underline: Container(),
-                                        onTap: () {
-                                          setState(() {
-                                            selected = true;
-                                            ind = 0;
-                                          });
-                                        },
-                                        items: categoryName!.map((value) {
-                                          return DropdownMenuItem(
-                                              value: value, child: Text(value));
-                                        }).toList(),
-                                        value: dropdownvalue == ""
-                                            ? categoryName == []
-                                                ? ""
-                                                : categoryName![0]
-                                            : dropdownvalue,
-                                        style: const TextStyle(
-                                            // fontSize: 14,
-                                            fontFamily: "Poppins"),
-                                        onChanged: (value) {
-                                          setState(() {
-                                            dropdownvalue = value!;
-                                            String result1 =
-                                                dropdownvalue.replaceAll(
-                                                    RegExp(r"[(]+[0-9]+[)]"),
-                                                    '');
-                                            label = result1;
-                                            print("DROPDOWNNNN $label");
-                                          });
-                                        },
-                                      ),
+                                      selected: ind == 0 ? true : false,
+                                      selectedColor: ColorPalette().topColor,
+                                      disabledColor: ColorPalette().highlight,
                                     ),
-                            )),
-                      ),
-                      const SizedBox(height: 15),
-                      AnimatedPadding(
-                        duration: const Duration(milliseconds: 400),
-                        padding: EdgeInsets.symmetric(
-                            horizontal: showSearchField ? 20 : 0),
-                        child: AnimatedContainer(
-                          duration: const Duration(
-                            milliseconds: 500,
-                          ),
-                          height: showSearchField ? 50 : 0,
-                          width: double.maxFinite,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                  child: Container(
-                                height: 50,
+                            ),
+                            const SizedBox(width: 10),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  prevIndex = ind!;
+                                  ind = 1;
+                                  showSearchField = false;
+                                  categorysearch = false;
+                                });
+                              },
+                              child: ChoiceChip(
+                                showCheckmark: false,
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 10),
-                                decoration: BoxDecoration(
-                                    color: highlight,
-                                    borderRadius: BorderRadius.circular(10),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color:
-                                            highlight.darken().withOpacity(1),
-                                        offset: const Offset(2, 2),
-                                        blurRadius: 2,
-                                      )
-                                    ]),
+                                label: SizedBox(
+                                  height: 45,
+                                  child: Center(
+                                    child: Text(
+                                      "${"favorites".tr()} (${favData.length})",
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                                selected: ind == 1 ? true : false,
+                                selectedColor: ColorPalette().topColor,
+                                disabledColor: ColorPalette().highlight,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  prevIndex = ind!;
+                                  ind = 2;
+                                  showSearchField = false;
+                                  categorysearch = false;
+                                });
+                              },
+                              child: ChoiceChip(
+                                showCheckmark: false,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                label: SizedBox(
+                                  height: 45,
+                                  child: Center(
+                                    child: Text(
+                                      "${"Movies History"} (${hisData.length})",
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                                selected: ind == 2 ? true : false,
+                                selectedColor: ColorPalette().topColor,
+                                disabledColor: ColorPalette().highlight,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      categorysearch == false
+                          ? AnimatedPadding(
+                              duration: const Duration(milliseconds: 400),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: showSearchField ? 20 : 0),
+                              child: AnimatedContainer(
+                                duration: const Duration(
+                                  milliseconds: 500,
+                                ),
+                                height: showSearchField ? 50 : 0,
+                                width: double.maxFinite,
                                 child: Row(
                                   children: [
-                                    SvgPicture.asset(
-                                      "assets/icons/search.svg",
-                                      height: 20,
-                                      width: 20,
-                                      color: white,
-                                    ),
-                                    const SizedBox(width: 10),
                                     Expanded(
-                                      child: AnimatedSwitcher(
-                                        duration:
-                                            const Duration(milliseconds: 300),
-                                        child: showSearchField
-                                            ? TextField(
-                                                onChanged: (text) {
-                                                  if (_kList.currentState !=
-                                                      null) {
-                                                    _kList.currentState!
-                                                        .search(text);
-                                                  } else if (_catPage
-                                                          .currentState !=
-                                                      null) {
-                                                    _catPage.currentState!
-                                                        .search(text);
-                                                  } else if (_favPage
-                                                          .currentState !=
-                                                      null) {
-                                                    _favPage.currentState!
-                                                        .search(text);
-                                                  } else if (_hisPage
-                                                          .currentState !=
-                                                      null) {
-                                                    _hisPage.currentState!
-                                                        .search(text);
-                                                  }
-                                                  if (mounted) setState(() {});
-                                                },
-                                                cursorColor: orange,
-                                                controller: _search,
-                                                decoration: InputDecoration(
-                                                  hintText: "Search".tr(),
-                                                ),
-                                              )
-                                            : Container(),
+                                        child: Container(
+                                      height: 50,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      decoration: BoxDecoration(
+                                          color: highlight,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: highlight
+                                                  .darken()
+                                                  .withOpacity(1),
+                                              offset: const Offset(2, 2),
+                                              blurRadius: 2,
+                                            )
+                                          ]),
+                                      child: Row(
+                                        children: [
+                                          SvgPicture.asset(
+                                            "assets/icons/search.svg",
+                                            height: 20,
+                                            width: 20,
+                                            color: white,
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Expanded(
+                                            child: AnimatedSwitcher(
+                                              duration: const Duration(
+                                                  milliseconds: 300),
+                                              child: showSearchField
+                                                  ? TextField(
+                                                      onChanged: (text) {
+                                                        if (_kList
+                                                                .currentState !=
+                                                            null) {
+                                                          _kList.currentState!
+                                                              .search(text);
+                                                        } else if (_favPage
+                                                                .currentState !=
+                                                            null) {
+                                                          _favPage.currentState!
+                                                              .search(text);
+                                                        } else if (_hisPage
+                                                                .currentState !=
+                                                            null) {
+                                                          _hisPage.currentState!
+                                                              .search(text);
+                                                        }
+                                                        if (mounted) {
+                                                          setState(() {});
+                                                        }
+                                                      },
+                                                      cursorColor: orange,
+                                                      controller: _search,
+                                                      decoration:
+                                                          InputDecoration(
+                                                        hintText: "Search".tr(),
+                                                      ),
+                                                    )
+                                                  : Container(),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )),
+                                    const SizedBox(width: 10),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _kList.currentState?.search("");
+                                          _favPage.currentState?.search("");
+                                          _hisPage.currentState?.search("");
+                                          _search.text = "";
+                                          showSearchField = !showSearchField;
+                                        });
+                                      },
+                                      child: Text(
+                                        "Cancel".tr(),
+                                        style: const TextStyle(
+                                            color: Colors.white),
                                       ),
                                     ),
                                   ],
                                 ),
-                              )),
-                              const SizedBox(width: 10),
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _kList.currentState?.search("");
-                                    _catPage.currentState?.search("");
-                                    _favPage.currentState?.search("");
-                                    _hisPage.currentState?.search("");
-                                    _search.text = "";
-                                    showSearchField = !showSearchField;
-                                  });
-                                },
-                                child: Text(
-                                  "Cancel".tr(),
-                                  style: const TextStyle(color: Colors.white),
-                                ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
+                            )
+                          : const SizedBox(),
                       if (showSearchField) ...{
                         const SizedBox(height: 20),
                       },
@@ -385,7 +481,8 @@ class _MoviePageState extends State<MoviePage>
                                     )
                                   : MovieCategoryPage(
                                       key: _catPage,
-                                      category: label,
+                                      categorydata: categorydata,
+                                      showsearchfield: categorysearch,
                                     )
                               : ind == 1
                                   ? FaveMoviePage(
