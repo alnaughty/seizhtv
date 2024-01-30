@@ -21,11 +21,11 @@ class SeriesListPage extends StatefulWidget {
   SeriesListPage(
       {required this.controller,
       required this.data,
-      this.showSearchField = false,
+      required this.showSearchField,
       super.key});
   final ScrollController controller;
   final List<ClassifiedData> data;
-  bool showSearchField;
+  final bool showSearchField;
 
   @override
   State<SeriesListPage> createState() => SeriesListPageState();
@@ -97,7 +97,7 @@ class SeriesListPageState extends State<SeriesListPage>
     return Column(
       children: [
         Expanded(
-          child: widget.showSearchField
+          child: widget.showSearchField == true
               ? searchData!.isEmpty
                   ? Center(
                       child: Text(
@@ -295,18 +295,20 @@ class SeriesListPageState extends State<SeriesListPage>
                         if (snapshot.hasData && !snapshot.hasError) {
                           if (snapshot.data!.isNotEmpty) {
                             final List<TopSeriesModel> result = snapshot.data!;
-                            late Iterable<ClassifiedData> cd;
+                            late ClassifiedData cd;
                             late TopSeriesModel tm;
 
                             for (final TopSeriesModel tsm in result) {
-                              print("TM TITLE: ${tsm.title}");
-                              print(
-                                  "${widget.data.where((element) => element.name.toLowerCase().contains(tsm.title.toLowerCase()))}");
-                              cd = widget.data.where((element) => element.name
-                                  .toLowerCase()
-                                  .contains(tsm.title.toLowerCase()));
-                              tm = tsm;
+                              print("TOP SERIES DATA: ${tsm.title}");
+                              for (final ClassifiedData c in widget.data) {
+                                if (c.name.contains(tsm.title)) {
+                                  print("CLASSIFIED DATA: $c");
+                                  cd = c;
+                                  tm = tsm;
+                                }
+                              }
                             }
+
                             getTVVideos(id: tm.id);
 
                             return Column(
@@ -339,7 +341,7 @@ class SeriesListPageState extends State<SeriesListPage>
                                       context,
                                       PageTransition(
                                         child: SeriesDetailsPage(
-                                          data: cd.first,
+                                          data: cd,
                                           title: tm.title,
                                         ),
                                         type: PageTransitionType.rightToLeft,
@@ -355,7 +357,7 @@ class SeriesListPageState extends State<SeriesListPage>
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          cd.first.name,
+                                          cd.name,
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(

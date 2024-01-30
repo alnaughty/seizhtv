@@ -5,7 +5,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:seizhtv/data_containers/loaded_m3u_data.dart';
 import 'package:seizhtv/extensions/color.dart';
 import 'package:seizhtv/extensions/list.dart';
@@ -45,10 +44,12 @@ class _LivePageState extends State<LivePage>
   late List<ClassifiedData> _hisdata;
   late List<M3uEntry> favData = [];
   late List<M3uEntry> hisData = [];
+  late List<M3uEntry> data = [];
+  late List<M3uEntry> categorydata = [];
   late final List<M3uEntry> _data;
   List<M3uEntry>? displayData;
   String dropdownvalue = "";
-  String categorylabel = "";
+  bool categorysearch = false;
   bool selected = true;
   bool update = false;
   int prevIndex = 1;
@@ -68,7 +69,12 @@ class _LivePageState extends State<LivePage>
         categoryName!.add("${cdata.name} (${cdata.data.length})");
       }
       categoryName!.sort((a, b) => a.compareTo(b));
-      dropdownvalue = categoryName![3];
+      for (final String label in categoryName!) {
+        if (label.contains(
+            "ALL (${displayData == null ? "" : displayData!.length})")) {
+          dropdownvalue = label;
+        }
+      }
       if (mounted) setState(() {});
     });
   }
@@ -151,6 +157,19 @@ class _LivePageState extends State<LivePage>
             1,
             onSearchPressed: () async {
               showSearchField = !showSearchField;
+
+              if (showSearchField == true) {
+                if (ind == 0) {
+                  if (dropdownvalue.contains("ALL") || dropdownvalue == "") {
+                    categorysearch = false;
+                  } else {
+                    categorysearch = true;
+                  }
+                } else {
+                  categorysearch = false;
+                }
+              }
+              print("CATEGORY SEARCH: $categorysearch");
               if (mounted) setState(() {});
             },
             onUpdateChannel: () {
@@ -192,6 +211,7 @@ class _LivePageState extends State<LivePage>
                                 setState(() {
                                   prevIndex = ind!;
                                   ind = 0;
+                                  showSearchField = false;
                                   print("CURRENT INDEX $ind");
                                   print("PREV INDEX $prevIndex");
                                 });
@@ -230,7 +250,6 @@ class _LivePageState extends State<LivePage>
                                                   : categoryName![3]
                                               : dropdownvalue,
                                           style: const TextStyle(
-                                              // fontSize: 14,
                                               fontFamily: "Poppins"),
                                           onChanged: (value) {
                                             setState(
@@ -241,7 +260,20 @@ class _LivePageState extends State<LivePage>
                                                         RegExp(
                                                             r"[(]+[0-9]+[)]"),
                                                         '');
-                                                categorylabel = result1;
+
+                                                data = sdata
+                                                    .where((element) => element
+                                                        .name
+                                                        .contains(result1
+                                                            .trimRight()))
+                                                    .expand((element) =>
+                                                        element.data)
+                                                    .toList()
+                                                  ..sort((a, b) => a.title
+                                                      .compareTo(b.title));
+                                                categorydata = data;
+                                                showSearchField = false;
+                                                categorysearch = false;
                                               },
                                             );
                                           },
@@ -276,6 +308,8 @@ class _LivePageState extends State<LivePage>
                                 setState(() {
                                   prevIndex = ind!;
                                   ind = 1;
+                                  showSearchField = false;
+                                  categorysearch = false;
                                   print("CURRENT INDEX $ind");
                                   print("PREV INDEX $prevIndex");
                                 });
@@ -333,107 +367,120 @@ class _LivePageState extends State<LivePage>
                         ),
                       ),
                       const SizedBox(height: 15),
-                      AnimatedPadding(
-                        duration: const Duration(milliseconds: 400),
-                        padding: EdgeInsets.symmetric(
-                            horizontal: showSearchField ? 20 : 0),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 500),
-                          height: showSearchField ? 50 : 0,
-                          width: double.maxFinite,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  height: 50,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  decoration: BoxDecoration(
-                                    color: highlight,
-                                    borderRadius: BorderRadius.circular(10),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color:
-                                            highlight.darken().withOpacity(1),
-                                        offset: const Offset(2, 2),
-                                        blurRadius: 2,
-                                      )
-                                    ],
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      SvgPicture.asset(
-                                        "assets/icons/search.svg",
-                                        height: 20,
-                                        width: 20,
-                                        color: white,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Expanded(
-                                        child: AnimatedSwitcher(
-                                          duration:
-                                              const Duration(milliseconds: 300),
-                                          child: showSearchField
-                                              ? TextField(
-                                                  onChanged: (text) {
-                                                    if (_kList.currentState !=
-                                                        null) {
-                                                      _kList.currentState!
-                                                          .search(text);
-                                                    } else if (_catPage
-                                                            .currentState !=
-                                                        null) {
-                                                      _catPage.currentState!
-                                                          .search(text);
-                                                    } else if (_favPage
-                                                            .currentState !=
-                                                        null) {
-                                                      _favPage.currentState!
-                                                          .search(text);
-                                                    } else if (_hisPage
-                                                            .currentState !=
-                                                        null) {
-                                                      _hisPage.currentState!
-                                                          .search(text);
-                                                    }
-                                                    if (mounted) {
-                                                      setState(() {});
-                                                    }
-                                                  },
-                                                  cursorColor: orange,
-                                                  controller: _search,
-                                                  decoration: InputDecoration(
-                                                    hintText: "Search".tr(),
-                                                  ),
-                                                )
-                                              : Container(),
+                      categorysearch == false
+                          ? AnimatedPadding(
+                              duration: const Duration(milliseconds: 400),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: showSearchField ? 20 : 0),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 500),
+                                height: showSearchField ? 50 : 0,
+                                width: double.maxFinite,
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Container(
+                                        height: 50,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        decoration: BoxDecoration(
+                                          color: highlight,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: highlight
+                                                  .darken()
+                                                  .withOpacity(1),
+                                              offset: const Offset(2, 2),
+                                              blurRadius: 2,
+                                            )
+                                          ],
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            SvgPicture.asset(
+                                              "assets/icons/search.svg",
+                                              height: 20,
+                                              width: 20,
+                                              color: white,
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: AnimatedSwitcher(
+                                                duration: const Duration(
+                                                    milliseconds: 300),
+                                                child: showSearchField
+                                                    ? TextField(
+                                                        onChanged: (text) {
+                                                          if (_kList
+                                                                  .currentState !=
+                                                              null) {
+                                                            _kList.currentState!
+                                                                .search(text);
+                                                          }
+                                                          // else if (_catPage
+                                                          //         .currentState !=
+                                                          //     null) {
+                                                          //   _catPage
+                                                          //       .currentState!
+                                                          //       .search(text);
+                                                          // }
+                                                          else if (_favPage
+                                                                  .currentState !=
+                                                              null) {
+                                                            _favPage
+                                                                .currentState!
+                                                                .search(text);
+                                                          } else if (_hisPage
+                                                                  .currentState !=
+                                                              null) {
+                                                            _hisPage
+                                                                .currentState!
+                                                                .search(text);
+                                                          }
+                                                          if (mounted) {
+                                                            setState(() {});
+                                                          }
+                                                        },
+                                                        cursorColor: orange,
+                                                        controller: _search,
+                                                        decoration:
+                                                            InputDecoration(
+                                                          hintText:
+                                                              "Search".tr(),
+                                                        ),
+                                                      )
+                                                    : Container(),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _kList.currentState?.search("");
+                                          // _catPage.currentState?.search("");
+                                          _favPage.currentState?.search("");
+                                          _hisPage.currentState?.search("");
+                                          _search.text = "";
+                                          showSearchField = !showSearchField;
+                                        });
+                                      },
+                                      child: Text(
+                                        "Cancel".tr(),
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(width: 10),
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _kList.currentState?.search("");
-                                    _catPage.currentState?.search("");
-                                    _favPage.currentState?.search("");
-                                    _hisPage.currentState?.search("");
-                                    _search.text = "";
-                                    showSearchField = !showSearchField;
-                                  });
-                                },
-                                child: Text(
-                                  "Cancel".tr(),
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                            )
+                          : const SizedBox(),
                       if (showSearchField) ...{
                         const SizedBox(height: 20),
                       },
@@ -453,7 +500,8 @@ class _LivePageState extends State<LivePage>
                                     )
                                   : LiveCategoryPage(
                                       key: _catPage,
-                                      category: categorylabel,
+                                      categorydata: categorydata,
+                                      showsearchfield: categorysearch,
                                     )
                               : ind == 1
                                   ? FavLiveTvPage(
