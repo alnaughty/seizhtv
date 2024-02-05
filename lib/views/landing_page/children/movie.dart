@@ -213,91 +213,75 @@ class _MoviePageState extends State<MoviePage>
                                   showSearchField = false;
                                 });
                               },
-                              child: ind == 0 && prevIndex != 0
-                                  ? ChoiceChip(
-                                      showCheckmark: false,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                      label: Container(
-                                        width: 170,
-                                        height: 45,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(30),
-                                        ),
-                                        child: DropdownButton(
-                                          elevation: 0,
-                                          isExpanded: true,
-                                          padding: const EdgeInsets.all(0),
-                                          underline: Container(),
-                                          onTap: () {
-                                            setState(() {
-                                              selected = true;
-                                              ind = 0;
-                                            });
-                                          },
-                                          items: categoryName!.map((value) {
-                                            return DropdownMenuItem(
-                                                value: value,
-                                                child: Text(value));
-                                          }).toList(),
-                                          value: dropdownvalue == ""
-                                              ? categoryName == []
-                                                  ? ""
-                                                  : categoryName![3]
-                                              : dropdownvalue,
-                                          style: const TextStyle(
-                                              fontFamily: "Poppins"),
-                                          onChanged: (value) {
-                                            setState(
-                                              () {
-                                                dropdownvalue = value!;
-                                                String result1 =
-                                                    dropdownvalue.replaceAll(
-                                                        RegExp(
-                                                            r"[(]+[0-9]+[)]"),
-                                                        '');
+                              child: Container(
+                                width: 170,
+                                height: 50,
+                                alignment: Alignment.centerLeft,
+                                decoration: BoxDecoration(
+                                    color: ind == 0
+                                        ? ColorPalette().topColor
+                                        : ColorPalette().highlight,
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                        color: ind == 0
+                                            ? ColorPalette().topColor
+                                            : Colors.grey)),
+                                child: ind == 0 && prevIndex != 0
+                                    ? DropdownButton(
+                                        elevation: 0,
+                                        isExpanded: true,
+                                        padding: const EdgeInsets.all(0),
+                                        underline: Container(),
+                                        onTap: () {
+                                          setState(() {
+                                            selected = true;
+                                            ind = 0;
+                                          });
+                                        },
+                                        items: categoryName!.map((value) {
+                                          return DropdownMenuItem(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                        value: dropdownvalue == ""
+                                            ? categoryName == []
+                                                ? ""
+                                                : categoryName![3]
+                                            : dropdownvalue,
+                                        style: const TextStyle(
+                                            fontFamily: "Poppins"),
+                                        onChanged: (value) {
+                                          setState(
+                                            () {
+                                              dropdownvalue = value!;
+                                              String result1 =
+                                                  dropdownvalue.replaceAll(
+                                                      RegExp(r"[(]+[0-9]+[)]"),
+                                                      '');
 
-                                                data = displayData!
-                                                    .where((element) => element
-                                                        .name
-                                                        .contains(result1
-                                                            .trimRight()))
-                                                    .expand((element) =>
-                                                        element.data)
-                                                    .toList()
-                                                  ..sort((a, b) => a.title
-                                                      .compareTo(b.title));
-                                                categorydata = data;
-                                                showSearchField = false;
-                                                categorysearch = false;
-                                              },
-                                            );
-                                          },
-                                        ),
+                                              data = displayData!
+                                                  .where((element) =>
+                                                      element.name.contains(
+                                                          result1.trimRight()))
+                                                  .expand(
+                                                      (element) => element.data)
+                                                  .toList()
+                                                ..sort((a, b) =>
+                                                    a.title.compareTo(b.title));
+                                              categorydata = data;
+                                              showSearchField = false;
+                                              categorysearch = false;
+                                            },
+                                          );
+                                        },
+                                      )
+                                    : Text(
+                                        dropdownvalue,
+                                        style: const TextStyle(
+                                            fontFamily: "Poppins"),
                                       ),
-                                      selected: ind == 0 ? true : false,
-                                      selectedColor: ColorPalette().topColor,
-                                      disabledColor: ColorPalette().highlight,
-                                    )
-                                  : ChoiceChip(
-                                      showCheckmark: false,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                      label: SizedBox(
-                                        height: 45,
-                                        child: Center(
-                                          child: Text(
-                                            dropdownvalue,
-                                            style: const TextStyle(
-                                                fontFamily: "Poppins"),
-                                          ),
-                                        ),
-                                      ),
-                                      selected: ind == 0 ? true : false,
-                                      selectedColor: ColorPalette().topColor,
-                                      disabledColor: ColorPalette().highlight,
-                                    ),
+                              ),
                             ),
                             const SizedBox(width: 10),
                             GestureDetector(
@@ -306,26 +290,28 @@ class _MoviePageState extends State<MoviePage>
                                   prevIndex = ind!;
                                   ind = 1;
                                   showSearchField = false;
-                                  categorysearch = false;
                                 });
                               },
-                              child: ChoiceChip(
-                                showCheckmark: false,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                label: SizedBox(
-                                  height: 45,
-                                  child: Center(
-                                    child: Text(
-                                      "${"favorites".tr()} (${favData.length})",
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                    ),
+                              child: Container(
+                                height: 50,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 5, vertical: 5),
+                                alignment: Alignment.centerLeft,
+                                decoration: BoxDecoration(
+                                  color: ind == 1
+                                      ? ColorPalette().topColor
+                                      : ColorPalette().highlight,
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(
+                                    color: ind == 1
+                                        ? ColorPalette().topColor
+                                        : Colors.grey,
                                   ),
                                 ),
-                                selected: ind == 1 ? true : false,
-                                selectedColor: ColorPalette().topColor,
-                                disabledColor: ColorPalette().highlight,
+                                child: Text(
+                                  "${"favorites".tr().toUpperCase()} (${favData.length})",
+                                  style: const TextStyle(fontFamily: "Poppins"),
+                                ),
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -335,28 +321,180 @@ class _MoviePageState extends State<MoviePage>
                                   prevIndex = ind!;
                                   ind = 2;
                                   showSearchField = false;
-                                  categorysearch = false;
                                 });
                               },
-                              child: ChoiceChip(
-                                showCheckmark: false,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                label: SizedBox(
-                                  height: 45,
-                                  child: Center(
-                                    child: Text(
-                                      "${"Movies History"} (${hisData.length})",
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                    ),
-                                  ),
+                              child: Container(
+                                height: 50,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 5, vertical: 5),
+                                alignment: Alignment.centerLeft,
+                                decoration: BoxDecoration(
+                                    color: ind == 2
+                                        ? ColorPalette().topColor
+                                        : ColorPalette().highlight,
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                        color: ind == 2
+                                            ? ColorPalette().topColor
+                                            : Colors.grey)),
+                                child: Text(
+                                  "${"Movies History".toUpperCase()} (${hisData.length})",
+                                  style: const TextStyle(fontFamily: "Poppins"),
                                 ),
-                                selected: ind == 2 ? true : false,
-                                selectedColor: ColorPalette().topColor,
-                                disabledColor: ColorPalette().highlight,
                               ),
                             ),
+                            // GestureDetector(
+                            //   onTap: () {
+                            //     setState(() {
+                            //       prevIndex = ind!;
+                            //       ind = 0;
+                            //       showSearchField = false;
+                            //     });
+                            //   },
+                            //   child: ind == 0 && prevIndex != 0
+                            //       ? ChoiceChip(
+                            //           showCheckmark: false,
+                            //           padding: const EdgeInsets.symmetric(
+                            //               horizontal: 10),
+                            //           label: Container(
+                            //             width: 170,
+                            //             height: 45,
+                            //             decoration: BoxDecoration(
+                            //               borderRadius:
+                            //                   BorderRadius.circular(30),
+                            //             ),
+                            //             child: DropdownButton(
+                            //               elevation: 0,
+                            //               isExpanded: true,
+                            //               padding: const EdgeInsets.all(0),
+                            //               underline: Container(),
+                            //               onTap: () {
+                            //                 setState(() {
+                            //                   selected = true;
+                            //                   ind = 0;
+                            //                 });
+                            //               },
+                            //               items: categoryName!.map((value) {
+                            //                 return DropdownMenuItem(
+                            //                     value: value,
+                            //                     child: Text(value));
+                            //               }).toList(),
+                            //               value: dropdownvalue == ""
+                            //                   ? categoryName == []
+                            //                       ? ""
+                            //                       : categoryName![3]
+                            //                   : dropdownvalue,
+                            //               style: const TextStyle(
+                            //                   fontFamily: "Poppins"),
+                            //               onChanged: (value) {
+                            //                 setState(
+                            //                   () {
+                            //                     dropdownvalue = value!;
+                            //                     String result1 =
+                            //                         dropdownvalue.replaceAll(
+                            //                             RegExp(
+                            //                                 r"[(]+[0-9]+[)]"),
+                            //                             '');
+
+                            //                     data = displayData!
+                            //                         .where((element) => element
+                            //                             .name
+                            //                             .contains(result1
+                            //                                 .trimRight()))
+                            //                         .expand((element) =>
+                            //                             element.data)
+                            //                         .toList()
+                            //                       ..sort((a, b) => a.title
+                            //                           .compareTo(b.title));
+                            //                     categorydata = data;
+                            //                     showSearchField = false;
+                            //                     categorysearch = false;
+                            //                   },
+                            //                 );
+                            //               },
+                            //             ),
+                            //           ),
+                            //           selected: ind == 0 ? true : false,
+                            //           selectedColor: ColorPalette().topColor,
+                            //           disabledColor: ColorPalette().highlight,
+                            //         )
+                            //       : ChoiceChip(
+                            //           showCheckmark: false,
+                            //           padding: const EdgeInsets.symmetric(
+                            //               horizontal: 10),
+                            //           label: SizedBox(
+                            //             height: 45,
+                            //             child: Center(
+                            //               child: Text(
+                            //                 dropdownvalue,
+                            //                 style: const TextStyle(
+                            //                     fontFamily: "Poppins"),
+                            //               ),
+                            //             ),
+                            //           ),
+                            //           selected: ind == 0 ? true : false,
+                            //           selectedColor: ColorPalette().topColor,
+                            //           disabledColor: ColorPalette().highlight,
+                            //         ),
+                            // ),
+                            // const SizedBox(width: 10),
+                            // GestureDetector(
+                            //   onTap: () {
+                            //     setState(() {
+                            //       prevIndex = ind!;
+                            //       ind = 1;
+                            //       showSearchField = false;
+                            //       categorysearch = false;
+                            //     });
+                            //   },
+                            //   child: ChoiceChip(
+                            //     showCheckmark: false,
+                            //     padding:
+                            //         const EdgeInsets.symmetric(horizontal: 10),
+                            //     label: SizedBox(
+                            //       height: 45,
+                            //       child: Center(
+                            //         child: Text(
+                            //           "${"favorites".tr()} (${favData.length})",
+                            //           style:
+                            //               const TextStyle(color: Colors.white),
+                            //         ),
+                            //       ),
+                            //     ),
+                            //     selected: ind == 1 ? true : false,
+                            //     selectedColor: ColorPalette().topColor,
+                            //     disabledColor: ColorPalette().highlight,
+                            //   ),
+                            // ),
+                            // const SizedBox(width: 10),
+                            // GestureDetector(
+                            //   onTap: () {
+                            //     setState(() {
+                            //       prevIndex = ind!;
+                            //       ind = 2;
+                            //       showSearchField = false;
+                            //       categorysearch = false;
+                            //     });
+                            //   },
+                            //   child: ChoiceChip(
+                            //     showCheckmark: false,
+                            //     padding:
+                            //         const EdgeInsets.symmetric(horizontal: 10),
+                            //     label: SizedBox(
+                            //       height: 45,
+                            //       child: Center(
+                            //         child: Text(
+                            //           "${"Movies History"} (${hisData.length})",
+                            //           style:
+                            //               const TextStyle(color: Colors.white),
+                            //         ),
+                            //       ),
+                            //     ),
+                            //     selected: ind == 2 ? true : false,
+                            //     selectedColor: ColorPalette().topColor,
+                            //     disabledColor: ColorPalette().highlight,
+                            //   ),
+                            // ),
                             const SizedBox(width: 10),
                           ],
                         ),
