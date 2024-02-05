@@ -97,7 +97,7 @@ class MovieListPageState extends State<MovieListPage>
       children: [
         Expanded(
             child: widget.showSearchField == true
-                ? _displayData.isEmpty
+                ? searchData!.isEmpty
                     ? Center(
                         child: Text(
                           "No Result Found for `$searchText`",
@@ -110,9 +110,9 @@ class MovieListPageState extends State<MovieListPage>
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 3, mainAxisExtent: 155),
-                        itemCount: _displayData.length,
+                        itemCount: searchData!.length,
                         itemBuilder: (context, i) {
-                          final M3uEntry d = _displayData[i];
+                          final M3uEntry d = searchData![i];
 
                           return GestureDetector(
                             onTap: () async {
@@ -463,15 +463,17 @@ class MovieListPageState extends State<MovieListPage>
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
                                                 child: NetworkImageViewer(
                                                   url: item
                                                       .attributes['tvg-logo'],
                                                   width: w,
                                                   height: 75,
-                                                  fit: BoxFit.cover,
+                                                  fit: BoxFit.fitHeight,
                                                   color: highlight,
                                                 ),
                                               ),
