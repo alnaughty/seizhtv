@@ -41,7 +41,7 @@ class _LabeledTextFieldState extends State<LabeledTextField> {
           controller: widget.controller,
           keyboardType: widget.isPassword
               ? TextInputType.visiblePassword
-              : TextInputType.emailAddress,
+              : TextInputType.text,
           decoration: InputDecoration(
             hintText: widget.hinttext,
             hintStyle: TextStyle(

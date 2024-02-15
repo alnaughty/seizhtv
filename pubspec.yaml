@@ -57,18 +57,16 @@ dependencies:
     git: https://github.com/alnaughty/ztabbar
   z_m3u_handler:
     git: https://github.com/alnaughty/z_m3u_handler
-    # git: https://github.com/alnaughty/z_m3u_handler
-    # path: /Users/qonvexmacmini/Desktop/z_m3u_handler
   page_transition: ^2.0.9
   dotted_border: ^2.0.0+3
   file_picker: ^6.1.1
   rxdart: ^0.27.7
   platform_device_id: ^1.0.1
   shimmer: ^3.0.0
-  video_player: ^2.6.0
+  video_player: ^2.8.2
   chewie: 
-    git: https://github.com/alnaughty/chewie_custom
-  #  ^1.4.0
+    # git: https://github.com/alnaughty/chewie_custom
+   ^1.7.4
   # flutter_cast_framework:
   #   path: /Users/qonvexmacmini/Desktop/flutter_cast_framework
   cached_network_image: ^3.2.3
@@ -86,6 +84,8 @@ dependencies:
   cool_dropdown: ^2.1.0
   firebase_auth: ^4.10.1
   flutter_isolate: ^2.0.4
+  flutter_to_airplay: ^2.0.4
+  flutter_vlc_player: ^7.4.1
 
 dev_dependencies:
   flutter_test:

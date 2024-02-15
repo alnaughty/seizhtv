@@ -190,41 +190,53 @@ class MovieCategoryPageState extends State<MovieCategoryPage>
                             Container(
                               margin: const EdgeInsets.only(top: 10, right: 10),
                               child: LayoutBuilder(
-                                builder: (context, c) {
-                                  final double w = c.maxWidth;
-                                  return Tooltip(
-                                    message: item.title,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          child: NetworkImageViewer(
-                                            url: item.attributes['tvg-logo'],
-                                            width: w,
-                                            height: 90,
-                                            fit: BoxFit.cover,
-                                            color: highlight,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 3),
-                                        Tooltip(
-                                          message: item.title,
-                                          child: Text(
-                                            item.title,
-                                            style:
-                                                const TextStyle(fontSize: 12),
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
+                                      builder: (context, c) {
+                                        final double w = c.maxWidth;
+                                        final double h = c.maxHeight;
+                                        return ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                              child: NetworkImageViewer(
+                                                url: item.attributes['tvg-logo'],
+                                                width: w,
+                                                height:h, 
+                                                fit: BoxFit.cover,
+                                                color: highlight,
+                                              ),
+                                            );
+                                      },
                                     ),
-                                  );
-                                },
-                              ),
+                              // Tooltip(
+                              //   message: item.title,
+                              //   child: Column(
+                              //     crossAxisAlignment:
+                              //         CrossAxisAlignment.start,
+                              //     children: [
+                              //       ClipRRect(
+                              //         borderRadius:
+                              //             BorderRadius.circular(10),
+                              //         child: NetworkImageViewer(
+                              //           url: item.attributes['tvg-logo'],
+                              //           width: w,
+                              //           height: 90,
+                              //           fit: BoxFit.cover,
+                              //           color: highlight,
+                              //         ),
+                              //       ),
+                              //       const SizedBox(height: 3),
+                              //       Tooltip(
+                              //         message: item.title,
+                              //         child: Text(
+                              //           item.title,
+                              //           style:
+                              //               const TextStyle(fontSize: 12),
+                              //           maxLines: 2,
+                              //           overflow: TextOverflow.ellipsis,
+                              //         ),
+                              //       ),
+                              //     ],
+                              //   ),
+                              // ),
                             ),
                             Positioned(
                               top: 0,

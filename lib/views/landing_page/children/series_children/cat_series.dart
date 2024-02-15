@@ -225,54 +225,64 @@ class SeriesCategoryPageState extends State<SeriesCategoryPage>
                             Container(
                               margin: const EdgeInsets.only(top: 10, right: 10),
                               child: LayoutBuilder(
-                                builder: (context, c) {
-                                  final double w = c.maxWidth;
-                                  return Tooltip(
-                                    message: datas.name,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                          child: NetworkImageViewer(
-                                            url: datas
-                                                .data[0].attributes['tvg-logo'],
-                                            width: w,
-                                            height: 75,
-                                            fit: BoxFit.cover,
-                                            color: highlight,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Tooltip(
-                                          message: datas.name,
-                                          child: Text(
-                                            datas.name,
-                                            style:
-                                                const TextStyle(fontSize: 12),
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                        Row(
-                                          children: [
-                                            Text("${datas.data.length} ",
-                                                style: const TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.grey)),
-                                            Text("Episodes".tr(),
-                                                style: const TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.grey)),
-                                          ],
-                                        ),
-                                      ],
+                                      builder: (context, c) {
+                                        final double w = c.maxWidth;
+                                        final double h = c.maxHeight;
+                                        return ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                              child: NetworkImageViewer(
+                                                url: datas
+                                          .data[0].attributes['tvg-logo'],
+                                                width: w,
+                                                height:h, 
+                                                fit: BoxFit.cover,
+                                                color: highlight,
+                                              ),
+                                            );
+                                      },
                                     ),
-                                  );
-                                },
-                              ),
+                              // Column(
+                              //   crossAxisAlignment:
+                              //       CrossAxisAlignment.start,
+                              //   children: [
+                              //     ClipRRect(
+                              //       borderRadius:
+                              //           BorderRadius.circular(5),
+                              //       child: NetworkImageViewer(
+                              //         url: datas
+                              //             .data[0].attributes['tvg-logo'],
+                              //         width: w,
+                              //         height: 75,
+                              //         fit: BoxFit.cover,
+                              //         color: highlight,
+                              //       ),
+                              //     ),
+                              //     const SizedBox(height: 2),
+                              //     Tooltip(
+                              //       message: datas.name,
+                              //       child: Text(
+                              //         datas.name,
+                              //         style:
+                              //             const TextStyle(fontSize: 12),
+                              //         maxLines: 2,
+                              //         overflow: TextOverflow.ellipsis,
+                              //       ),
+                              //     ),
+                              //     Row(
+                              //       children: [
+                              //         Text("${datas.data.length} ",
+                              //             style: const TextStyle(
+                              //                 fontSize: 12,
+                              //                 color: Colors.grey)),
+                              //         Text("Episodes".tr(),
+                              //             style: const TextStyle(
+                              //                 fontSize: 12,
+                              //                 color: Colors.grey)),
+                              //       ],
+                              //     ),
+                              //   ],
+                              // ),
                             ),
                             Positioned(
                               top: 0,

@@ -18,7 +18,7 @@ import '../../../../viewmodel/video_vm.dart';
 import 'details.dart';
 
 class SeriesListPage extends StatefulWidget {
-  SeriesListPage(
+  const SeriesListPage(
       {required this.controller,
       required this.data,
       required this.showSearchField,
@@ -152,57 +152,76 @@ class SeriesListPageState extends State<SeriesListPage>
                               Container(
                                 margin:
                                     const EdgeInsets.only(top: 10, right: 10),
-                                child: LayoutBuilder(
-                                  builder: (context, c) {
-                                    final double w = c.maxWidth;
-                                    return Tooltip(
-                                      message: searchData![i].name,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                            child: NetworkImageViewer(
-                                              url: searchData![i]
-                                                  .data[0]
-                                                  .attributes['tvg-logo'],
-                                              width: w,
-                                              height: 53,
-                                              fit: BoxFit.cover,
-                                              color: highlight,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 2),
-                                          Tooltip(
-                                            message: searchData![i].name,
-                                            child: Text(
-                                              searchData![i].name,
-                                              style:
-                                                  const TextStyle(fontSize: 12),
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                  "${searchData![i].data.length} ",
-                                                  style: const TextStyle(
-                                                      fontSize: 12,
-                                                      color: Colors.grey)),
-                                              Text("Episodes".tr(),
-                                                  style: const TextStyle(
-                                                      fontSize: 12,
-                                                      color: Colors.grey)),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
+                                child: Container(
+                                    margin: const EdgeInsets.only(
+                                        top: 10, right: 10),
+                                    child: LayoutBuilder(
+                                      builder: (context, c) {
+                                        final double w = c.maxWidth;
+                                        final double h = c.maxHeight;
+                                        return ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                              child: NetworkImageViewer(
+                                                url: _displayData[i]
+                                                    .data[0]
+                                                    .attributes['tvg-logo'],
+                                                width: w,
+                                                height:h, 
+                                                // 75,
+                                                fit: BoxFit.cover,
+                                                color: highlight,
+                                              ),
+                                            );
+                                      },
+                                    ),
+                                  ),
+                                // Tooltip(
+                                //   message: searchData![i].name,
+                                //   child: Column(
+                                //     crossAxisAlignment:
+                                //         CrossAxisAlignment.start,
+                                //     children: [
+                                //       ClipRRect(
+                                //         borderRadius:
+                                //             BorderRadius.circular(5),
+                                //         child: NetworkImageViewer(
+                                //           url: searchData![i]
+                                //               .data[0]
+                                //               .attributes['tvg-logo'],
+                                //           width: w,
+                                //           height: 53,
+                                //           fit: BoxFit.cover,
+                                //           color: highlight,
+                                //         ),
+                                //       ),
+                                //       const SizedBox(height: 2),
+                                //       Tooltip(
+                                //         message: searchData![i].name,
+                                //         child: Text(
+                                //           searchData![i].name,
+                                //           style:
+                                //               const TextStyle(fontSize: 12),
+                                //           maxLines: 2,
+                                //           overflow: TextOverflow.ellipsis,
+                                //         ),
+                                //       ),
+                                //       Row(
+                                //         children: [
+                                //           Text(
+                                //               "${searchData![i].data.length} ",
+                                //               style: const TextStyle(
+                                //                   fontSize: 12,
+                                //                   color: Colors.grey)),
+                                //           Text("Episodes".tr(),
+                                //               style: const TextStyle(
+                                //                   fontSize: 12,
+                                //                   color: Colors.grey)),
+                                //         ],
+                                //       ),
+                                //     ],
+                                //   ),
+                                // ),
                               ),
                               Positioned(
                                 top: 0,
@@ -488,53 +507,20 @@ class SeriesListPageState extends State<SeriesListPage>
                                     child: LayoutBuilder(
                                       builder: (context, c) {
                                         final double w = c.maxWidth;
-                                        return Tooltip(
-                                          message: _displayData[i].name,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(5),
-                                                child: NetworkImageViewer(
-                                                  url: _displayData[i]
-                                                      .data[0]
-                                                      .attributes['tvg-logo'],
-                                                  width: w,
-                                                  height: 75,
-                                                  fit: BoxFit.cover,
-                                                  color: highlight,
-                                                ),
+                                        final double h = c.maxHeight;
+                                        return ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                              child: NetworkImageViewer(
+                                                url: _displayData[i]
+                                                    .data[0]
+                                                    .attributes['tvg-logo'],
+                                                width: w,
+                                                height:h, 
+                                                fit: BoxFit.cover,
+                                                color: highlight,
                                               ),
-                                              const SizedBox(height: 3),
-                                              Tooltip(
-                                                message: _displayData[i].name,
-                                                child: Text(
-                                                  _displayData[i].name,
-                                                  style: const TextStyle(
-                                                      fontSize: 12),
-                                                  maxLines: 2,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                      "${_displayData[i].data.length} ",
-                                                      style: const TextStyle(
-                                                          fontSize: 12,
-                                                          color: Colors.grey)),
-                                                  Text("Episodes".tr(),
-                                                      style: const TextStyle(
-                                                          fontSize: 12,
-                                                          color: Colors.grey)),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        );
+                                            );
                                       },
                                     ),
                                   ),
