@@ -1,10 +1,13 @@
 // ignore_for_file: must_be_immutable, use_build_context_synchronously, deprecated_member_use, avoid_print
 
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_to_airplay/flutter_to_airplay.dart';
+import 'package:flutter_vlc_player/flutter_vlc_player.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:seizhtv/extensions/color.dart';
 import 'package:seizhtv/globals/loader.dart';
@@ -15,20 +18,19 @@ import 'cast.dart';
 
 class CustomPlayer extends StatefulWidget {
   CustomPlayer({
-    Key? key,
+    super.key,
     required this.link,
     required this.id,
     required this.name,
     required this.image,
     this.isLive = false,
-    required this.popOnError,
-  }) : super(key: key);
+    required this.popOnError
+  });
   String? id;
   bool popOnError;
   final String link;
   final String image;
   final String name;
-  // final String path;
   final bool isLive;
   @override
   State<CustomPlayer> createState() => _CustomPlayerState();
@@ -37,21 +39,27 @@ class CustomPlayer extends StatefulWidget {
 class _CustomPlayerState extends State<CustomPlayer> with ColorPalette {
   late VideoPlayerController _videoController;
   late ChewieController _chewieController;
+  
 
   Widget? _chewieWidget;
   init() async {
     print("URL : ${widget.link}");
     print("URL : ${widget.link.substring(6).replaceAll("http", "https")}");
+    print("URL : ${widget.link.replaceAll("http", "https")}");
+
     try {
       unableToPlay = false;
       _chewieWidget = null;
-      _videoController = VideoPlayerController.network(
-        widget.link,
+      _videoController =   VideoPlayerController.network( 
+        // widget.link
+        // "https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4"
+      Platform.isAndroid ?  widget.link : widget.link.replaceAll("http", "https"),
       );
 
       await _videoController.initialize().whenComplete(() {
-        print("VIDEO LINK: ${widget.link}");
+        print("VIDEO LINK: ${Platform.isAndroid ?  widget.link : widget.link.replaceAll("http", "https")}");
         print("DURATION ${_videoController.value.duration}");
+        
         _chewieController = ChewieController(
           videoPlayerController: _videoController,
           autoPlay: true,
@@ -113,10 +121,9 @@ class _CustomPlayerState extends State<CustomPlayer> with ColorPalette {
         _chewieWidget = Chewie(
           controller: _chewieController,
         );
-        if (mounted) setState(() {});
       });
 
-      // if (mounted) setState(() {});
+      if (mounted) setState(() {});
     } catch (e, s) {
       Fluttertoast.showToast(msg: "No video to stream");
       print("NO VIDEO ON STREAM : $e");
@@ -161,7 +168,8 @@ class _CustomPlayerState extends State<CustomPlayer> with ColorPalette {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
     try {
-      return _chewieWidget != null
+      return
+       _chewieWidget != null
           ? Stack(
               children: [
                 Container(

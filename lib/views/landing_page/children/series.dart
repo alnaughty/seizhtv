@@ -206,7 +206,7 @@ class _SeriesPageState extends State<SeriesPage>
                             GestureDetector(
                               onTap: () {
                                 setState(() {
-                                  prevIndex = ind!;
+                                  prevIndex = ind;
                                   ind = 0;
                                   showSearchField = false;
                                   print("CURRENT INDEX $ind");

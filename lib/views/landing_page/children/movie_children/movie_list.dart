@@ -143,36 +143,53 @@ class MovieListPageState extends State<MovieListPage>
                                     child: LayoutBuilder(
                                       builder: (context, c) {
                                         final double w = c.maxWidth;
-                                        return Tooltip(
-                                          message: d.title,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              NetworkImageViewer(
+                                        final double h = c.maxHeight;
+                                        return ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                              child: NetworkImageViewer(
                                                 url: d.attributes['tvg-logo'],
                                                 width: w,
-                                                height: 90,
+                                                height:h, 
                                                 fit: BoxFit.cover,
                                                 color: highlight,
                                               ),
-                                              const SizedBox(height: 3),
-                                              Tooltip(
-                                                message: d.title,
-                                                child: Text(
-                                                  d.title,
-                                                  style: const TextStyle(
-                                                      fontSize: 12),
-                                                  maxLines: 2,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        );
+                                            );
                                       },
                                     ),
+                                    // LayoutBuilder(
+                                    //   builder: (context, c) {
+                                    //     final double w = c.maxWidth;
+                                    //     return Tooltip(
+                                    //       message: d.title,
+                                    //       child: Column(
+                                    //         crossAxisAlignment:
+                                    //             CrossAxisAlignment.start,
+                                    //         children: [
+                                    //           NetworkImageViewer(
+                                    //             url: d.attributes['tvg-logo'],
+                                    //             width: w,
+                                    //             height: 90,
+                                    //             fit: BoxFit.cover,
+                                    //             color: highlight,
+                                    //           ),
+                                    //           const SizedBox(height: 3),
+                                    //           Tooltip(
+                                    //             message: d.title,
+                                    //             child: Text(
+                                    //               d.title,
+                                    //               style: const TextStyle(
+                                    //                   fontSize: 12),
+                                    //               maxLines: 2,
+                                    //               overflow:
+                                    //                   TextOverflow.ellipsis,
+                                    //             ),
+                                    //           ),
+                                    //         ],
+                                    //       ),
+                                    //     );
+                                    //   },
+                                    // ),
                                   ),
                                   Positioned(
                                     top: 0,
@@ -457,43 +474,60 @@ class MovieListPageState extends State<MovieListPage>
                                     child: LayoutBuilder(
                                       builder: (context, c) {
                                         final double w = c.maxWidth;
-                                        return Tooltip(
-                                          message: item.title,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                                child: NetworkImageViewer(
-                                                  url: item
-                                                      .attributes['tvg-logo'],
-                                                  width: w,
-                                                  height: 75,
-                                                  fit: BoxFit.fitHeight,
-                                                  color: highlight,
-                                                ),
+                                        final double h = c.maxHeight;
+                                        return ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                              child: NetworkImageViewer(
+                                                url: item.attributes['tvg-logo'],
+                                                width: w,
+                                                height:h, 
+                                                fit: BoxFit.cover,
+                                                color: highlight,
                                               ),
-                                              const SizedBox(height: 3),
-                                              Tooltip(
-                                                message: item.title,
-                                                child: Text(
-                                                  item.title,
-                                                  style: const TextStyle(
-                                                      fontSize: 12),
-                                                  maxLines: 2,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        );
+                                            );
                                       },
                                     ),
+                                    // LayoutBuilder(
+                                    //   builder: (context, c) {
+                                    //     final double w = c.maxWidth;
+                                    //     return Tooltip(
+                                    //       message: item.title,
+                                    //       child: Column(
+                                    //         crossAxisAlignment:
+                                    //             CrossAxisAlignment.start,
+                                    //         children: [
+                                    //           Container(
+                                    //             decoration: BoxDecoration(
+                                    //               borderRadius:
+                                    //                   BorderRadius.circular(10),
+                                    //             ),
+                                    //             child: NetworkImageViewer(
+                                    //               url: item
+                                    //                   .attributes['tvg-logo'],
+                                    //               width: w,
+                                    //               height: 75,
+                                    //               fit: BoxFit.fitHeight,
+                                    //               color: highlight,
+                                    //             ),
+                                    //           ),
+                                    //           const SizedBox(height: 3),
+                                    //           Tooltip(
+                                    //             message: item.title,
+                                    //             child: Text(
+                                    //               item.title,
+                                    //               style: const TextStyle(
+                                    //                   fontSize: 12),
+                                    //               maxLines: 2,
+                                    //               overflow:
+                                    //                   TextOverflow.ellipsis,
+                                    //             ),
+                                    //           ),
+                                    //         ],
+                                    //       ),
+                                    //     );
+                                    //   },
+                                    // ),
                                   ),
                                   Positioned(
                                     top: 0,

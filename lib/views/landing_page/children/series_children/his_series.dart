@@ -81,10 +81,7 @@ class HistorySeriesPageState extends State<HistorySeriesPage>
               itemBuilder: (context, index) {
                 final ClassifiedData item = _displayData[index];
 
-                return LayoutBuilder(
-                  builder: (context, c) {
-                    final double w = c.maxWidth;
-                    return Stack(
+                return Stack(
                       children: [
                         GestureDetector(
                           onTap: () {
@@ -107,29 +104,46 @@ class HistorySeriesPageState extends State<HistorySeriesPage>
                           },
                           child: Container(
                             margin: const EdgeInsets.only(top: 10, right: 10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: NetworkImageViewer(
-                                    url: item.data[0].attributes['tvg-logo'],
-                                    width: w,
-                                    height: 75,
-                                    color: highlight,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                const SizedBox(height: 5),
-                                Text(
-                                  item.name,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(height: 1),
-                                ),
-                              ],
-                            ),
+                            child: LayoutBuilder(
+                                      builder: (context, c) {
+                                        final double w = c.maxWidth;
+                                        final double h = c.maxHeight;
+                                        return ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                              child: NetworkImageViewer(
+                                                url: item.data[0].attributes['tvg-logo'],
+                                                width: w,
+                                                height:h, 
+                                                fit: BoxFit.cover,
+                                                color: highlight,
+                                              ),
+                                            );
+                                      },
+                                    ),
+                            // Column(
+                            //   crossAxisAlignment: CrossAxisAlignment.start,
+                            //   mainAxisAlignment: MainAxisAlignment.start,
+                            //   children: [
+                            //     ClipRRect(
+                            //       borderRadius: BorderRadius.circular(10),
+                            //       child: NetworkImageViewer(
+                            //         url: item.data[0].attributes['tvg-logo'],
+                            //         width: w,
+                            //         height: 75,
+                            //         color: highlight,
+                            //         fit: BoxFit.cover,
+                            //       ),
+                            //     ),
+                            //     const SizedBox(height: 5),
+                            //     Text(
+                            //       item.name,
+                            //       maxLines: 2,
+                            //       overflow: TextOverflow.ellipsis,
+                            //       style: const TextStyle(height: 1),
+                            //     ),
+                            //   ],
+                            // ),
                           ),
                         ),
                         // Positioned(
@@ -198,8 +212,7 @@ class HistorySeriesPageState extends State<HistorySeriesPage>
                         //       ),
                         //     ))
                       ],
-                    );
-                  },
+                    
                 );
               }),
     );
