@@ -17,7 +17,6 @@ import 'package:seizhtv/views/landing_page/source_management.dart';
 import 'package:z_m3u_handler/extension.dart';
 import 'package:z_m3u_handler/z_m3u_handler.dart';
 import 'package:timeago/timeago.dart' as timeago;
-
 import '../../../globals/data.dart';
 import '../../../globals/network_image_viewer.dart';
 import 'movie_children/classified_movie_data.dart';
