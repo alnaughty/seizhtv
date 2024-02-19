@@ -634,6 +634,8 @@ PODS:
   - AppAuth/Core (1.6.2)
   - AppAuth/ExternalUserAgent (1.6.2):
     - AppAuth/Core
+  - auto_orientation (0.0.1):
+    - Flutter
   - bonsoir_darwin (3.0.0):
     - Flutter
     - FlutterMacOS
@@ -783,6 +785,8 @@ PODS:
   - flutter_localization (0.0.1):
     - Flutter
   - flutter_native_splash (0.0.1):
+    - Flutter
+  - flutter_screen_wake (0.0.1):
     - Flutter
   - flutter_to_airplay (0.0.1):
     - Flutter
@@ -951,6 +955,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - auto_orientation (from `.symlinks/plugins/auto_orientation/ios`)
   - bonsoir_darwin (from `.symlinks/plugins/bonsoir_darwin/darwin`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
@@ -964,6 +969,7 @@ DEPENDENCIES:
   - flutter_isolate (from `.symlinks/plugins/flutter_isolate/ios`)
   - flutter_localization (from `.symlinks/plugins/flutter_localization/ios`)
   - flutter_native_splash (from `.symlinks/plugins/flutter_native_splash/ios`)
+  - flutter_screen_wake (from `.symlinks/plugins/flutter_screen_wake/ios`)
   - flutter_to_airplay (from `.symlinks/plugins/flutter_to_airplay/ios`)
   - flutter_vlc_player (from `.symlinks/plugins/flutter_vlc_player/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
@@ -1018,6 +1024,8 @@ SPEC REPOS:
     - Toast
 
 EXTERNAL SOURCES:
+  auto_orientation:
+    :path: ".symlinks/plugins/auto_orientation/ios"
   bonsoir_darwin:
     :path: ".symlinks/plugins/bonsoir_darwin/darwin"
   cloud_firestore:
@@ -1044,6 +1052,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_localization/ios"
   flutter_native_splash:
     :path: ".symlinks/plugins/flutter_native_splash/ios"
+  flutter_screen_wake:
+    :path: ".symlinks/plugins/flutter_screen_wake/ios"
   flutter_to_airplay:
     :path: ".symlinks/plugins/flutter_to_airplay/ios"
   flutter_vlc_player:
@@ -1074,6 +1084,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   abseil: 926fb7a82dc6d2b8e1f2ed7f3a718bce691d1e46
   AppAuth: 3bb1d1cd9340bd09f5ed189fb00b1cc28e1e8570
+  auto_orientation: 102ed811a5938d52c86520ddd7ecd3a126b5d39d
   bonsoir_darwin: 127bdc632fdc154ae2f277a4d5c86a6212bc75be
   BoringSSL-GRPC: 3175b25143e648463a56daeaaa499c6cb86dad33
   cloud_firestore: 73eece22ce25a0565238c283ee9990f1618d8063
@@ -1101,6 +1112,7 @@ SPEC CHECKSUMS:
   flutter_isolate: 0edf5081826d071adf21759d1eb10ff5c24503b5
   flutter_localization: f43b18844a2b3d2c71fd64f04ffd6b1e64dd54d4
   flutter_native_splash: 52501b97d1c0a5f898d687f1646226c1f93c56ef
+  flutter_screen_wake: 4d3c2b43943ea81bd5e591fd4e639ea537f4ca5e
   flutter_to_airplay: 3194fe6e4ca6ba1d9529c3c4194c32b9610d990f
   flutter_vlc_player: 2e318881576450ff081eb023d47c289f2c6681eb
   fluttertoast: 31b00dabfa7fb7bacd9e7dbee580d7a2ff4bf265
@@ -1135,6 +1147,6 @@ SPEC CHECKSUMS:
   video_player_avfoundation: 02011213dab73ae3687df27ce441fbbcc82b5579
   wakelock_plus: 8b09852c8876491e4b6d179e17dfe2a0b5f60d47
 
-PODFILE CHECKSUM: c48e27d48d8798010040e4e70aea41b6736969c3
+PODFILE CHECKSUM: c0960b7e624ab1869e5db8b54c47b05fcdfd2668
 
 COCOAPODS: 1.14.3

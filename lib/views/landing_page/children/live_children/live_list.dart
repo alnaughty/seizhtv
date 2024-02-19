@@ -100,6 +100,7 @@ class LiveListState extends State<LiveList> with ColorPalette, UIAdditional {
                   itemCount: _displayData.length,
                   itemBuilder: (context, index) {
                     final M3uEntry item = _displayData[index];
+                    print("LIVE M3U DATA: $item");
 
                     return LayoutBuilder(builder: (context, c) {
                       final double w = c.maxWidth;
