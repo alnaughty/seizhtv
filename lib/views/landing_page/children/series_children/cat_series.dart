@@ -201,18 +201,40 @@ class SeriesCategoryPageState extends State<SeriesCategoryPage>
 
                     return GestureDetector(
                       onTap: () async {
+                        String title = '';
+
                         String result1 = datas.name.replaceAll(
                             RegExp(r"[(]+[a-zA-Z]+[)]|[0-9]|[|]\s+[0-9]+\s[|]"),
                             '');
                         String result2 = result1.replaceAll(
-                            RegExp(r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|]"), '');
+                            RegExp(r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|] "), '');
+
+                        String result3 =
+                            datas.name.replaceAll(RegExp('[^0-9]'), '');
+
+                        if (result2.contains('FHD MULTI')) {
+                          title = result2.replaceAll('FHD MULTI', '').trim();
+                        } else if (result2.contains('FHD')) {
+                          title = result2.replaceAll('FHD', '').trim();
+                        } else if (result2.contains('HD')) {
+                          title = result2.replaceAll('HD', '').trim();
+                        } else if (result2.contains('SD')) {
+                          title = result2.replaceAll('SD', '').trim();
+                        }
+
+                        print("TITLE: ${datas.name}");
+                        print("SERIES TITLE (result1): $result1");
+                        print("SERIES TITLE (result2): $result2");
+                        print("SERIES TITLE (result3): $result3");
+                        print("SERIES TITLE (result3): $title");
 
                         Navigator.push(
                           context,
                           PageTransition(
                             child: SeriesDetailsPage(
                               data: datas,
-                              title: result2,
+                              title: title,
+                              year: result3,
                             ),
                             type: PageTransitionType.rightToLeft,
                           ),
@@ -225,23 +247,21 @@ class SeriesCategoryPageState extends State<SeriesCategoryPage>
                             Container(
                               margin: const EdgeInsets.only(top: 10, right: 10),
                               child: LayoutBuilder(
-                                      builder: (context, c) {
-                                        final double w = c.maxWidth;
-                                        final double h = c.maxHeight;
-                                        return ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                              child: NetworkImageViewer(
-                                                url: datas
-                                          .data[0].attributes['tvg-logo'],
-                                                width: w,
-                                                height:h, 
-                                                fit: BoxFit.cover,
-                                                color: highlight,
-                                              ),
-                                            );
-                                      },
+                                builder: (context, c) {
+                                  final double w = c.maxWidth;
+                                  final double h = c.maxHeight;
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(5),
+                                    child: NetworkImageViewer(
+                                      url: datas.data[0].attributes['tvg-logo'],
+                                      width: w,
+                                      height: h,
+                                      fit: BoxFit.cover,
+                                      color: highlight,
                                     ),
+                                  );
+                                },
+                              ),
                               // Column(
                               //   crossAxisAlignment:
                               //       CrossAxisAlignment.start,

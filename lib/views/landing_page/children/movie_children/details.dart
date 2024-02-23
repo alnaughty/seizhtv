@@ -21,10 +21,12 @@ import '../../../../viewmodel/moviedetails.dart';
 import '../details.dart';
 
 class MovieDetailsPage extends StatefulWidget {
-  const MovieDetailsPage({super.key, required this.data, required this.title});
+  const MovieDetailsPage(
+      {super.key, required this.data, required this.title, this.year});
   // final ClassifiedData data;
   final M3uEntry data;
   final String title;
+  final String? year;
 
   @override
   State<MovieDetailsPage> createState() => _MovieDetailsPageState();
@@ -45,7 +47,8 @@ class _MovieDetailsPageState extends State<MovieDetailsPage>
   void initState() {
     fetchFav();
     print("MOVIE TITLE: ${widget.title}");
-    searchMovie(title: widget.title).then((value) {
+    print("MOVIE YEAR: ${widget.year}");
+    searchMovie(title: widget.title, year: widget.year).then((value) {
       if (value != null) {
         print("MOVIE DETAILS: $value");
         movieDetails(value);

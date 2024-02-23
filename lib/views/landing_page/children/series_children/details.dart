@@ -18,9 +18,11 @@ import '../details.dart';
 import 'episode.dart';
 
 class SeriesDetailsPage extends StatefulWidget {
-  const SeriesDetailsPage({super.key, required this.data, required this.title});
+  const SeriesDetailsPage(
+      {super.key, required this.data, required this.title, this.year});
   final ClassifiedData data;
   final String title;
+  final String? year;
 
   @override
   State<SeriesDetailsPage> createState() => _SeriesDetailsPageState();
@@ -46,7 +48,9 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
   @override
   void initState() {
     fetchFav();
-    searchTV(title: widget.title).then((value) {
+    print("TITLE: ${widget.title}");
+    print("YEAR RELEASE: ${widget.year}");
+    searchTV(title: widget.title, year: widget.year).then((value) {
       if (value != null) {
         seriesDetails(value);
       }
