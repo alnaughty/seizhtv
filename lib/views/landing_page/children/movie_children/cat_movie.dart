@@ -172,12 +172,21 @@ class MovieCategoryPageState extends State<MovieCategoryPage>
                         String result2 = result1.replaceAll(
                             RegExp(r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|] "), '');
 
+                        String result3 =
+                            item.title.replaceAll(RegExp('[^0-9]'), '');
+
+                        print("MOVIEEE TITLE: ${item.title}");
+                        print("MOVIEEE TITLE (result1): $result1");
+                        print("MOVIEEE TITLE (result2): $result2");
+                        print("MOVIEEE TITLE (result3): $result3");
+
                         Navigator.push(
                           context,
                           PageTransition(
                             child: MovieDetailsPage(
                               data: item,
                               title: result2,
+                              year: result3,
                             ),
                             type: PageTransitionType.rightToLeft,
                           ),
@@ -190,22 +199,21 @@ class MovieCategoryPageState extends State<MovieCategoryPage>
                             Container(
                               margin: const EdgeInsets.only(top: 10, right: 10),
                               child: LayoutBuilder(
-                                      builder: (context, c) {
-                                        final double w = c.maxWidth;
-                                        final double h = c.maxHeight;
-                                        return ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                              child: NetworkImageViewer(
-                                                url: item.attributes['tvg-logo'],
-                                                width: w,
-                                                height:h, 
-                                                fit: BoxFit.cover,
-                                                color: highlight,
-                                              ),
-                                            );
-                                      },
+                                builder: (context, c) {
+                                  final double w = c.maxWidth;
+                                  final double h = c.maxHeight;
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(5),
+                                    child: NetworkImageViewer(
+                                      url: item.attributes['tvg-logo'],
+                                      width: w,
+                                      height: h,
+                                      fit: BoxFit.cover,
+                                      color: highlight,
                                     ),
+                                  );
+                                },
+                              ),
                               // Tooltip(
                               //   message: item.title,
                               //   child: Column(

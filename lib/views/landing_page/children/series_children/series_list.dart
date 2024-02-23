@@ -128,13 +128,26 @@ class SeriesListPageState extends State<SeriesListPage>
 
                         return GestureDetector(
                           onTap: () async {
-                            print("TITLE: ${searchData![i]}");
                             String result1 = searchData![i].name.replaceAll(
                                 RegExp(
                                     r"[(]+[a-zA-Z]+[)]|[0-9]|[|]\s+[0-9]+\s[|]"),
                                 '');
                             String result2 = result1.replaceAll(
                                 RegExp(r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|] "), '');
+
+                            String result3 = searchData![i]
+                                .name
+                                .replaceAll(RegExp('[^0-9]'), '');
+
+                            String result4 = searchData![i].name.replaceAll(
+                                RegExp(r'[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|]+[\w\s]'),
+                                '');
+
+                            print("TITLE: ${searchData![i]}");
+                            print("SERIES TITLE (result1): $result1");
+                            print("SERIES TITLE (result2): $result2");
+                            print("SERIES TITLE (result3): $result3");
+                            print("SERIES TITLE (result3): $result4");
 
                             Navigator.push(
                               context,
@@ -153,29 +166,28 @@ class SeriesListPageState extends State<SeriesListPage>
                                 margin:
                                     const EdgeInsets.only(top: 10, right: 10),
                                 child: Container(
-                                    margin: const EdgeInsets.only(
-                                        top: 10, right: 10),
-                                    child: LayoutBuilder(
-                                      builder: (context, c) {
-                                        final double w = c.maxWidth;
-                                        final double h = c.maxHeight;
-                                        return ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                              child: NetworkImageViewer(
-                                                url: _displayData[i]
-                                                    .data[0]
-                                                    .attributes['tvg-logo'],
-                                                width: w,
-                                                height:h, 
-                                                // 75,
-                                                fit: BoxFit.cover,
-                                                color: highlight,
-                                              ),
-                                            );
-                                      },
-                                    ),
+                                  margin:
+                                      const EdgeInsets.only(top: 10, right: 10),
+                                  child: LayoutBuilder(
+                                    builder: (context, c) {
+                                      final double w = c.maxWidth;
+                                      final double h = c.maxHeight;
+                                      return ClipRRect(
+                                        borderRadius: BorderRadius.circular(5),
+                                        child: NetworkImageViewer(
+                                          url: _displayData[i]
+                                              .data[0]
+                                              .attributes['tvg-logo'],
+                                          width: w,
+                                          height: h,
+                                          // 75,
+                                          fit: BoxFit.cover,
+                                          color: highlight,
+                                        ),
+                                      );
+                                    },
                                   ),
+                                ),
                                 // Tooltip(
                                 //   message: searchData![i].name,
                                 //   child: Column(
@@ -465,12 +477,29 @@ class SeriesListPageState extends State<SeriesListPage>
 
                           return GestureDetector(
                             onTap: () async {
-                              String result1 = _displayData[i].name.replaceAll(
-                                  RegExp(r"[(]+[a-zA-Z]+[)]|[|]\s+[0-9]+\s[|]"),
+                              // String result1 = _displayData[i].name.replaceAll(
+                              //     RegExp(r"[(]+[a-zA-Z]+[)]|[|]\s+[0-9]+\s[|]"),
+                              //     '');
+                              // String result2 = result1.replaceAll(
+                              //     RegExp(r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|] "),
+                              //     '');
+                              String result1 = searchData![i].name.replaceAll(
+                                  RegExp(
+                                      r"[(]+[a-zA-Z]+[)]|[0-9]|[|]\s+[0-9]+\s[|]"),
                                   '');
                               String result2 = result1.replaceAll(
                                   RegExp(r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|] "),
                                   '');
+
+                              String result3 = searchData![i]
+                                  .name
+                                  .replaceAll(RegExp('[^0-9]'), '');
+
+                              print("TITLE: ${searchData![i]}");
+                              print("SERIES TITLE (result1): $result1");
+                              print("SERIES TITLE (result2): $result2");
+                              print("SERIES TITLE (result3): $result3");
+
                               // await showModalBottomSheet(
                               //   context: context,
                               //   isDismissible: true,
@@ -491,6 +520,7 @@ class SeriesListPageState extends State<SeriesListPage>
                                   child: SeriesDetailsPage(
                                     data: _displayData[i],
                                     title: result2,
+                                    year: result3,
                                   ),
                                   type: PageTransitionType.rightToLeft,
                                 ),
@@ -509,18 +539,18 @@ class SeriesListPageState extends State<SeriesListPage>
                                         final double w = c.maxWidth;
                                         final double h = c.maxHeight;
                                         return ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                              child: NetworkImageViewer(
-                                                url: _displayData[i]
-                                                    .data[0]
-                                                    .attributes['tvg-logo'],
-                                                width: w,
-                                                height:h, 
-                                                fit: BoxFit.cover,
-                                                color: highlight,
-                                              ),
-                                            );
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          child: NetworkImageViewer(
+                                            url: _displayData[i]
+                                                .data[0]
+                                                .attributes['tvg-logo'],
+                                            width: w,
+                                            height: h,
+                                            fit: BoxFit.cover,
+                                            color: highlight,
+                                          ),
+                                        );
                                       },
                                     ),
                                   ),

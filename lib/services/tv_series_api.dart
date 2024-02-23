@@ -62,15 +62,17 @@ class TVSeriesAPI {
     }
   }
 
-  Future<int?> searchTV({required String title}) async {
+  Future<int?> searchTV({required String title, String? year}) async {
     try {
-      return dio.get(
-        "${Network.tmdbDomain}/search/tv?api_key=$_apiKey",
+      return dio
+          .get(
+        "${Network.tmdbDomain}/search/tv?api_key=$_apiKey&query=$title&year=$year",
         options: Options(headers: {
           "accept": "application/json",
         }),
-        queryParameters: {"query": title},
-      ).then((response) {
+        // queryParameters: {"query": title},
+      )
+          .then((response) {
         if (response.statusCode == 200) {
           if (response.data['total_results'] != 0) {
             final int data = response.data['results'][0]['id'];
