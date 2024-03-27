@@ -210,6 +210,7 @@ class MovieCategoryPageState extends State<MovieCategoryPage>
                                       height: h,
                                       fit: BoxFit.cover,
                                       color: highlight,
+                                      title: item.title,
                                     ),
                                   );
                                 },

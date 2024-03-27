@@ -249,6 +249,7 @@ class LiveCategoryPageState extends State<LiveCategoryPage>
                                       borderRadius: BorderRadius.circular(10),
                                       child: NetworkImageViewer(
                                         url: item.attributes['tvg-logo'],
+                                        title: "false",
                                         width: w,
                                         height: 75,
                                         color: highlight,

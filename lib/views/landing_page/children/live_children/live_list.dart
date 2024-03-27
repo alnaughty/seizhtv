@@ -121,6 +121,7 @@ class LiveListState extends State<LiveList> with ColorPalette, UIAdditional {
                                     borderRadius: BorderRadius.circular(10),
                                     child: NetworkImageViewer(
                                       url: item.attributes['tvg-logo'],
+                                      title: "false",
                                       width: w,
                                       height: 75,
                                       color: highlight,
@@ -198,7 +199,9 @@ class LiveListState extends State<LiveList> with ColorPalette, UIAdditional {
                                     } else {
                                       await item.removeFromFavorites(refId!);
                                     }
-                                    await fetchFav();
+                                    setState(() {
+                                      fetchFav();
+                                    });
                                   },
                                   initValue: item.existsInFavorites("live"),
                                   iconSize: 20,

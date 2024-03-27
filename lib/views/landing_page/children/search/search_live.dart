@@ -235,6 +235,7 @@ class _SearchLiveState extends State<SearchLive>
                                                       return NetworkImageViewer(
                                                         url: _dat.attributes[
                                                             'tvg-logo']!,
+                                                        title: _dat.title,
                                                         height: h,
                                                         width: w,
                                                         fit: BoxFit.cover,
@@ -260,7 +261,7 @@ class _SearchLiveState extends State<SearchLive>
                                                       ),
                                                     ),
                                                     padding: const EdgeInsets
-                                                            .symmetric(
+                                                        .symmetric(
                                                         horizontal: 10),
                                                     width: double.infinity,
                                                     height: 45,

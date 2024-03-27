@@ -179,6 +179,7 @@ class _MovieDetailsState extends State<MovieDetails> with ColorPalette {
                                 child: NetworkImageViewer(
                                     url: widget.data.data[chosenIndex!]
                                         .attributes['tvg-logo'],
+                                    title: "false",
                                     width: 100,
                                     height: h,
                                     color: highlight),

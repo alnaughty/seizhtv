@@ -206,6 +206,7 @@ class _SearchSeriesState extends State<SearchSeries>
                                                 child: NetworkImageViewer(
                                                   url: e.data[0]
                                                       .attributes['tvg-logo']!,
+                                                  title: e.data[0].title,
                                                   height: h,
                                                   width: w,
                                                   fit: BoxFit.cover,

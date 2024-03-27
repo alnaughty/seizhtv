@@ -122,6 +122,7 @@ class FavLiveTvPageState extends State<FavLiveTvPage>
                                 borderRadius: BorderRadius.circular(10),
                                 child: NetworkImageViewer(
                                   url: item.attributes['tvg-logo'],
+                                  title: "false",
                                   width: w,
                                   height: 80,
                                   color: highlight,

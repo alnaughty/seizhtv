@@ -15,12 +15,14 @@ class NetworkImageViewer extends StatelessWidget
       required this.width,
       this.fit = BoxFit.contain,
       required this.height,
+      required this.title,
       required this.color});
   final String? url;
   final double height;
   final double width;
   final Color color;
   final BoxFit fit;
+  final String title;
   @override
   Widget build(BuildContext context) {
     return url == null
@@ -38,7 +40,7 @@ class NetworkImageViewer extends StatelessWidget
                   SvgPicture.asset(
                     "assets/icons/logo.svg",
                     width: width * .7,
-                    // color: Colors.red.withOpacity(.5),
+                    color: Colors.red.withOpacity(.5),
                     fit: BoxFit.contain,
                   ),
                 ],
@@ -74,24 +76,23 @@ class NetworkImageViewer extends StatelessWidget
             placeholderFadeInDuration: const Duration(milliseconds: 500),
             errorWidget: (_, url, error) => Container(
               color: cardColor.darken().withOpacity(.5),
-              child: Center(
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // shimmerLoading(
-                    //   color,
-                    //   height,
-                    //   width: width,
-                    // ),
-                    SvgPicture.asset(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: title == "false"
+                  ? SvgPicture.asset(
                       "assets/icons/logo-ico.svg",
                       width: width * .7,
                       color: Colors.red.withOpacity(.5),
                       fit: BoxFit.contain,
+                    )
+                  : Center(
+                      child: Text(
+                        title,
+                        style: const TextStyle(fontSize: 12),
+                        textAlign: TextAlign.center,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ],
-                ),
-              ),
             ),
           );
     // Image.network("");

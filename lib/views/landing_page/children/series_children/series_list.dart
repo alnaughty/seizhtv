@@ -175,12 +175,12 @@ class SeriesListPageState extends State<SeriesListPage>
                                       return ClipRRect(
                                         borderRadius: BorderRadius.circular(5),
                                         child: NetworkImageViewer(
-                                          url: _displayData[i]
+                                          url: searchData![i]
                                               .data[0]
                                               .attributes['tvg-logo'],
+                                          title: searchData![i].data[0].title,
                                           width: w,
                                           height: h,
-                                          // 75,
                                           fit: BoxFit.cover,
                                           color: highlight,
                                         ),
@@ -545,6 +545,8 @@ class SeriesListPageState extends State<SeriesListPage>
                                             url: _displayData[i]
                                                 .data[0]
                                                 .attributes['tvg-logo'],
+                                            title:
+                                                _displayData[i].data[0].title,
                                             width: w,
                                             height: h,
                                             fit: BoxFit.cover,

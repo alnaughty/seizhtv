@@ -281,6 +281,7 @@ class _EpisodePageState extends State<EpisodePage>
                           borderRadius: BorderRadius.circular(10),
                           child: NetworkImageViewer(
                             url: e.attributes['tvg-logo']!,
+                            title: "false",
                             height: 60,
                             width: 85,
                             color: highlight,

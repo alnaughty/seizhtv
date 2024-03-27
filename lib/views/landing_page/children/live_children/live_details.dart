@@ -54,6 +54,7 @@ class _LiveDetailsState extends State<LiveDetails> with ColorPalette {
             borderRadius: BorderRadius.circular(10),
             child: NetworkImageViewer(
               url: widget.entry.attributes['tvg-logo']!,
+              title: widget.entry.title,
               height: 200,
               width: double.infinity,
               color: highlight,

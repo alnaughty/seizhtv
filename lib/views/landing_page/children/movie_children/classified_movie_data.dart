@@ -253,6 +253,7 @@ class _ClassifiedMovieDataState extends State<ClassifiedMovieData>
                                             children: [
                                               NetworkImageViewer(
                                                 url: d.attributes['tvg-logo'],
+                                                title: d.title,
                                                 width: w,
                                                 height: 90,
                                                 fit: BoxFit.cover,
@@ -305,7 +306,7 @@ class _ClassifiedMovieDataState extends State<ClassifiedMovieData>
                                                   ),
                                                   child: Container(
                                                     padding: const EdgeInsets
-                                                            .symmetric(
+                                                        .symmetric(
                                                         horizontal: 20),
                                                     child: Row(
                                                       mainAxisAlignment:

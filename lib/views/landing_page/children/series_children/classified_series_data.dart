@@ -274,6 +274,9 @@ class _ClassifiedSeriesDataState extends State<ClassifiedSeriesData>
                                                   url: _displayData[i]
                                                       .data[0]
                                                       .attributes['tvg-logo'],
+                                                  title: _displayData[i]
+                                                      .data[0]
+                                                      .title,
                                                   width: w,
                                                   height: 53,
                                                   fit: BoxFit.cover,
@@ -342,7 +345,7 @@ class _ClassifiedSeriesDataState extends State<ClassifiedSeriesData>
                                                   ),
                                                   child: Container(
                                                     padding: const EdgeInsets
-                                                            .symmetric(
+                                                        .symmetric(
                                                         horizontal: 20),
                                                     child: Row(
                                                       mainAxisAlignment:

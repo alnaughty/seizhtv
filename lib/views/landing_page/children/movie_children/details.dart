@@ -311,6 +311,7 @@ class _MovieDetailsPageState extends State<MovieDetailsPage>
                 width: double.infinity,
                 child: NetworkImageViewer(
                   url: "${widget.data.attributes['tvg-logo']}",
+                  title: "false",
                   width: 85,
                   height: 60,
                   fit: BoxFit.cover,

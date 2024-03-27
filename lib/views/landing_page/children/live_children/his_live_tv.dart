@@ -97,6 +97,7 @@ class HistoryLiveTvPageState extends State<HistoryLiveTvPage>
                           borderRadius: BorderRadius.circular(10),
                           child: NetworkImageViewer(
                             url: item.attributes['tvg-logo'],
+                            title: "false",
                             width: w,
                             height: 70,
                             color: highlight,
