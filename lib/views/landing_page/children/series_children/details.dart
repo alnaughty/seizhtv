@@ -371,6 +371,7 @@ class _SeriesDetailsPageState extends State<SeriesDetailsPage>
                   width: double.infinity,
                   child: NetworkImageViewer(
                     url: "${widget.data.data[0].attributes['tvg-logo']}",
+                    title: "false",
                     width: 85,
                     height: 60,
                     fit: BoxFit.cover,

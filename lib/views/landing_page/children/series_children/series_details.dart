@@ -78,6 +78,7 @@ class _SeriesDetailsState extends State<SeriesDetails>
                             final M3uEntry _entry = widget.data.data[index];
                             return NetworkImageViewer(
                               url: _entry.attributes['tvg-logo']!,
+                              title: "false",
                               height: h,
                               width: w,
                               color: card.darken(),
@@ -175,6 +176,7 @@ class _SeriesDetailsState extends State<SeriesDetails>
                     borderRadius: BorderRadius.circular(5),
                     child: NetworkImageViewer(
                       url: _entry.attributes['tvg-logo']!,
+                      title: "false",
                       width: 120,
                       height: 60,
                       color: card.darken(),

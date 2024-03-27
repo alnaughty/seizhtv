@@ -82,73 +82,71 @@ class HistoryMoviePageState extends State<HistoryMoviePage>
                   itemBuilder: (context, index) {
                     final M3uEntry item = _displayData[index];
 
-                
-                        return GestureDetector(
-                          onTap: () {
-                            String result1 = item.title.replaceAll(
-                                RegExp(
-                                    r"[0-9]|[(]+[0-9]+[)]|[|]\s+[0-9]+\s[|]"),
-                                '');
-                            String result2 = result1.replaceAll(
-                                RegExp(r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|] "), '');
+                    return GestureDetector(
+                      onTap: () {
+                        String result1 = item.title.replaceAll(
+                            RegExp(r"[0-9]|[(]+[0-9]+[)]|[|]\s+[0-9]+\s[|]"),
+                            '');
+                        String result2 = result1.replaceAll(
+                            RegExp(r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|] "), '');
 
-                            Navigator.push(
-                              context,
-                              PageTransition(
-                                child: MovieDetailsPage(
-                                  data: item,
-                                  title: result2,
-                                ),
-                                type: PageTransitionType.rightToLeft,
-                              ),
-                            );
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.only(top: 10, right: 10),
-                            child: LayoutBuilder(
-                                      builder: (context, c) {
-                                        final double w = c.maxWidth;
-                                        final double h = c.maxHeight;
-                                        return ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                              child: NetworkImageViewer(
-                                                url: item.attributes['tvg-logo'],
-                                                width: w,
-                                                height:h, 
-                                                fit: BoxFit.cover,
-                                                color: highlight,
-                                              ),
-                                            );
-                                      },
-                                    ),
-                            // Column(
-                            //   crossAxisAlignment: CrossAxisAlignment.start,
-                            //   mainAxisAlignment: MainAxisAlignment.start,
-                            //   children: [
-                            //     ClipRRect(
-                            //       borderRadius: BorderRadius.circular(10),
-                            //       child: NetworkImageViewer(
-                            //         url: item.attributes['tvg-logo'],
-                            //         width: w,
-                            //         height: 75,
-                            //         color: highlight,
-                            //         fit: BoxFit.cover,
-                            //       ),
-                            //     ),
-                            //     const SizedBox(height: 7),
-                            //     Text(
-                            //       item.title,
-                            //       maxLines: 2,
-                            //       overflow: TextOverflow.ellipsis,
-                            //       style: const TextStyle(height: 1),
-                            //     ),
-                            //   ],
-                            // ),
+                        Navigator.push(
+                          context,
+                          PageTransition(
+                            child: MovieDetailsPage(
+                              data: item,
+                              title: result2,
+                            ),
+                            type: PageTransitionType.rightToLeft,
                           ),
                         );
                       },
-                    ),
+                      child: Container(
+                        margin: const EdgeInsets.only(top: 10, right: 10),
+                        child: LayoutBuilder(
+                          builder: (context, c) {
+                            final double w = c.maxWidth;
+                            final double h = c.maxHeight;
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(5),
+                              child: NetworkImageViewer(
+                                url: item.attributes['tvg-logo'],
+                                width: w,
+                                height: h,
+                                fit: BoxFit.cover,
+                                color: highlight,
+                                title: item.title,
+                              ),
+                            );
+                          },
+                        ),
+                        // Column(
+                        //   crossAxisAlignment: CrossAxisAlignment.start,
+                        //   mainAxisAlignment: MainAxisAlignment.start,
+                        //   children: [
+                        //     ClipRRect(
+                        //       borderRadius: BorderRadius.circular(10),
+                        //       child: NetworkImageViewer(
+                        //         url: item.attributes['tvg-logo'],
+                        //         width: w,
+                        //         height: 75,
+                        //         color: highlight,
+                        //         fit: BoxFit.cover,
+                        //       ),
+                        //     ),
+                        //     const SizedBox(height: 7),
+                        //     Text(
+                        //       item.title,
+                        //       maxLines: 2,
+                        //       overflow: TextOverflow.ellipsis,
+                        //       style: const TextStyle(height: 1),
+                        //     ),
+                        //   ],
+                        // ),
+                      ),
+                    );
+                  },
+                ),
         ),
       ],
     );

@@ -214,6 +214,7 @@ class _ClassifiedLiveDataState extends State<ClassifiedLiveData>
                                                 BorderRadius.circular(10),
                                             child: NetworkImageViewer(
                                               url: item.attributes['tvg-logo'],
+                                              title: item.title,
                                               width: w,
                                               height: 80,
                                               color: highlight,

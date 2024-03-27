@@ -154,6 +154,7 @@ class _FavoritesPageState extends State<FavoritesPage>
                                         },
                                         child: NetworkImageViewer(
                                           url: e.attributes['tvg-logo'],
+                                          title: e.title,
                                           width: 150,
                                           height: 90,
                                           color: card,
@@ -373,6 +374,7 @@ class _FavoritesPageState extends State<FavoritesPage>
                                             },
                                             child: NetworkImageViewer(
                                               url: d.attributes['tvg-logo']!,
+                                              title: d.title,
                                               width: 150,
                                               height: 90,
                                               color: card,
@@ -557,6 +559,7 @@ class _FavoritesPageState extends State<FavoritesPage>
                                             child: NetworkImageViewer(
                                               url: d.data[0]
                                                   .attributes['tvg-logo']!,
+                                              title: d.data[0].title,
                                               width: 150,
                                               height: 90,
                                               color: card,

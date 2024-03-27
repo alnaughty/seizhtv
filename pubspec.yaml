@@ -87,6 +87,7 @@ dependencies:
   flutter_to_airplay: ^2.0.4
   flutter_vlc_player: ^7.4.1
   lecle_yoyo_player: ^0.0.8
+  path_provider: ^2.1.2
 
 dev_dependencies:
   flutter_test:

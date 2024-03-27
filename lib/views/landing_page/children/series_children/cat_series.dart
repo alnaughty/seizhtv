@@ -254,6 +254,7 @@ class SeriesCategoryPageState extends State<SeriesCategoryPage>
                                     borderRadius: BorderRadius.circular(5),
                                     child: NetworkImageViewer(
                                       url: datas.data[0].attributes['tvg-logo'],
+                                      title: datas.data[0].title,
                                       width: w,
                                       height: h,
                                       fit: BoxFit.cover,

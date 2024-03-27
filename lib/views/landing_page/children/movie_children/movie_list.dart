@@ -156,6 +156,7 @@ class MovieListPageState extends State<MovieListPage>
                                             height: h,
                                             fit: BoxFit.cover,
                                             color: highlight,
+                                            title: d.title,
                                           ),
                                         );
                                       },
@@ -179,14 +180,14 @@ class MovieListPageState extends State<MovieListPage>
                                     //           const SizedBox(height: 3),
                                     //           Tooltip(
                                     //             message: d.title,
-                                    //             child: Text(
-                                    //               d.title,
-                                    //               style: const TextStyle(
-                                    //                   fontSize: 12),
-                                    //               maxLines: 2,
-                                    //               overflow:
-                                    //                   TextOverflow.ellipsis,
-                                    //             ),
+                                    // child: Text(
+                                    //   d.title,
+                                    //   style: const TextStyle(
+                                    //       fontSize: 12),
+                                    //   maxLines: 2,
+                                    //   overflow:
+                                    //       TextOverflow.ellipsis,
+                                    // ),
                                     //           ),
                                     //         ],
                                     //       ),
@@ -492,12 +493,12 @@ class MovieListPageState extends State<MovieListPage>
                                           borderRadius:
                                               BorderRadius.circular(5),
                                           child: NetworkImageViewer(
-                                            url: item.attributes['tvg-logo'],
-                                            width: w,
-                                            height: h,
-                                            fit: BoxFit.cover,
-                                            color: highlight,
-                                          ),
+                                              url: item.attributes['tvg-logo'],
+                                              width: w,
+                                              height: h,
+                                              fit: BoxFit.cover,
+                                              color: highlight,
+                                              title: item.title),
                                         );
                                       },
                                     ),

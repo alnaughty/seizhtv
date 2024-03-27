@@ -251,6 +251,7 @@ class _HomePageState extends State<HomePage>
                                                             url:
                                                                 data.attributes[
                                                                     'tvg-logo'],
+                                                            title: data.title,
                                                             width: w,
                                                             height: 110,
                                                             fit:

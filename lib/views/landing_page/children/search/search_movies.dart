@@ -196,6 +196,8 @@ class _SearchMoviesState extends State<SearchMovies>
                                         url: _displayData![index]
                                             .data[0]
                                             .attributes['tvg-logo']!,
+                                        title:
+                                            _displayData![index].data[0].title,
                                         height: h,
                                         width: w,
                                         color: card.darken(),
