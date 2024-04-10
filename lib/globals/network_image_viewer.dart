@@ -62,12 +62,21 @@ class NetworkImageViewer extends StatelessWidget
                       height,
                       width: width,
                     ),
-                    SvgPicture.asset(
-                      "assets/icons/logo-ico.svg",
-                      width: width * .7,
-                      color: cardColor.withOpacity(.7),
-                      fit: BoxFit.contain,
+                    Center(
+                      child: Text(
+                        title,
+                        style: const TextStyle(fontSize: 12),
+                        textAlign: TextAlign.center,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
+                    // SvgPicture.asset(
+                    //   "assets/icons/logo-ico.svg",
+                    //   width: width * .7,
+                    //   color: cardColor.withOpacity(.7),
+                    //   fit: BoxFit.contain,
+                    // ),
                   ],
                 ),
               ),

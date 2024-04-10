@@ -16,9 +16,13 @@ import 'details.dart';
 
 class MovieCategoryPage extends StatefulWidget {
   MovieCategoryPage(
-      {super.key, required this.categorydata, required this.showsearchfield});
+      {super.key,
+      required this.categorydata,
+      required this.showsearchfield,
+      required this.onUpdateCallback});
 
   final List<M3uEntry> categorydata;
+  final ValueChanged<M3uEntry> onUpdateCallback;
   late bool showsearchfield;
 
   @override
@@ -303,8 +307,10 @@ class MovieCategoryPageState extends State<MovieCategoryPage>
                                         },
                                       );
                                       await item.addToFavorites(refId!);
+                                      widget.onUpdateCallback(item);
                                     } else {
                                       await item.removeFromFavorites(refId!);
+                                      widget.onUpdateCallback(item);
                                     }
                                     await fetchFav();
                                   },

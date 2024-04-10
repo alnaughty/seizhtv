@@ -18,9 +18,13 @@ import '../../../../globals/video_loader.dart';
 
 class SeriesCategoryPage extends StatefulWidget {
   SeriesCategoryPage(
-      {super.key, required this.categorydata, required this.showsearchfield});
+      {super.key,
+      required this.categorydata,
+      required this.showsearchfield,
+      required this.onUpdateCallback});
 
   final List<ClassifiedData> categorydata;
+  final ValueChanged<M3uEntry> onUpdateCallback;
   late bool showsearchfield;
 
   @override
@@ -364,10 +368,12 @@ class SeriesCategoryPageState extends State<SeriesCategoryPage>
                                       );
                                       for (M3uEntry m3u in datas.data) {
                                         await m3u.addToFavorites(refId!);
+                                        widget.onUpdateCallback(m3u);
                                       }
                                     } else {
                                       for (M3uEntry m3u in datas.data) {
                                         await m3u.removeFromFavorites(refId!);
+                                        widget.onUpdateCallback(m3u);
                                       }
                                     }
                                     await fetchFav();

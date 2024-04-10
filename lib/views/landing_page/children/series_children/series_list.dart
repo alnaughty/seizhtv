@@ -22,10 +22,12 @@ class SeriesListPage extends StatefulWidget {
       {required this.controller,
       required this.data,
       required this.showSearchField,
+      required this.onUpdateCallback,
       super.key});
   final ScrollController controller;
   final List<ClassifiedData> data;
   final bool showSearchField;
+  final ValueChanged<M3uEntry> onUpdateCallback;
 
   @override
   State<SeriesListPage> createState() => SeriesListPageState();
@@ -86,7 +88,7 @@ class SeriesListPageState extends State<SeriesListPage>
   }
 
   final int startIndex = 0;
-  late int endIndex = widget.data.length < 30 ? widget.data.length : 30;
+  late int endIndex = widget.data.length < 20 ? widget.data.length : 20;
   late List<ClassifiedData> _displayData =
       List.from(widget.data.sublist(startIndex, endIndex));
 
@@ -188,52 +190,6 @@ class SeriesListPageState extends State<SeriesListPage>
                                     },
                                   ),
                                 ),
-                                // Tooltip(
-                                //   message: searchData![i].name,
-                                //   child: Column(
-                                //     crossAxisAlignment:
-                                //         CrossAxisAlignment.start,
-                                //     children: [
-                                //       ClipRRect(
-                                //         borderRadius:
-                                //             BorderRadius.circular(5),
-                                //         child: NetworkImageViewer(
-                                //           url: searchData![i]
-                                //               .data[0]
-                                //               .attributes['tvg-logo'],
-                                //           width: w,
-                                //           height: 53,
-                                //           fit: BoxFit.cover,
-                                //           color: highlight,
-                                //         ),
-                                //       ),
-                                //       const SizedBox(height: 2),
-                                //       Tooltip(
-                                //         message: searchData![i].name,
-                                //         child: Text(
-                                //           searchData![i].name,
-                                //           style:
-                                //               const TextStyle(fontSize: 12),
-                                //           maxLines: 2,
-                                //           overflow: TextOverflow.ellipsis,
-                                //         ),
-                                //       ),
-                                //       Row(
-                                //         children: [
-                                //           Text(
-                                //               "${searchData![i].data.length} ",
-                                //               style: const TextStyle(
-                                //                   fontSize: 12,
-                                //                   color: Colors.grey)),
-                                //           Text("Episodes".tr(),
-                                //               style: const TextStyle(
-                                //                   fontSize: 12,
-                                //                   color: Colors.grey)),
-                                //         ],
-                                //       ),
-                                //     ],
-                                //   ),
-                                // ),
                               ),
                               Positioned(
                                 top: 0,
@@ -296,12 +252,14 @@ class SeriesListPageState extends State<SeriesListPage>
                                         for (M3uEntry m3u
                                             in searchData![i].data) {
                                           await m3u.addToFavorites(refId!);
+                                          widget.onUpdateCallback(m3u);
                                         }
                                         if (mounted) setState(() {});
                                       } else {
                                         for (M3uEntry m3u
                                             in searchData![i].data) {
                                           await m3u.removeFromFavorites(refId!);
+                                          widget.onUpdateCallback(m3u);
                                         }
                                         if (mounted) setState(() {});
                                       }
@@ -332,8 +290,8 @@ class SeriesListPageState extends State<SeriesListPage>
                             for (final TopSeriesModel tsm in result) {
                               print("TOP SERIES DATA: ${tsm.title}");
                               for (final ClassifiedData c in widget.data) {
+                                print("CLASSIFIED DATA: $c");
                                 if (c.name.contains(tsm.title)) {
-                                  print("CLASSIFIED DATA: $c");
                                   cd = c;
                                   tm = tsm;
                                 }
@@ -461,8 +419,6 @@ class SeriesListPageState extends State<SeriesListPage>
                             mainAxisExtent: 150),
                         itemCount: _displayData.length,
                         itemBuilder: (context, i) {
-                          // late bool isFavorite =
-                          //     _displayData[i].isInFavorite("series");
                           bool isInFavorite = false;
                           for (final ClassifiedData fav in favData) {
                             if (_displayData[i].name == fav.name) {
@@ -477,12 +433,6 @@ class SeriesListPageState extends State<SeriesListPage>
 
                           return GestureDetector(
                             onTap: () async {
-                              // String result1 = _displayData[i].name.replaceAll(
-                              //     RegExp(r"[(]+[a-zA-Z]+[)]|[|]\s+[0-9]+\s[|]"),
-                              //     '');
-                              // String result2 = result1.replaceAll(
-                              //     RegExp(r"[|]+[a-zA-Z]+[|]|[a-zA-Z]+[|] "),
-                              //     '');
                               String result1 = searchData![i].name.replaceAll(
                                   RegExp(
                                       r"[(]+[a-zA-Z]+[)]|[0-9]|[|]\s+[0-9]+\s[|]"),
@@ -622,12 +572,14 @@ class SeriesListPageState extends State<SeriesListPage>
                                             for (M3uEntry m3u
                                                 in _displayData[i].data) {
                                               await m3u.addToFavorites(refId!);
+                                              // widget.onUpdateCallback(m3u);
                                             }
                                           } else {
                                             for (M3uEntry m3u
                                                 in _displayData[i].data) {
                                               await m3u
                                                   .removeFromFavorites(refId!);
+                                              // widget.onUpdateCallback(m3u);
                                             }
                                           }
                                           await fetchFav();

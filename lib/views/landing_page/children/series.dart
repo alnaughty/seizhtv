@@ -203,87 +203,190 @@ class _SeriesPageState extends State<SeriesPage>
                           shrinkWrap: true,
                           scrollDirection: Axis.horizontal,
                           children: [
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  prevIndex = ind;
-                                  ind = 0;
-                                  showSearchField = false;
-                                  print("CURRENT INDEX $ind");
-                                  print("PREV INDEX $prevIndex");
-                                });
-                              },
-                              child: Container(
-                                width: 170,
-                                height: 50,
-                                // padding: const EdgeInsets.all(5),
-                                alignment: Alignment.centerLeft,
-                                decoration: BoxDecoration(
-                                    color: ind == 0
-                                        ? ColorPalette().topColor
-                                        : ColorPalette().highlight,
-                                    borderRadius: BorderRadius.circular(5),
-                                    border: Border.all(
+                            ind == 0
+                                ? Container(
+                                    width: 270,
+                                    height: 50,
+                                    padding: const EdgeInsets.all(10),
+                                    alignment: Alignment.centerLeft,
+                                    decoration: BoxDecoration(
                                         color: ind == 0
                                             ? ColorPalette().topColor
-                                            : Colors.grey)),
-                                child: ind == 0 && prevIndex != 0
-                                    ? DropdownButton(
-                                        elevation: 0,
-                                        isExpanded: true,
-                                        padding: const EdgeInsets.all(0),
-                                        underline: Container(),
-                                        onTap: () {
-                                          setState(() {
-                                            selected = true;
-                                            ind = 0;
-                                          });
-                                        },
-                                        items: categoryName!.map((value) {
-                                          return DropdownMenuItem(
-                                            value: value,
-                                            child: Text(value),
-                                          );
-                                        }).toList(),
-                                        value: dropdownvalue == ""
-                                            ? categoryName == []
-                                                ? ""
-                                                : categoryName![3]
-                                            : dropdownvalue,
-                                        style: const TextStyle(
-                                            fontFamily: "Poppins"),
-                                        onChanged: (value) {
-                                          setState(
-                                            () {
-                                              dropdownvalue = value!;
-                                              String result1 =
-                                                  dropdownvalue.replaceAll(
-                                                      RegExp(r"[(]+[0-9]+[)]"),
-                                                      '');
+                                            : ColorPalette().highlight,
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(
+                                            color: ind == 0
+                                                ? ColorPalette().topColor
+                                                : Colors.grey)),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          prevIndex = ind;
+                                          ind = 0;
+                                          showSearchField = false;
+                                          print("CURRENT INDEX $ind");
+                                          print("PREV INDEX $prevIndex");
+                                        });
+                                      },
+                                      child: ind == 0 && prevIndex != 0
+                                          ? DropdownButton(
+                                              elevation: 0,
+                                              isExpanded: true,
+                                              padding: const EdgeInsets.all(0),
+                                              underline: Container(),
+                                              onTap: () {
+                                                setState(() {
+                                                  selected = true;
+                                                  ind = 0;
+                                                });
+                                              },
+                                              items: categoryName!.map((value) {
+                                                return DropdownMenuItem(
+                                                  value: value,
+                                                  child: Text(
+                                                    value,
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                );
+                                              }).toList(),
+                                              value: dropdownvalue == ""
+                                                  ? categoryName == []
+                                                      ? ""
+                                                      : categoryName![3]
+                                                  : dropdownvalue,
+                                              style: const TextStyle(
+                                                  fontFamily: "Poppins"),
+                                              onChanged: (value) {
+                                                setState(
+                                                  () {
+                                                    dropdownvalue = value!;
+                                                    String result1 =
+                                                        dropdownvalue.replaceAll(
+                                                            RegExp(
+                                                                r"[(]+[0-9]+[)]"),
+                                                            '');
 
-                                              data = displayData!
-                                                  .where((element) =>
-                                                      element.name.contains(
-                                                          result1.trimRight()))
-                                                  .expand((element) =>
-                                                      element.data.classify())
-                                                  .toList()
-                                                ..sort((a, b) =>
-                                                    a.name.compareTo(b.name));
-                                              categorydata = data;
-                                              showSearchField = false;
-                                              categorysearch = false;
-                                            },
-                                          );
-                                        },
-                                      )
-                                    : Text(
-                                        dropdownvalue,
-                                        style: const TextStyle(
-                                            fontFamily: "Poppins"),
-                                      ),
-                              ),
-                            ),
+                                                    data = displayData!
+                                                        .where((element) => element
+                                                            .name
+                                                            .contains(result1
+                                                                .trimRight()))
+                                                        .expand((element) =>
+                                                            element.data
+                                                                .classify())
+                                                        .toList()
+                                                      ..sort((a, b) => a.name
+                                                          .compareTo(b.name));
+                                                    categorydata = data;
+                                                    showSearchField = false;
+                                                    categorysearch = false;
+                                                  },
+                                                );
+                                              },
+                                            )
+                                          : Text(
+                                              dropdownvalue,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                  fontFamily: "Poppins"),
+                                            ),
+                                    ),
+                                  )
+                                : GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        prevIndex = ind;
+                                        ind = 0;
+                                        showSearchField = false;
+                                        print("CURRENT INDEX $ind");
+                                        print("PREV INDEX $prevIndex");
+                                      });
+                                    },
+                                    child: Container(
+                                      width: 180,
+                                      height: 50,
+                                      padding: const EdgeInsets.all(10),
+                                      alignment: Alignment.centerLeft,
+                                      decoration: BoxDecoration(
+                                          color: ind == 0
+                                              ? ColorPalette().topColor
+                                              : ColorPalette().highlight,
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          border: Border.all(
+                                              color: ind == 0
+                                                  ? ColorPalette().topColor
+                                                  : Colors.grey)),
+                                      child: ind == 0 && prevIndex != 0
+                                          ? DropdownButton(
+                                              elevation: 0,
+                                              isExpanded: true,
+                                              padding: const EdgeInsets.all(0),
+                                              underline: Container(),
+                                              onTap: () {
+                                                setState(() {
+                                                  selected = true;
+                                                  ind = 0;
+                                                });
+                                              },
+                                              items: categoryName!.map((value) {
+                                                return DropdownMenuItem(
+                                                  value: value,
+                                                  child: Text(
+                                                    value,
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                );
+                                              }).toList(),
+                                              value: dropdownvalue == ""
+                                                  ? categoryName == []
+                                                      ? ""
+                                                      : categoryName![3]
+                                                  : dropdownvalue,
+                                              style: const TextStyle(
+                                                  fontFamily: "Poppins"),
+                                              onChanged: (value) {
+                                                setState(
+                                                  () {
+                                                    dropdownvalue = value!;
+                                                    String result1 =
+                                                        dropdownvalue.replaceAll(
+                                                            RegExp(
+                                                                r"[(]+[0-9]+[)]"),
+                                                            '');
+
+                                                    data = displayData!
+                                                        .where((element) => element
+                                                            .name
+                                                            .contains(result1
+                                                                .trimRight()))
+                                                        .expand((element) =>
+                                                            element.data
+                                                                .classify())
+                                                        .toList()
+                                                      ..sort((a, b) => a.name
+                                                          .compareTo(b.name));
+                                                    categorydata = data;
+                                                    showSearchField = false;
+                                                    categorysearch = false;
+                                                  },
+                                                );
+                                              },
+                                            )
+                                          : Text(
+                                              dropdownvalue,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                  fontFamily: "Poppins"),
+                                            ),
+                                    ),
+                                  ),
                             const SizedBox(width: 10),
                             GestureDetector(
                               onTap: () {
@@ -295,8 +398,7 @@ class _SeriesPageState extends State<SeriesPage>
                               },
                               child: Container(
                                 height: 50,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 5, vertical: 5),
+                                padding: const EdgeInsets.all(10),
                                 alignment: Alignment.centerLeft,
                                 decoration: BoxDecoration(
                                   color: ind == 1
@@ -326,8 +428,7 @@ class _SeriesPageState extends State<SeriesPage>
                               },
                               child: Container(
                                 height: 50,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 5, vertical: 5),
+                                padding: const EdgeInsets.all(10),
                                 alignment: Alignment.centerLeft,
                                 decoration: BoxDecoration(
                                     color: ind == 2
@@ -621,16 +722,31 @@ class _SeriesPageState extends State<SeriesPage>
                                         controller: _scrollController,
                                         data: seriesData,
                                         showSearchField: showSearchField,
+                                        onUpdateCallback: (item) {
+                                          setState(() {
+                                            print("Valueee: $item");
+                                          });
+                                        },
                                       )
                                     : SeriesCategoryPage(
                                         key: _catPage,
                                         categorydata: categorydata,
                                         showsearchfield: categorysearch,
+                                        onUpdateCallback: (item) {
+                                          setState(() {
+                                            print("Valueee: $item");
+                                          });
+                                        },
                                       )
                                 : ind == 1
                                     ? FavSeriesPage(
                                         key: _favPage,
                                         data: favData,
+                                        onUpdateCallback: (item) {
+                                          setState(() {
+                                            print("Valueee: $item");
+                                          });
+                                        },
                                       )
                                     : HistorySeriesPage(
                                         key: _hisPage,
