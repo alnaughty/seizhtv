@@ -23,10 +23,12 @@ class MovieListPage extends StatefulWidget {
       {required this.controller,
       required this.data,
       required this.showSearchField,
+      required this.onUpdateCallback,
       super.key});
   final ScrollController controller;
   final List<M3uEntry> data;
   final bool showSearchField;
+  final ValueChanged<M3uEntry> onUpdateCallback;
 
   @override
   State<MovieListPage> createState() => MovieListPageState();
@@ -257,8 +259,10 @@ class MovieListPageState extends State<MovieListPage>
                                               },
                                             );
                                             await d.addToFavorites(refId!);
+                                            widget.onUpdateCallback(d);
                                           } else {
                                             await d.removeFromFavorites(refId!);
+                                            widget.onUpdateCallback(d);
                                           }
                                           await fetchFav();
                                         },
@@ -609,9 +613,11 @@ class MovieListPageState extends State<MovieListPage>
                                                 },
                                               );
                                               await item.addToFavorites(refId!);
+                                              widget.onUpdateCallback(item);
                                             } else {
                                               await item
                                                   .removeFromFavorites(refId!);
+                                              widget.onUpdateCallback(item);
                                             }
                                             await fetchFav();
                                           },

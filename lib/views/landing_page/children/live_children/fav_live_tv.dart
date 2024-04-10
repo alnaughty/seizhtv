@@ -18,10 +18,12 @@ class FavLiveTvPage extends StatefulWidget {
       {super.key,
       required this.data,
       required this.onPressed,
+      required this.onUpdateCallback,
       this.showSearchField = false});
 
   final List<M3uEntry> data;
   final ValueChanged<M3uEntry> onPressed;
+  final ValueChanged<M3uEntry> onUpdateCallback;
   bool showSearchField;
 
   @override
@@ -197,8 +199,10 @@ class FavLiveTvPageState extends State<FavLiveTvPage>
                                     },
                                   );
                                   await item.addToFavorites(refId!);
+                                  widget.onUpdateCallback(item);
                                 } else {
                                   await item.removeFromFavorites(refId!);
+                                  widget.onUpdateCallback(item);
                                 }
                                 await fetchFav();
                               },

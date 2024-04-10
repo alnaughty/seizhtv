@@ -15,8 +15,13 @@ import '../../../../globals/video_loader.dart';
 import 'details.dart';
 
 class FaveMoviePage extends StatefulWidget {
-  FaveMoviePage({super.key, required this.data, this.showSearchField = false});
+  FaveMoviePage(
+      {super.key,
+      required this.data,
+      this.showSearchField = false,
+      required this.onUpdateCallback});
   final List<M3uEntry> data;
+  final ValueChanged<M3uEntry> onUpdateCallback;
   bool showSearchField;
 
   @override
@@ -225,8 +230,10 @@ class FaveMoviePageState extends State<FaveMoviePage>
                                       },
                                     );
                                     await item.addToFavorites(refId!);
+                                    widget.onUpdateCallback(item);
                                   } else {
                                     await item.removeFromFavorites(refId!);
+                                    widget.onUpdateCallback(item);
                                   }
                                   await fetchFav();
                                 },

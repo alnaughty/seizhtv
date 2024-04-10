@@ -61,62 +61,65 @@ class HistoryLiveTvPageState extends State<HistoryLiveTvPage>
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: _displayData.isEmpty
-          ? Center(
-              child: Text(
-                "No Result Found for `$searchText`",
-                style: TextStyle(
-                  color: Colors.white.withOpacity(.5),
-                ),
+    if (widget.data.isEmpty) {
+      return const Center(
+        child: Text("No data added to favorites"),
+      );
+    }
+    return _displayData.isEmpty
+        ? Center(
+            child: Text(
+              "No Result Found for `$searchText`",
+              style: TextStyle(
+                color: Colors.white.withOpacity(.5),
               ),
-            )
-          : GridView.builder(
-              physics: const ClampingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: calculateCrossAxisCount(context),
-                  childAspectRatio: .8,
-                  crossAxisSpacing: 10),
-              itemCount: _displayData.length,
-              itemBuilder: (context, index) {
-                final M3uEntry item = _displayData[index];
+            ),
+          )
+        : GridView.builder(
+            physics: const ClampingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: calculateCrossAxisCount(context),
+                childAspectRatio: .8,
+                crossAxisSpacing: 10),
+            itemCount: _displayData.length,
+            itemBuilder: (context, index) {
+              final M3uEntry item = _displayData[index];
 
-                return LayoutBuilder(builder: (context, c) {
-                  final double w = c.maxWidth;
-                  return GestureDetector(
-                    onTap: () {
-                      widget.onPressed(item);
-                      print("${item.existsInFavorites("live")}");
-                    },
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: NetworkImageViewer(
-                            url: item.attributes['tvg-logo'],
-                            title: "false",
-                            width: w,
-                            height: 70,
-                            color: highlight,
-                            fit: BoxFit.cover,
-                          ),
+              return LayoutBuilder(builder: (context, c) {
+                final double w = c.maxWidth;
+                return GestureDetector(
+                  onTap: () {
+                    widget.onPressed(item);
+                    print("${item.existsInFavorites("live")}");
+                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: NetworkImageViewer(
+                          url: item.attributes['tvg-logo'],
+                          title: "false",
+                          width: w,
+                          height: 70,
+                          color: highlight,
+                          fit: BoxFit.cover,
                         ),
-                        const SizedBox(height: 5),
-                        Text(
-                          item.title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(height: 1),
-                        ),
-                      ],
-                    ),
-                  );
-                });
-              }),
-    );
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        item.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(height: 1),
+                      ),
+                    ],
+                  ),
+                );
+              });
+            });
   }
 
   int calculateCrossAxisCount(BuildContext context) {

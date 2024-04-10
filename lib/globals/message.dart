@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable, avoid_print
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_vlc_player/flutter_vlc_player.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart';
@@ -45,6 +46,7 @@ class VlcPlayerWithControlsState extends State<VlcPlayerWithControls> {
   int numberOfCaptions = 0;
   double sliderValue = 0.0;
   double volumeValue = 50;
+  bool screenTap = true;
   String position = '';
   String duration = '';
 
@@ -53,6 +55,14 @@ class VlcPlayerWithControlsState extends State<VlcPlayerWithControls> {
     super.initState();
     _controller = widget.controller;
     _controller.addListener(listener);
+
+    Future.delayed(const Duration(seconds: 10), () {
+      if (mounted) {
+        setState(() {
+          screenTap = false;
+        });
+      }
+    });
   }
 
   void listener() {
@@ -61,6 +71,7 @@ class VlcPlayerWithControlsState extends State<VlcPlayerWithControls> {
     if (_controller.value.isInitialized) {
       final oPosition = _controller.value.position;
       final oDuration = _controller.value.duration;
+
       if (oDuration.inHours == 0) {
         final strPosition = oPosition.toString().split('.').first;
         final strDuration = oDuration.toString().split('.').first;
@@ -108,197 +119,219 @@ class VlcPlayerWithControlsState extends State<VlcPlayerWithControls> {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    return OrientationBuilder(
-      builder: (context, orientation) {
-        return Container(
-          width: size.width,
-          height: size.height,
-          color: Colors.black,
-          child: Stack(
-            children: [
-              Stack(
-                alignment: Alignment.bottomCenter,
-                children: <Widget>[
-                  Center(
-                    child: VlcPlayer(
-                      controller: _controller,
-                      aspectRatio: _aspectRatio,
-                      placeholder:
-                          const Center(child: CircularProgressIndicator()),
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          screenTap = !screenTap;
+          print("SCREEN ONTAP $screenTap");
+          Future.delayed(const Duration(seconds: 5), () {
+            if (mounted) {
+              setState(() {
+                screenTap = false;
+              });
+            }
+          });
+        });
+      },
+      child: OrientationBuilder(
+        builder: (context, orientation) {
+          return Container(
+            width: size.width,
+            height: size.height,
+            color: Colors.black,
+            child: Stack(
+              children: [
+                Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: <Widget>[
+                    Center(
+                      child: VlcPlayer(
+                        controller: _controller,
+                        aspectRatio: _aspectRatio,
+                        placeholder:
+                            const Center(child: CircularProgressIndicator()),
+                      ),
                     ),
-                  ),
-                  Positioned(
-                    top: _recordingPositionOffset,
-                    left: _recordingPositionOffset,
-                    child: AnimatedOpacity(
-                      opacity: recordingTextOpacity,
-                      duration: const Duration(seconds: 1),
-                      child: const Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
+                    Positioned(
+                      top: _recordingPositionOffset,
+                      left: _recordingPositionOffset,
+                      child: AnimatedOpacity(
+                        opacity: recordingTextOpacity,
+                        duration: const Duration(seconds: 1),
+                        child: const Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Icon(Icons.circle, color: Colors.red),
+                            SizedBox(width: 5),
+                            Text(
+                              'REC',
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    ControlsOverlay(controller: _controller),
+                  ],
+                ),
+                Visibility(
+                  visible: screenTap,
+                  child: Positioned(
+                    top: orientation == Orientation.landscape ? 0 : 0,
+                    left: 0,
+                    child: SizedBox(
+                      height: 50,
+                      width: size.width,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.circle, color: Colors.red),
-                          SizedBox(width: 5),
-                          Text(
-                            'REC',
-                            style: TextStyle(
+                          IconButton(
+                            onPressed: () {
+                              if (orientation == Orientation.landscape) {
+                                SystemChrome.setPreferredOrientations(
+                                    [DeviceOrientation.portraitUp]);
+                              }
+                              setState(() {
+                                widget.showControls = false;
+                              });
+                              Navigator.of(context).pop();
+                            },
+                            icon: const Icon(
+                              Icons.arrow_back_ios_new,
                               color: Colors.white,
                             ),
                           ),
+                          SizedBox(
+                              width: orientation == Orientation.landscape
+                                  ? size.width * .77
+                                  : size.width * .6),
+                          Stack(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.timer),
+                                color: Colors.white,
+                                onPressed: _cyclePlaybackSpeed,
+                              ),
+                              Positioned(
+                                bottom: _positionedBottomSpace,
+                                right: _positionedRightSpace,
+                                child: IgnorePointer(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.orange,
+                                      borderRadius: BorderRadius.circular(1),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 1,
+                                      horizontal: 2,
+                                    ),
+                                    child: Text(
+                                      '${playbackSpeeds.elementAt(playbackSpeedIndex)}x',
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.cast),
+                            color: Colors.white,
+                            onPressed: _getRendererDevices,
+                          ),
                         ],
                       ),
                     ),
                   ),
-                  ControlsOverlay(controller: _controller),
-                ],
-              ),
-              Positioned(
-                top: orientation == Orientation.landscape ? 0 : 0,
-                left: 0,
-                child: SizedBox(
-                  height: 50,
-                  width: size.width,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          if (orientation == Orientation.landscape) {
-                            SystemChrome.setPreferredOrientations(
-                                [DeviceOrientation.portraitUp]);
-                          }
-                          setState(() {
-                            widget.showControls = false;
-                          });
-                          Navigator.of(context).pop();
-                        },
-                        icon: const Icon(
-                          Icons.arrow_back_ios_new,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(
-                          width: orientation == Orientation.landscape
-                              ? size.width * .77
-                              : size.width * .6),
-                      Stack(
+                ),
+                Visibility(
+                  visible: screenTap,
+                  child: Positioned(
+                    bottom: 10,
+                    left: 0,
+                    child: SizedBox(
+                      height: 50,
+                      width: size.width,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.timer),
                             color: Colors.white,
-                            onPressed: _cyclePlaybackSpeed,
+                            icon: _controller.value.isPlaying
+                                ? const Icon(Icons.pause_circle_outline)
+                                : const Icon(Icons.play_circle_outline),
+                            onPressed: _togglePlaying,
                           ),
-                          Positioned(
-                            bottom: _positionedBottomSpace,
-                            right: _positionedRightSpace,
-                            child: IgnorePointer(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.orange,
-                                  borderRadius: BorderRadius.circular(1),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 1,
-                                  horizontal: 2,
-                                ),
-                                child: Text(
-                                  '${playbackSpeeds.elementAt(playbackSpeedIndex)}x',
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 8,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          Row(
+                            children: [
+                              Text(
+                                position,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              SizedBox(
+                                width: orientation == Orientation.landscape
+                                    ? size.width * .7
+                                    : size.width * .45,
+                                child: Slider(
+                                  activeColor: Colors.redAccent,
+                                  inactiveColor: Colors.white70,
+                                  value: sliderValue,
+                                  max: !validPosition
+                                      ? 1.0
+                                      : _controller.value.duration.inSeconds
+                                          .toDouble(),
+                                  onChanged: validPosition
+                                      ? _onSliderPositionChanged
+                                      : null,
                                 ),
                               ),
-                            ),
+                              Text(
+                                duration,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                            icon: orientation == Orientation.landscape
+                                ? const Icon(Icons.fullscreen_exit)
+                                : const Icon(Icons.fullscreen),
+                            color: Colors.white,
+                            onPressed: () {
+                              print("DEVICE ORIENTATION $orientation");
+                              if (orientation == Orientation.landscape) {
+                                SystemChrome.setPreferredOrientations(
+                                    [DeviceOrientation.portraitUp]);
+                                setState(() {
+                                  widget.showControls = true;
+                                });
+                              } else {
+                                SystemChrome.setPreferredOrientations(
+                                    [DeviceOrientation.landscapeLeft]);
+                                SystemChrome.setEnabledSystemUIMode(
+                                    SystemUiMode.immersiveSticky);
+                                setState(() {
+                                  widget.showControls = false;
+                                });
+                              }
+                            },
                           ),
                         ],
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.cast),
-                        color: Colors.white,
-                        onPressed: _getRendererDevices,
-                      ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-              Positioned(
-                bottom: 10,
-                left: 0,
-                child: SizedBox(
-                  height: 50,
-                  width: size.width,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        color: Colors.white,
-                        icon: _controller.value.isPlaying
-                            ? const Icon(Icons.pause_circle_outline)
-                            : const Icon(Icons.play_circle_outline),
-                        onPressed: _togglePlaying,
-                      ),
-                      Row(
-                        children: [
-                          Text(
-                            position,
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                          SizedBox(
-                            width: orientation == Orientation.landscape
-                                ? size.width * .7
-                                : size.width * .45,
-                            child: Slider(
-                              activeColor: Colors.redAccent,
-                              inactiveColor: Colors.white70,
-                              value: sliderValue,
-                              max: !validPosition
-                                  ? 1.0
-                                  : _controller.value.duration.inSeconds
-                                      .toDouble(),
-                              onChanged: validPosition
-                                  ? _onSliderPositionChanged
-                                  : null,
-                            ),
-                          ),
-                          Text(
-                            duration,
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ],
-                      ),
-                      IconButton(
-                        icon: orientation == Orientation.landscape
-                            ? const Icon(Icons.fullscreen_exit)
-                            : const Icon(Icons.fullscreen),
-                        color: Colors.white,
-                        onPressed: () {
-                          print("DEVICE ORIENTATION $orientation");
-                          if (orientation == Orientation.landscape) {
-                            SystemChrome.setPreferredOrientations(
-                                [DeviceOrientation.portraitUp]);
-                            setState(() {
-                              widget.showControls = true;
-                            });
-                          } else {
-                            SystemChrome.setPreferredOrientations(
-                                [DeviceOrientation.landscapeLeft]);
-                            SystemChrome.setEnabledSystemUIMode(
-                                SystemUiMode.immersiveSticky);
-                            setState(() {
-                              widget.showControls = false;
-                            });
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 

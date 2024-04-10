@@ -14,9 +14,16 @@ import '../../../../globals/loader.dart';
 import '../../../../globals/ui_additional.dart';
 
 class LiveList extends StatefulWidget {
-  const LiveList({super.key, required this.data, required this.onPressed});
+  const LiveList(
+      {super.key,
+      required this.data,
+      required this.controller,
+      required this.onPressed,
+      required this.onUpdateCallback});
   final List<M3uEntry> data;
+  final ScrollController controller;
   final ValueChanged<M3uEntry> onPressed;
+  final ValueChanged<M3uEntry> onUpdateCallback;
 
   @override
   State<LiveList> createState() => LiveListState();
@@ -102,44 +109,36 @@ class LiveListState extends State<LiveList> with ColorPalette, UIAdditional {
                     final M3uEntry item = _displayData[index];
                     print("LIVE M3U DATA: $item");
 
-                    return LayoutBuilder(builder: (context, c) {
-                      final double w = c.maxWidth;
-                      return Stack(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              widget.onPressed(item);
-                              print(item.title);
-                            },
-                            child: Container(
+                    return GestureDetector(
+                      onTap: () {
+                        widget.onPressed(item);
+                        print("ITEM TITLE: ${item.title}");
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                        child: Stack(
+                          children: [
+                            Container(
+                              // color: Colors.red,
                               margin: const EdgeInsets.only(top: 10, right: 10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
+                              child: LayoutBuilder(
+                                builder: (context, c) {
+                                  final double w = c.maxWidth;
+                                  final double h = c.maxHeight;
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(5),
                                     child: NetworkImageViewer(
-                                      url: item.attributes['tvg-logo'],
-                                      title: "false",
-                                      width: w,
-                                      height: 75,
-                                      color: highlight,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 7),
-                                  Text(
-                                    item.title,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(height: 1),
-                                  ),
-                                ],
+                                        url: item.attributes['tvg-logo'],
+                                        width: w,
+                                        height: h,
+                                        fit: BoxFit.cover,
+                                        color: highlight,
+                                        title: item.title),
+                                  );
+                                },
                               ),
                             ),
-                          ),
-                          Positioned(
+                            Positioned(
                               top: 0,
                               right: 0,
                               child: SizedBox(
@@ -196,20 +195,58 @@ class LiveListState extends State<LiveList> with ColorPalette, UIAdditional {
                                         },
                                       );
                                       await item.addToFavorites(refId!);
+                                      widget.onUpdateCallback(item);
                                     } else {
                                       await item.removeFromFavorites(refId!);
+                                      widget.onUpdateCallback(item);
                                     }
-                                    setState(() {
-                                      fetchFav();
-                                    });
                                   },
                                   initValue: item.existsInFavorites("live"),
                                   iconSize: 20,
                                 ),
-                              ))
-                        ],
-                      );
-                    });
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                    //  LayoutBuilder(builder: (context, c) {
+                    //   final double w = c.maxWidth;
+                    //   return Stack(
+                    //     children: [
+                    //       GestureDetector(
+                    //         onTap: () {
+                    // widget.onPressed(item);
+                    // print("ITEM TITLE: ${item.title}");
+                    //         },
+                    //         child: Container(
+                    //           margin: const EdgeInsets.only(top: 10, right: 10),
+                    //           // child: Column(
+                    //           //   crossAxisAlignment: CrossAxisAlignment.start,
+                    //           //   mainAxisAlignment: MainAxisAlignment.start,
+                    //           //   children: [
+                    //           //     ClipRRect(
+                    //           //       borderRadius: BorderRadius.circular(10),
+                    //           //       child: NetworkImageViewer(
+                    //           //         url: item.attributes['tvg-logo'],
+                    //           //         title: "false",
+                    //           //         width: w,
+                    //           //         height: 75,
+                    //           //         color: highlight,
+                    //           //         fit: BoxFit.cover,
+                    //           //       ),
+                    //           //     ),
+                    //           //     const SizedBox(height: 7),
+                    //           //     Text(
+                    //           //       item.title,
+                    //           //       maxLines: 2,
+                    //           //       overflow: TextOverflow.ellipsis,
+                    //           //       style: const TextStyle(height: 1),
+                    //           //     ),
+                    //           //   ],
+                    //           // ),
+                    //         ),
+                    //       ),
                   },
                 ),
         ),
@@ -223,26 +260,26 @@ class LiveListState extends State<LiveList> with ColorPalette, UIAdditional {
     return crossAxisCount < 3 ? 3 : crossAxisCount;
   }
 
-  // void _scrollListener() {
-  //   if (widget.controller.offset >=
-  //       widget.controller.position.maxScrollExtent) {
-  //     print("DUGANG!");
+  void _scrollListener() {
+    if (widget.controller.offset >=
+        widget.controller.position.maxScrollExtent) {
+      print("DUGANG!");
 
-  //     if (searchText == "") {
-  //       setState(() {
-  //         if (endIndex < widget.data.length) {
-  //           endIndex += 5;
-  //           if (endIndex > widget.data.length) {
-  //             endIndex = widget.data.length;
-  //           }
-  //         }
-  //         _displayData = List.from(widget.data.sublist(startIndex,
-  //             endIndex > widget.data.length ? widget.data.length : endIndex));
-  //         print(_displayData.length);
-  //       });
-  //       return;
-  //     }
-  //     return;
-  //   }
-  // }
+      if (searchText == "") {
+        setState(() {
+          if (endIndex < widget.data.length) {
+            endIndex += 5;
+            if (endIndex > widget.data.length) {
+              endIndex = widget.data.length;
+            }
+          }
+          _displayData = List.from(widget.data.sublist(startIndex,
+              endIndex > widget.data.length ? widget.data.length : endIndex));
+          print(_displayData.length);
+        });
+        return;
+      }
+      return;
+    }
+  }
 }

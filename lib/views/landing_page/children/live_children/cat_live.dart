@@ -16,10 +16,14 @@ import '../../../../globals/video_loader.dart';
 
 class LiveCategoryPage extends StatefulWidget {
   LiveCategoryPage(
-      {super.key, required this.categorydata, required this.showsearchfield});
+      {super.key,
+      required this.categorydata,
+      required this.showsearchfield,
+      required this.onUpdateCallback});
 
   final List<M3uEntry> categorydata;
   late bool showsearchfield;
+  final ValueChanged<M3uEntry> onUpdateCallback;
 
   @override
   State<LiveCategoryPage> createState() => LiveCategoryPageState();
@@ -328,8 +332,10 @@ class LiveCategoryPageState extends State<LiveCategoryPage>
                                         },
                                       );
                                       await item.addToFavorites(refId!);
+                                      widget.onUpdateCallback(item);
                                     } else {
                                       await item.removeFromFavorites(refId!);
+                                      widget.onUpdateCallback(item);
                                     }
                                     await fetchFav();
                                   },
